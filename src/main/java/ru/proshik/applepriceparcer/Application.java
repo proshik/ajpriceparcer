@@ -52,51 +52,48 @@ public class Application {
                 continue;
             }
 
+            String title;
+            String description = null;
+
             if (h2.getChildNodes().size() == 1) {
-                System.out.println(h2.asText());
+                title = h2.asText();
             } else {
                 DomNodeList<DomNode> childNodes = h2.getChildNodes();
-                String text = childNodes.stream()
+                title = childNodes.stream()
                         .map(DomNode::asText)
                         .filter(value -> !value.equals("\r\n"))
                         .collect(Collectors.joining(" "));
-                System.out.println(text);
             }
+            List<Item> items = new ArrayList<>();
 
-            HtmlElement ul = article.getFirstByXPath("./ul");
-            if (ul != null) {
-                Iterable<DomElement> insideLi = ul.getChildElements();
-                for (DomElement ili : insideLi) {
-                    List<HtmlSpan> spans = ili.getByXPath("./span");
-                    if (spans.isEmpty()) {
-                        if (ili.getFirstChild() != null && ili.getFirstChild().getNodeValue() != null) {
-                            System.out.println(ili.getFirstChild().asText());
-                        }
-                        continue;
+            Iterable<DomElement> insideLi = ((HtmlElement) article.getFirstByXPath("./ul")).getChildElements();
+            for (DomElement ili : insideLi) {
+                List<HtmlSpan> spans = ili.getByXPath("./span");
+                if (spans.isEmpty()) {
+                    if (ili.getFirstChild() != null && ili.getFirstChild().getNodeValue() != null) {
+                        description = ili.getFirstChild().asText();
                     }
-
-                    if (ili.getFirstChild().getNodeValue() != null) {
-                        StringBuilder value = new StringBuilder(ili.getFirstChild().getNodeValue());
-                        for (HtmlSpan span : spans) {
-                            if (span != null) {
-                                value.append(" ").append(span.asText());
-                            } else {
-                                if (ili.getFirstChild() != null && ili.getFirstChild().getNodeValue() != null) {
-                                    value.append(" ").append(ili.getFirstChild().asText());
-                                }
-                            }
-                        }
-                        System.out.println(value);
-                    } else {
-                        // TODO: 25.12.2017 тут обработать "MacBook 12", проверяя дочерние через  ili.getChildNodes()
-                        continue;
-                    }
-
+                    continue;
                 }
-                System.out.println();
+
+                BigDecimal price = null;
+                for (HtmlSpan span : spans) {
+                    try {
+                        price = new BigDecimal(span.asText().replace(" ", ""));
+                    } catch (Exception e) {
+                        System.out.println("Not found price for item=" + title);
+                    }
+                }
+
+                items.add(new Item(ili.getFirstChild().getNodeValue().replace(" — ", ""), price));
             }
+            assortment.add(new Assortment(title, description, items));
         }
 
+        //for test purpose
+        assortment.stream()
+                .flatMap(assortment1 -> assortment1.items.stream())
+                .forEach(item -> System.out.println(item.title + " " + item.price));
     }
 
     class Assortment {
@@ -110,7 +107,17 @@ public class Application {
             this.items = items;
         }
 
+        public String getTitle() {
+            return title;
+        }
 
+        public String getDescription() {
+            return description;
+        }
+
+        public List<Item> getItems() {
+            return items;
+        }
     }
 
     class Item {
