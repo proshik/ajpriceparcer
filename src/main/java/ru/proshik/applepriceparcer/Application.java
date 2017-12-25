@@ -1,13 +1,13 @@
 package ru.proshik.applepriceparcer;
 
 import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.DomElement;
-import com.gargoylesoftware.htmlunit.html.HtmlElement;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.html.HtmlSpan;
+import com.gargoylesoftware.htmlunit.html.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Application {
 
@@ -33,6 +33,8 @@ public class Application {
 
         HtmlElement ulContainer = page.getFirstByXPath("//ul[@class='container']");
 
+        List<Assortment> assortment = new ArrayList<>();
+
         Iterable<DomElement> childElements = ulContainer.getChildElements();
         for (DomElement parentElem : childElements) {
 
@@ -50,10 +52,18 @@ public class Application {
                 continue;
             }
 
-            System.out.println(h2.asText());
+            if (h2.getChildNodes().size() == 1) {
+                System.out.println(h2.asText());
+            } else {
+                DomNodeList<DomNode> childNodes = h2.getChildNodes();
+                String text = childNodes.stream()
+                        .map(DomNode::asText)
+                        .filter(value -> !value.equals("\r\n"))
+                        .collect(Collectors.joining(" "));
+                System.out.println(text);
+            }
 
             HtmlElement ul = article.getFirstByXPath("./ul");
-
             if (ul != null) {
                 Iterable<DomElement> insideLi = ul.getChildElements();
                 for (DomElement ili : insideLi) {
@@ -87,6 +97,38 @@ public class Application {
             }
         }
 
+    }
+
+    class Assortment {
+        private String title;
+        private String description;
+        private List<Item> items;
+
+        public Assortment(String title, String description, List<Item> items) {
+            this.title = title;
+            this.description = description;
+            this.items = items;
+        }
+
+
+    }
+
+    class Item {
+        private String title;
+        private BigDecimal price;
+
+        public Item(String title, BigDecimal price) {
+            this.title = title;
+            this.price = price;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public BigDecimal getPrice() {
+            return price;
+        }
     }
 
 }
