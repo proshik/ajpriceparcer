@@ -1,0 +1,12 @@
+2017-12-27 16:14:44 INFO  ConsoleApp:32 - Success run application!
+2017-12-27 16:14:44 WARN  ConsoleApp:54 - Incorrect parameters
+ru.proshik.applepriceparcer.exception.NotFoundOptionException: Option with title = -3 not found
+	at ru.proshik.applepriceparcer.service.OptionExtractor.extract(OptionExtractor.java:26)
+	at ru.proshik.applepriceparcer.ConsoleApp.Run(ConsoleApp.java:49)
+	at ru.proshik.applepriceparcer.Main.main(Main.java:7)
+2017-12-27 16:14:44 INFO  ConsoleApp:58 - Close run application!
+2017-12-27 16:14:52 WARN  ConsoleApp:54 - Incorrect parameters
+ru.proshik.applepriceparcer.exception.NotFoundOptionException: Option with title = -3 not found
+	at ru.proshik.applepriceparcer.service.OptionExtractor.extract(OptionExtractor.java:26)
+	at ru.proshik.applepriceparcer.ConsoleApp.Run(ConsoleApp.java:49)
+	at ru.proshik.applepriceparcer.Main.main(Main.java:7)

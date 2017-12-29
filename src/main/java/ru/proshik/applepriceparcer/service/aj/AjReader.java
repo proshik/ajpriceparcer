@@ -1,7 +1,9 @@
-package ru.proshik.applepriceparcer;
+package ru.proshik.applepriceparcer.service.aj;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
+import ru.proshik.applepriceparcer.model.goods.Assortment;
+import ru.proshik.applepriceparcer.model.goods.Item;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -9,15 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Application {
+public class AjReader {
 
-    public static void main(String[] args) {
-        Application app = new Application();
-
-        app.printAjPrices();
-    }
-
-    private void printAjPrices() {
+    public List<Assortment> printAjPrices() {
         WebClient client = new WebClient();
         client.getOptions().setCssEnabled(false);
         client.getOptions().setJavaScriptEnabled(false);
@@ -27,8 +23,7 @@ public class Application {
             page = client.getPage("http://aj.ru");
         } catch (IOException e) {
             System.out.println("ERROR on extract page from aj.ru");
-            e.printStackTrace();
-            return;
+            throw new RuntimeException("Error on read page from aj.ru");
         }
 
         HtmlElement ulContainer = page.getFirstByXPath("//ul[@class='container']");
@@ -84,58 +79,13 @@ public class Application {
                         System.out.println("Not found price for item=" + title);
                     }
                 }
-
-                items.add(new Item(ili.getFirstChild().getNodeValue().replace(" — ", ""), price));
+                String changedTitle = ili.getFirstChild().getNodeValue().substring(0, ili.getFirstChild().getNodeValue().length()-3);
+                items.add(new Item(changedTitle, price));
             }
             assortment.add(new Assortment(title, description, items));
         }
 
-        //for test purpose
-        assortment.stream()
-                .flatMap(assortment1 -> assortment1.items.stream())
-                .forEach(item -> System.out.println(item.title + " " + item.price));
-    }
-
-    class Assortment {
-        private String title;
-        private String description;
-        private List<Item> items;
-
-        public Assortment(String title, String description, List<Item> items) {
-            this.title = title;
-            this.description = description;
-            this.items = items;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public List<Item> getItems() {
-            return items;
-        }
-    }
-
-    class Item {
-        private String title;
-        private BigDecimal price;
-
-        public Item(String title, BigDecimal price) {
-            this.title = title;
-            this.price = price;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public BigDecimal getPrice() {
-            return price;
-        }
+        return assortment;
     }
 
 }
