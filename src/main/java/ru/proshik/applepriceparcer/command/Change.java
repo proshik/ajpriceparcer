@@ -93,17 +93,17 @@ public class Change extends Command {
                                      Map<String, List<ImmutablePair<Item, BigDecimal>>> assortmentChanges) {
 
         StringBuilder change = new StringBuilder();
-        change.append("Old date: ").append(DATE_TIME_FORMATTER.format(lastAssortmentCreatedDate)).append("\n");
-        change.append("New date: ").append(DATE_TIME_FORMATTER.format(LocalDateTime.now())).append("\n\n");
+        change.append("Date: ").append(DATE_TIME_FORMATTER.format(lastAssortmentCreatedDate)).append("\n");
+        change.append("------------------").append("\n");
 
         for (Map.Entry<String, List<ImmutablePair<Item, BigDecimal>>> entry : assortmentChanges.entrySet()) {
-            change.append("\"").append(entry.getKey()).append("\"").append("\n");
+            change.append("\n").append("*** ").append(entry.getKey()).append(" ***").append("\n");
             for (ImmutablePair<Item, BigDecimal> i : entry.getValue()) {
                 change.append(i.getLeft().getTitle()).append(": ")
                         .append(" old - ").append(i.getRight()).append("; new - ").append(i.getLeft().getPrice()).append("\n");
             }
-            change.append("\n");
         }
+        change.append("\n").append("*****************").append("\n");
 
         return change.toString();
     }

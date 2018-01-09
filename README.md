@@ -76,3 +76,13 @@ iPhone X
 iPhone X 256GB:  old - 8700; new - 87000
 ...
 ```
+
+`--only-change`
+
+Specific flag, which show only changed history.
+
+Example: 
+
+```bash
+$ java -jar apple-price-parcer-1.0-SNAPSHOT-jar-with-dependencies.jar history --only-change
+```

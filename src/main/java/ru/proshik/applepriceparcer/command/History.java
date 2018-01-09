@@ -66,7 +66,7 @@ public class History extends Command {
         StringBuilder history = new StringBuilder("History:\n");
 
         for (AjAssortment ajA : limitedAssortment) {
-            history.append(DATE_TIME_FORMATTER.format(ajA.getCreatedDate())).append("\n");
+            history.append("Date: ").append(DATE_TIME_FORMATTER.format(ajA.getCreatedDate())).append("\n");
             history.append("-----------------").append("\n");
             history.append(buildAssortmentOut(ajA.getAssortments()));
             history.append("*****************").append("\n\n");
