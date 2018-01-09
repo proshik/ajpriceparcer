@@ -49,7 +49,7 @@ public class CommandUtils {
         StringBuilder p = new StringBuilder();
 
         for (Assortment a : newAjAssortments) {
-            p.append(a.getTitle()).append("\n");
+            p.append("### ").append(a.getTitle()).append(" ###").append("\n");
             for (Item i : a.getItems()) {
                 p.append(i.getTitle()).append(" - ").append(i.getPrice()).append("\n");
             }

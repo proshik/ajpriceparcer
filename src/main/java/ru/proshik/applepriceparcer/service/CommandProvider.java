@@ -2,20 +2,20 @@ package ru.proshik.applepriceparcer.service;
 
 import ru.proshik.applepriceparcer.command.Change;
 import ru.proshik.applepriceparcer.command.Command;
+import ru.proshik.applepriceparcer.command.History;
 import ru.proshik.applepriceparcer.command.Read;
 import ru.proshik.applepriceparcer.model.Option;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CommandProvider {
 
     private static final Command READ = new Read("read", "Read aj.ru page and print result",
-            Arrays.asList(new Option("-h", "Show help")));
+            Collections.singletonList(new Option("-h", "Show help")));
     private static final Command CHANGE = new Change("change", "Show history by change prices",
-            Arrays.asList(new Option("-h", "Show help")));
+            Collections.singletonList(new Option("-h", "Show help")));
+    private static final Command HISTORY = new History("history", "Show history by the last N request. Default 5",
+            Collections.singletonList(new Option("-h", "Show help")));
 
     private List<Command> commands;
 
@@ -24,6 +24,7 @@ public class CommandProvider {
 
         commands.add(READ);
         commands.add(CHANGE);
+        commands.add(HISTORY);
 
         this.commands = commands;
     }
