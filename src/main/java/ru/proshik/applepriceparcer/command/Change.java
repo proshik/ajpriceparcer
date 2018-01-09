@@ -11,6 +11,7 @@ import ru.proshik.applepriceparcer.storage.FileStorage;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +19,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Change extends Command {
+
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
     private AjReader ajReader = new AjReader();
     private FileStorage fileStorage = new FileStorage();
@@ -38,22 +41,27 @@ public class Change extends Command {
         List<AjAssortment> ajAssortments = fileStorage.read();
 
         if (!ajAssortments.isEmpty()) {
+            // get last assortments for compare
+            AjAssortment lastAssortment = CommandUtils.getLastAssortment(ajAssortments);
+            // searching changes in assortments
             Map<String, List<ImmutablePair<Item, BigDecimal>>> assortmentChanges =
-                    getAssortmentChanges(newAjAssortments, CommandUtils.getLastAssortment(ajAssortments).getAssortments());
+                    buildAssortmentChanges(newAjAssortments, lastAssortment.getAssortments());
+            // if changes from last date regarding this moment was found then save new assortment and print diff
             if (!assortmentChanges.isEmpty()) {
                 fileStorage.save(new AjAssortment(LocalDateTime.now(), newAjAssortments));
 
-                System.out.println(buildChangesString(assortmentChanges));
+                System.out.println(buildChangesString(lastAssortment.getCreatedDate(), assortmentChanges));
+            } else {
+                System.out.println("Change NOT was found");
             }
         } else {
             fileStorage.save(new AjAssortment(LocalDateTime.now(), newAjAssortments));
+            System.out.println("Values was saved in first time");
         }
-
-        System.out.println("Change NOT was found");
     }
 
-    private Map<String, List<ImmutablePair<Item, BigDecimal>>> getAssortmentChanges(List<Assortment> newAjAssortments,
-                                                                                    List<Assortment> lastAssortments) {
+    private Map<String, List<ImmutablePair<Item, BigDecimal>>> buildAssortmentChanges(List<Assortment> newAjAssortments,
+                                                                                      List<Assortment> lastAssortments) {
         Map<ImmutablePair<String, String>, Item> savedAssortments = lastAssortments.stream()
                 .flatMap(assortment -> assortment.getItems().stream().map(item -> new ImmutablePair<>(assortment, item)))
                 .collect(Collectors.toMap(o -> new ImmutablePair<>(o.left.getTitle(), o.right.getTitle()), ImmutablePair::getRight));
@@ -79,11 +87,15 @@ public class Change extends Command {
         return foundChanges;
     }
 
-    private String buildChangesString(Map<String, List<ImmutablePair<Item, BigDecimal>>> assortmentChanges) {
+    private String buildChangesString(LocalDateTime lastAssortmentcreatedDate,
+                                      Map<String, List<ImmutablePair<Item, BigDecimal>>> assortmentChanges) {
+
         StringBuilder change = new StringBuilder("Change WAS FOUND!\n");
+        change.append("Old date: ").append(DATE_TIME_FORMATTER.format(lastAssortmentcreatedDate)).append("\n");
+        change.append("New date: ").append(DATE_TIME_FORMATTER.format(LocalDateTime.now())).append("\n\n");
 
         for (Map.Entry<String, List<ImmutablePair<Item, BigDecimal>>> entry : assortmentChanges.entrySet()) {
-            change.append(entry.getKey()).append("\n");
+            change.append("\"").append(entry.getKey()).append("\"").append("\n");
             for (ImmutablePair<Item, BigDecimal> i : entry.getValue()) {
                 change.append(i.getLeft().getTitle()).append(": ")
                         .append(" old - ").append(i.getRight()).append("; new - ").append(i.getLeft().getPrice()).append("\n");
