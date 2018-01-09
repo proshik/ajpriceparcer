@@ -50,9 +50,10 @@ public class Change extends Command {
             if (!assortmentChanges.isEmpty()) {
                 fileStorage.save(new AjAssortment(LocalDateTime.now(), newAjAssortments));
 
+                System.out.println("Change WAS FOUND!");
                 System.out.println(buildChangesString(lastAssortment.getCreatedDate(), assortmentChanges));
             } else {
-                System.out.println("Change NOT was found");
+                System.out.println("Change NOT was found!");
             }
         } else {
             fileStorage.save(new AjAssortment(LocalDateTime.now(), newAjAssortments));
@@ -60,10 +61,11 @@ public class Change extends Command {
         }
     }
 
-    private Map<String, List<ImmutablePair<Item, BigDecimal>>> buildAssortmentChanges(List<Assortment> newAjAssortments,
-                                                                                      List<Assortment> lastAssortments) {
+    static Map<String, List<ImmutablePair<Item, BigDecimal>>> buildAssortmentChanges(List<Assortment> newAjAssortments,
+                                                                                     List<Assortment> lastAssortments) {
         Map<ImmutablePair<String, String>, Item> savedAssortments = lastAssortments.stream()
-                .flatMap(assortment -> assortment.getItems().stream().map(item -> new ImmutablePair<>(assortment, item)))
+                .flatMap(assortment -> assortment.getItems().stream()
+                        .map(item -> new ImmutablePair<>(assortment, item)))
                 .collect(Collectors.toMap(o -> new ImmutablePair<>(o.left.getTitle(), o.right.getTitle()), ImmutablePair::getRight));
 
         Map<String, List<ImmutablePair<Item, BigDecimal>>> foundChanges = new HashMap<>();
@@ -87,11 +89,11 @@ public class Change extends Command {
         return foundChanges;
     }
 
-    private String buildChangesString(LocalDateTime lastAssortmentcreatedDate,
-                                      Map<String, List<ImmutablePair<Item, BigDecimal>>> assortmentChanges) {
+    static String buildChangesString(LocalDateTime lastAssortmentCreatedDate,
+                                     Map<String, List<ImmutablePair<Item, BigDecimal>>> assortmentChanges) {
 
-        StringBuilder change = new StringBuilder("Change WAS FOUND!\n");
-        change.append("Old date: ").append(DATE_TIME_FORMATTER.format(lastAssortmentcreatedDate)).append("\n");
+        StringBuilder change = new StringBuilder();
+        change.append("Old date: ").append(DATE_TIME_FORMATTER.format(lastAssortmentCreatedDate)).append("\n");
         change.append("New date: ").append(DATE_TIME_FORMATTER.format(LocalDateTime.now())).append("\n\n");
 
         for (Map.Entry<String, List<ImmutablePair<Item, BigDecimal>>> entry : assortmentChanges.entrySet()) {

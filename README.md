@@ -62,3 +62,17 @@ else only:
 ```
 Change NOT was found
 ```
+
+### history ##
+```bash
+$ java -jar apple-price-parcer-1.0-SNAPSHOT-jar-with-dependencies.jar history
+```
+
+If was history by 5 last changes:
+
+```
+Change WAS FOUND!
+iPhone X
+iPhone X 256GB:  old - 8700; new - 87000
+...
+```

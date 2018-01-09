@@ -15,7 +15,7 @@ public class CommandProvider {
     private static final Command CHANGE = new Change("change", "Show history by change prices",
             Collections.singletonList(new Option("-h", "Show help")));
     private static final Command HISTORY = new History("history", "Show history by the last N request. Default 5",
-            Collections.singletonList(new Option("-h", "Show help")));
+            Arrays.asList(new Option("-h", "Show help"), new Option("--only-change", "Show history only changes")));
 
     private List<Command> commands;
 

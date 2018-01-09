@@ -1,13 +1,19 @@
 package ru.proshik.applepriceparcer.command;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import ru.proshik.applepriceparcer.model.Option;
 import ru.proshik.applepriceparcer.model.goods.AjAssortment;
+import ru.proshik.applepriceparcer.model.goods.Item;
 import ru.proshik.applepriceparcer.storage.FileStorage;
 
+import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import static ru.proshik.applepriceparcer.command.Change.buildAssortmentChanges;
+import static ru.proshik.applepriceparcer.command.Change.buildChangesString;
 import static ru.proshik.applepriceparcer.command.utils.CommandUtils.buildAssortmentOut;
 
 public class History extends Command {
@@ -29,21 +35,34 @@ public class History extends Command {
         }
 
         List<AjAssortment> ajAssortments = fileStorage.read();
-
         if (ajAssortments.isEmpty()) {
             System.out.println("Not found not one assortment. Use command 'read'");
             return;
         }
 
-        List<AjAssortment> limitedAssortment = ajAssortments.stream()
+        List<AjAssortment> lAssort = ajAssortments.stream()
                 .sorted((o1, o2) -> o2.getCreatedDate().compareTo(o1.getCreatedDate()))
                 .limit(DEFAULT_COUNT)
                 .collect(Collectors.toList());
 
-        printHistory(limitedAssortment);
+        if (option != null && option.getTitle().equals("--only-change")) {
+            StringBuilder history = new StringBuilder("History changes:\n");
+
+            for (int i = 0; i < lAssort.size(); i++) {
+                if (i < lAssort.size() - 1) {
+                    Map<String, List<ImmutablePair<Item, BigDecimal>>> changes =
+                            buildAssortmentChanges(lAssort.get(i).getAssortments(), lAssort.get(i + 1).getAssortments());
+                    history.append(buildChangesString(lAssort.get(i).getCreatedDate(), changes)).append("\n");
+                }
+            }
+
+            System.out.println(history);
+        } else {
+            printSimpleHistory(lAssort);
+        }
     }
 
-    private void printHistory(List<AjAssortment> limitedAssortment) {
+    private void printSimpleHistory(List<AjAssortment> limitedAssortment) {
         StringBuilder history = new StringBuilder("History:\n");
 
         for (AjAssortment ajA : limitedAssortment) {

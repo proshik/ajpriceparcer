@@ -10,3 +10,8 @@ ru.proshik.applepriceparcer.exception.NotFoundOptionException: Option with title
 	at ru.proshik.applepriceparcer.service.OptionExtractor.extract(OptionExtractor.java:26)
 	at ru.proshik.applepriceparcer.ConsoleApp.Run(ConsoleApp.java:49)
 	at ru.proshik.applepriceparcer.Main.main(Main.java:7)
+2018-01-09 17:22:14 WARN  ConsoleApp:53 - Incorrect parameters
+ru.proshik.applepriceparcer.exception.NotFoundOptionException: Option with title = --only-change not found
+	at ru.proshik.applepriceparcer.service.OptionExtractor.extract(OptionExtractor.java:26)
+	at ru.proshik.applepriceparcer.ConsoleApp.Run(ConsoleApp.java:48)
+	at ru.proshik.applepriceparcer.Main.main(Main.java:7)
