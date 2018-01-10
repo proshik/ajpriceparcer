@@ -52,7 +52,7 @@ public class History extends Command {
                 if (i < lAssort.size() - 1) {
                     Map<String, List<ImmutablePair<Item, BigDecimal>>> changes =
                             buildAssortmentChanges(lAssort.get(i).getAssortments(), lAssort.get(i + 1).getAssortments());
-                    history.append(buildChangesString(lAssort.get(i).getCreatedDate(), changes)).append("\n");
+                    history.append(buildChangesString(lAssort.get(i).getCreatedDate(), lAssort.get(i + 1).getCreatedDate(), changes)).append("\n");
                 }
             }
 

@@ -108,4 +108,23 @@ public class Change extends Command {
         return change.toString();
     }
 
+    static String buildChangesString(LocalDateTime lastAssortmentCreatedDate, LocalDateTime newAssortmentCreatedDate,
+                                     Map<String, List<ImmutablePair<Item, BigDecimal>>> assortmentChanges) {
+        StringBuilder change = new StringBuilder();
+        change.append("Last price from: ").append(DATE_TIME_FORMATTER.format(lastAssortmentCreatedDate)).append("\n");
+        change.append("Old price from: ").append(DATE_TIME_FORMATTER.format(newAssortmentCreatedDate)).append("\n");
+        change.append("------------------").append("\n");
+
+        for (Map.Entry<String, List<ImmutablePair<Item, BigDecimal>>> entry : assortmentChanges.entrySet()) {
+            change.append("\n").append("*** ").append(entry.getKey()).append(" ***").append("\n");
+            for (ImmutablePair<Item, BigDecimal> i : entry.getValue()) {
+                change.append(i.getLeft().getTitle()).append(": ")
+                        .append(" old - ").append(i.getRight()).append("; new - ").append(i.getLeft().getPrice()).append("\n");
+            }
+        }
+        change.append("\n").append("*****************").append("\n");
+
+        return change.toString();
+    }
+
 }

@@ -7,7 +7,7 @@ Info stored in $HOME/.app
 ## Build and run ##
 
 ```bash
-$ mvn clean instal -U
+$ mvn package
 $ cd target
 $ java -jar apple-price-parcer-1.0-SNAPSHOT-jar-with-dependencies.jar
 ```
