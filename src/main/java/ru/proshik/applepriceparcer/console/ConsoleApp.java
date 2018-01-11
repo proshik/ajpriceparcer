@@ -1,14 +1,14 @@
-package ru.proshik.applepriceparcer;
+package ru.proshik.applepriceparcer.console;
 
 import org.apache.log4j.Logger;
-import ru.proshik.applepriceparcer.command.Command;
-import ru.proshik.applepriceparcer.exception.NotFoundParameterException;
-import ru.proshik.applepriceparcer.command.model.CommandLineParameters;
-import ru.proshik.applepriceparcer.command.model.Option;
-import ru.proshik.applepriceparcer.service.ArgsParser;
-import ru.proshik.applepriceparcer.service.CommandExtractor;
-import ru.proshik.applepriceparcer.provider.CommandProvider;
-import ru.proshik.applepriceparcer.service.OptionExtractor;
+import ru.proshik.applepriceparcer.console.command.Command;
+import ru.proshik.applepriceparcer.console.command.model.CommandLineParameters;
+import ru.proshik.applepriceparcer.console.command.model.Option;
+import ru.proshik.applepriceparcer.console.command.provider.CommandProvider;
+import ru.proshik.applepriceparcer.console.exception.NotFoundParameterException;
+import ru.proshik.applepriceparcer.console.service.ArgsParser;
+import ru.proshik.applepriceparcer.console.service.CommandExtractor;
+import ru.proshik.applepriceparcer.console.service.OptionExtractor;
 
 public class ConsoleApp {
 

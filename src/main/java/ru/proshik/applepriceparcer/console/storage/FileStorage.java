@@ -1,11 +1,11 @@
-package ru.proshik.applepriceparcer.storage;
+package ru.proshik.applepriceparcer.console.storage;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
-import ru.proshik.applepriceparcer.exception.SystemErrorException;
-import ru.proshik.applepriceparcer.command.model.goods.AjAssortment;
+import ru.proshik.applepriceparcer.console.exception.SystemErrorException;
+import ru.proshik.applepriceparcer.console.command.model.goods.AjAssortment;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

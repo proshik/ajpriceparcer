@@ -1,4 +1,4 @@
-package ru.proshik.applepriceparcer.exception;
+package ru.proshik.applepriceparcer.console.exception;
 
 public class NotFoundOptionException extends NotFoundParameterException {
 

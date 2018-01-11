@@ -1,10 +1,10 @@
-package ru.proshik.applepriceparcer.provider;
+package ru.proshik.applepriceparcer.console.command.provider;
 
-import ru.proshik.applepriceparcer.command.Change;
-import ru.proshik.applepriceparcer.command.Command;
-import ru.proshik.applepriceparcer.command.History;
-import ru.proshik.applepriceparcer.command.Read;
-import ru.proshik.applepriceparcer.command.model.Option;
+import ru.proshik.applepriceparcer.console.command.Change;
+import ru.proshik.applepriceparcer.console.command.Command;
+import ru.proshik.applepriceparcer.console.command.History;
+import ru.proshik.applepriceparcer.console.command.Read;
+import ru.proshik.applepriceparcer.console.command.model.Option;
 
 import java.util.*;
 

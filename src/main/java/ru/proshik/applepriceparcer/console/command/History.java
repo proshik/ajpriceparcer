@@ -1,10 +1,10 @@
-package ru.proshik.applepriceparcer.command;
+package ru.proshik.applepriceparcer.console.command;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import ru.proshik.applepriceparcer.command.model.Option;
-import ru.proshik.applepriceparcer.command.model.goods.AjAssortment;
-import ru.proshik.applepriceparcer.command.model.goods.Item;
-import ru.proshik.applepriceparcer.storage.FileStorage;
+import ru.proshik.applepriceparcer.console.command.model.Option;
+import ru.proshik.applepriceparcer.console.command.model.goods.AjAssortment;
+import ru.proshik.applepriceparcer.console.command.model.goods.Item;
+import ru.proshik.applepriceparcer.console.storage.FileStorage;
 
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static ru.proshik.applepriceparcer.command.Change.buildAssortmentChanges;
-import static ru.proshik.applepriceparcer.command.Change.buildChangesString;
-import static ru.proshik.applepriceparcer.command.utils.CommandUtils.buildAssortmentOut;
+import static ru.proshik.applepriceparcer.console.command.Change.buildAssortmentChanges;
+import static ru.proshik.applepriceparcer.console.command.Change.buildChangesString;
+import static ru.proshik.applepriceparcer.console.command.utils.CommandUtils.buildAssortmentOut;
 
 public class History extends Command {
 

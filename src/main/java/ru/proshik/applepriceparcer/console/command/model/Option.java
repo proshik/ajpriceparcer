@@ -1,4 +1,4 @@
-package ru.proshik.applepriceparcer.command.model;
+package ru.proshik.applepriceparcer.console.command.model;
 
 public class Option {
 

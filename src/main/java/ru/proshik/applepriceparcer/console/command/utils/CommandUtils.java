@@ -1,8 +1,8 @@
-package ru.proshik.applepriceparcer.command.utils;
+package ru.proshik.applepriceparcer.console.command.utils;
 
-import ru.proshik.applepriceparcer.command.model.goods.AjAssortment;
-import ru.proshik.applepriceparcer.command.model.goods.Assortment;
-import ru.proshik.applepriceparcer.command.model.goods.Item;
+import ru.proshik.applepriceparcer.console.command.model.goods.AjAssortment;
+import ru.proshik.applepriceparcer.console.command.model.goods.Assortment;
+import ru.proshik.applepriceparcer.console.command.model.goods.Item;
 
 import java.math.BigDecimal;
 import java.util.Comparator;

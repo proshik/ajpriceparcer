@@ -1,8 +1,8 @@
-package ru.proshik.applepriceparcer.service;
+package ru.proshik.applepriceparcer.console.service;
 
-import ru.proshik.applepriceparcer.command.Command;
-import ru.proshik.applepriceparcer.exception.NotFoundCommandException;
-import ru.proshik.applepriceparcer.provider.CommandProvider;
+import ru.proshik.applepriceparcer.console.command.Command;
+import ru.proshik.applepriceparcer.console.exception.NotFoundCommandException;
+import ru.proshik.applepriceparcer.console.command.provider.CommandProvider;
 
 import java.util.List;
 

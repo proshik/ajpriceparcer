@@ -1,4 +1,4 @@
-package ru.proshik.applepriceparcer.command.model.goods;
+package ru.proshik.applepriceparcer.console.command.model.goods;
 
 import java.util.List;
 import java.util.Objects;

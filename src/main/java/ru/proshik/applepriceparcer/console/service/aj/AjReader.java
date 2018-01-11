@@ -1,9 +1,9 @@
-package ru.proshik.applepriceparcer.service.aj;
+package ru.proshik.applepriceparcer.console.service.aj;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
-import ru.proshik.applepriceparcer.command.model.goods.Assortment;
-import ru.proshik.applepriceparcer.command.model.goods.Item;
+import ru.proshik.applepriceparcer.console.command.model.goods.Assortment;
+import ru.proshik.applepriceparcer.console.command.model.goods.Item;
 
 import java.io.IOException;
 import java.math.BigDecimal;

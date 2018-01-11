@@ -1,13 +1,13 @@
-package ru.proshik.applepriceparcer.command;
+package ru.proshik.applepriceparcer.console.command;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import ru.proshik.applepriceparcer.command.utils.CommandUtils;
-import ru.proshik.applepriceparcer.command.model.Option;
-import ru.proshik.applepriceparcer.command.model.goods.AjAssortment;
-import ru.proshik.applepriceparcer.command.model.goods.Assortment;
-import ru.proshik.applepriceparcer.command.model.goods.Item;
-import ru.proshik.applepriceparcer.service.aj.AjReader;
-import ru.proshik.applepriceparcer.storage.FileStorage;
+import ru.proshik.applepriceparcer.console.command.utils.CommandUtils;
+import ru.proshik.applepriceparcer.console.command.model.Option;
+import ru.proshik.applepriceparcer.console.command.model.goods.AjAssortment;
+import ru.proshik.applepriceparcer.console.command.model.goods.Assortment;
+import ru.proshik.applepriceparcer.console.command.model.goods.Item;
+import ru.proshik.applepriceparcer.console.service.aj.AjReader;
+import ru.proshik.applepriceparcer.console.storage.FileStorage;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
