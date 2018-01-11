@@ -1,6 +1,6 @@
 package ru.proshik.applepriceparcer.service;
 
-import ru.proshik.applepriceparcer.model.CommandLineParameters;
+import ru.proshik.applepriceparcer.command.model.CommandLineParameters;
 
 public class ArgsParser {
 

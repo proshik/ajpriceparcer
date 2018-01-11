@@ -1,7 +1,7 @@
 package ru.proshik.applepriceparcer.command;
 
 import ru.proshik.applepriceparcer.ConsoleApp;
-import ru.proshik.applepriceparcer.model.Option;
+import ru.proshik.applepriceparcer.command.model.Option;
 
 import java.util.List;
 

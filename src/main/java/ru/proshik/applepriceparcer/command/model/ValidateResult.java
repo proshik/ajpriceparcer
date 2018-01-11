@@ -1,4 +1,4 @@
-package ru.proshik.applepriceparcer.model;
+package ru.proshik.applepriceparcer.command.model;
 
 public class ValidateResult {
 

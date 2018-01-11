@@ -1,4 +1,4 @@
-package ru.proshik.applepriceparcer.model.goods;
+package ru.proshik.applepriceparcer.command.model.goods;
 
 import java.math.BigDecimal;
 import java.util.Objects;

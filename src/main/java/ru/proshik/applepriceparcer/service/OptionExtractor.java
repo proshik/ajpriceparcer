@@ -1,10 +1,9 @@
 package ru.proshik.applepriceparcer.service;
 
 import org.apache.log4j.Logger;
-import ru.proshik.applepriceparcer.ConsoleApp;
 import ru.proshik.applepriceparcer.command.Command;
 import ru.proshik.applepriceparcer.exception.NotFoundOptionException;
-import ru.proshik.applepriceparcer.model.Option;
+import ru.proshik.applepriceparcer.command.model.Option;
 
 public class OptionExtractor {
 

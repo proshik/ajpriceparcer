@@ -2,6 +2,7 @@ package ru.proshik.applepriceparcer.service;
 
 import ru.proshik.applepriceparcer.command.Command;
 import ru.proshik.applepriceparcer.exception.NotFoundCommandException;
+import ru.proshik.applepriceparcer.provider.CommandProvider;
 
 import java.util.List;
 

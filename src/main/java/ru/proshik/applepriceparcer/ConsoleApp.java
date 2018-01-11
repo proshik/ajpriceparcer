@@ -3,11 +3,11 @@ package ru.proshik.applepriceparcer;
 import org.apache.log4j.Logger;
 import ru.proshik.applepriceparcer.command.Command;
 import ru.proshik.applepriceparcer.exception.NotFoundParameterException;
-import ru.proshik.applepriceparcer.model.CommandLineParameters;
-import ru.proshik.applepriceparcer.model.Option;
+import ru.proshik.applepriceparcer.command.model.CommandLineParameters;
+import ru.proshik.applepriceparcer.command.model.Option;
 import ru.proshik.applepriceparcer.service.ArgsParser;
 import ru.proshik.applepriceparcer.service.CommandExtractor;
-import ru.proshik.applepriceparcer.service.CommandProvider;
+import ru.proshik.applepriceparcer.provider.CommandProvider;
 import ru.proshik.applepriceparcer.service.OptionExtractor;
 
 public class ConsoleApp {

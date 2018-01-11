@@ -2,10 +2,10 @@ package ru.proshik.applepriceparcer.command;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import ru.proshik.applepriceparcer.command.utils.CommandUtils;
-import ru.proshik.applepriceparcer.model.Option;
-import ru.proshik.applepriceparcer.model.goods.AjAssortment;
-import ru.proshik.applepriceparcer.model.goods.Assortment;
-import ru.proshik.applepriceparcer.model.goods.Item;
+import ru.proshik.applepriceparcer.command.model.Option;
+import ru.proshik.applepriceparcer.command.model.goods.AjAssortment;
+import ru.proshik.applepriceparcer.command.model.goods.Assortment;
+import ru.proshik.applepriceparcer.command.model.goods.Item;
 import ru.proshik.applepriceparcer.service.aj.AjReader;
 import ru.proshik.applepriceparcer.storage.FileStorage;
 
