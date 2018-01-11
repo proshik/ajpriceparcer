@@ -1,40 +1,53 @@
-package ru.proshik.applepriceparcer.console.service.aj;
+package ru.proshik.applepriceparcer.provider.screener.aj;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
-import ru.proshik.applepriceparcer.console.command.model.goods.Assortment;
-import ru.proshik.applepriceparcer.console.command.model.goods.Item;
+import org.apache.log4j.Logger;
+import ru.proshik.applepriceparcer.provider.model.*;
+import ru.proshik.applepriceparcer.provider.screener.Screener;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class AjReader {
+public class AjScreener implements Screener {
 
-    public List<Assortment> printAjPrices() {
+    private static final Logger LOG = Logger.getLogger(AjScreener.class);
+
+    private static final String URL = "http://aj.ru";
+
+    @Override
+    public Shop supplier() {
+        return new Shop("AJ", URL);
+    }
+
+    @Override
+    public Assortment screening() {
         WebClient client = new WebClient();
         client.getOptions().setCssEnabled(false);
         client.getOptions().setJavaScriptEnabled(false);
 
         HtmlPage page;
         try {
-            page = client.getPage("http://aj.ru");
+            page = client.getPage(URL);
         } catch (IOException e) {
-            System.out.println("ERROR on extract page from aj.ru");
+            LOG.error("ERROR on extract page from aj.ru");
             throw new RuntimeException("Error on read page from aj.ru");
         }
 
         HtmlElement ulContainer = page.getFirstByXPath("//ul[@class='container']");
 
-        List<Assortment> assortment = new ArrayList<>();
+        List<Product> products = new ArrayList<>();
 
         Iterable<DomElement> childElements = ulContainer.getChildElements();
         for (DomElement parentElem : childElements) {
 
             HtmlElement article = parentElem.getFirstByXPath("./article");
 
+            // TODO: 11.01.2018 saparate logic by extract data by type
             String aClass = article.getAttribute("class");
             if (!aClass.contains("iphone")) {
                 continue;
@@ -59,6 +72,7 @@ public class AjReader {
                         .filter(value -> !value.equals("\r\n"))
                         .collect(Collectors.joining(" "));
             }
+
             List<Item> items = new ArrayList<>();
 
             Iterable<DomElement> insideLi = ((HtmlElement) article.getFirstByXPath("./ul")).getChildElements();
@@ -76,16 +90,30 @@ public class AjReader {
                     try {
                         price = new BigDecimal(span.asText().replace(" ", ""));
                     } catch (Exception e) {
-                        System.out.println("Not found price for item=" + title);
+                        LOG.error("Not found price for item=" + title);
                     }
                 }
-                String changedTitle = ili.getFirstChild().getNodeValue().substring(0, ili.getFirstChild().getNodeValue().length()-3);
+                String changedTitle = ili.getFirstChild().getNodeValue().substring(0, ili.getFirstChild().getNodeValue().length() - 3);
                 items.add(new Item(changedTitle, price));
             }
-            assortment.add(new Assortment(title, description, items));
+            products.add(new Product(title, ProductType.IPHONE, description, items));
         }
 
-        return assortment;
+        return new Assortment(LocalDateTime.now(), products);
+    }
+
+    public static String buildAssortmentOut(Assortment assortment) {
+        StringBuilder out = new StringBuilder("Date: " + assortment.getCreatedDate().toString() + "\n");
+
+        for (Product p : assortment.getProducts()) {
+            out.append("### ").append(p.getTitle()).append(" ###").append("\n");
+            for (Item i : p.getItems()) {
+                out.append(i.getTitle()).append(" - ").append(i.getPrice()).append("\n");
+            }
+            out.append("\r\n");
+        }
+
+        return out.toString();
     }
 
 }

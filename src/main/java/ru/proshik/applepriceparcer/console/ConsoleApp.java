@@ -23,7 +23,7 @@ public class ConsoleApp {
     private CommandExtractor commandExtractor = new CommandExtractor(commandProvider);
     private OptionExtractor optionExtractor = new OptionExtractor();
 
-    ConsoleApp(String[] args) {
+    public ConsoleApp(String[] args) {
         this.args = args;
     }
 
