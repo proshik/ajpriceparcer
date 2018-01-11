@@ -6,6 +6,7 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.proshik.applepriceparcer.provider.ProviderFactory;
 import ru.proshik.applepriceparcer.provider.ProviderUtils;
+import ru.proshik.applepriceparcer.storage.Database;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -15,7 +16,10 @@ public class ApplePricePriceBot extends TelegramLongPollingBot {
     private final String botUsername;
     private final String botToken;
 
-    public ApplePricePriceBot(String botUsername, String botToken) {
+    private final Database db;
+
+    public ApplePricePriceBot(Database db, String botUsername, String botToken) {
+        this.db = db;
         this.botUsername = botUsername;
         this.botToken = botToken;
     }

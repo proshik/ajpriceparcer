@@ -5,11 +5,13 @@ import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.proshik.applepriceparcer.bot.ApplePricePriceBot;
+import ru.proshik.applepriceparcer.storage.Database;
 
 public class Application {
 
     private static final String TELEGRAM_USERNAME = "APPLEPRICEPARCER_TELEGRAMUSERNAME";
     private static final String TELEGRAM_TOKEN = "APPLEPRICEPARCER_TELEGRAMTOKEN";
+    private static final String DB_PATH = "APPLEPRICEPARCER_DBPATH";
 
     public static void main(String[] args) {
         Application application = new Application();
@@ -18,20 +20,27 @@ public class Application {
 
     private void Run() {
         // read environment variables
-        String telegramUsername = System.getenv(TELEGRAM_USERNAME);
-        checkEnvironmentVariabe(telegramUsername);
+        String telegramUsername = readSystemEnv(TELEGRAM_USERNAME);
+        String telegramToken = readSystemEnv(TELEGRAM_TOKEN);
+        String dbPath = readSystemEnv(DB_PATH);
 
-        String telegramToken = System.getenv(TELEGRAM_TOKEN);
-        checkEnvironmentVariabe(telegramToken);
+        Database db = new Database(dbPath);
+        db.init();
 
         // Bot initialization
         ApiContextInitializer.init();
         TelegramBotsApi botsApi = new TelegramBotsApi();
         try {
-            botsApi.registerBot(new ApplePricePriceBot(telegramUsername, telegramToken));
+            botsApi.registerBot(new ApplePricePriceBot(db, telegramUsername, telegramToken));
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
+    }
+
+    private String readSystemEnv(String telegramUsername) {
+        String value = System.getenv(telegramUsername);
+        checkEnvironmentVariabe(value);
+        return value;
     }
 
     private void checkEnvironmentVariabe(String telegramUsername) {
