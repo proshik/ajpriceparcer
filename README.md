@@ -1,5 +1,7 @@
 # aj.ru iPhone price parser #
 
+!!! NOT ACTUAL. The process to develop telegram bot was starting.
+
 Parser for aj.ru
 
 Info stored in $HOME/.app
