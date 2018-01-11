@@ -41,7 +41,7 @@ public class CommandUtils {
 //                .orElseThrow(() -> new IllegalArgumentException("Must be at least one element"));
 //    }
 //
-//    public static String buildAssortmentOut(List<Assortment> newAjAssortments) {
+//    public static String buildAssortmentString(List<Assortment> newAjAssortments) {
 //        StringBuilder p = new StringBuilder();
 //
 //        for (Assortment a : newAjAssortments) {

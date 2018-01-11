@@ -8,7 +8,7 @@ import ru.proshik.applepriceparcer.console.storage.FileStorage;
 import java.time.LocalDateTime;
 import java.util.List;
 
-//import static ru.proshik.applepriceparcer.console.command.utils.CommandUtils.buildAssortmentOut;
+//import static ru.proshik.applepriceparcer.console.command.utils.CommandUtils.buildAssortmentString;
 
 public class Read extends Command {
 
@@ -40,7 +40,7 @@ public class Read extends Command {
 //            fileStorage.save(new AjAssortment(LocalDateTime.now(), newAjAssortments));
 //        }
 //
-//        System.out.println(buildAssortmentOut(newAjAssortments));
+//        System.out.println(buildAssortmentString(newAjAssortments));
     }
 
 }

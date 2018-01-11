@@ -102,18 +102,5 @@ public class AjScreener implements Screener {
         return new Assortment(LocalDateTime.now(), products);
     }
 
-    public static String buildAssortmentOut(Assortment assortment) {
-        StringBuilder out = new StringBuilder("Date: " + assortment.getCreatedDate().toString() + "\n");
-
-        for (Product p : assortment.getProducts()) {
-            out.append("### ").append(p.getTitle()).append(" ###").append("\n");
-            for (Item i : p.getItems()) {
-                out.append(i.getTitle()).append(" - ").append(i.getPrice()).append("\n");
-            }
-            out.append("\r\n");
-        }
-
-        return out.toString();
-    }
 
 }

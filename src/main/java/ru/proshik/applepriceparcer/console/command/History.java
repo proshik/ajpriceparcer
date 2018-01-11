@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 //import static ru.proshik.applepriceparcer.console.command.Change.buildAssortmentChanges;
 //import static ru.proshik.applepriceparcer.console.command.Change.buildChangesString;
-//import static ru.proshik.applepriceparcer.console.command.utils.CommandUtils.buildAssortmentOut;
+//import static ru.proshik.applepriceparcer.console.command.utils.CommandUtils.buildAssortmentString;
 
 public class History extends Command {
 
@@ -66,7 +66,7 @@ public class History extends Command {
 //        for (AjAssortment ajA : limitedAssortment) {
 //            history.append("Date: ").append(DATE_TIME_FORMATTER.format(ajA.getCreatedDate())).append("\n");
 //            history.append("-----------------").append("\n");
-//            history.append(buildAssortmentOut(ajA.getAssortments()));
+//            history.append(buildAssortmentString(ajA.getAssortments()));
 //            history.append("*****************").append("\n\n");
 //        }
 //
