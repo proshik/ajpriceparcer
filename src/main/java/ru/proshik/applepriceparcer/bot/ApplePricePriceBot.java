@@ -50,6 +50,12 @@ public class ApplePricePriceBot extends TelegramLongPollingBot {
                                 .orElse("Need set a argument for command. It is a title of shop.");
                         message.setText(historyText);
                         break;
+                    case "/diff":
+                        String diffText = BotUtils.extractArgument(update.getMessage().getText())
+                                .map(s -> commandService.history(s))
+                                .orElse("Need set a argument for command. It is a title of shop.");
+                        message.setText(diffText);
+                        break;
 
                     default:
                         message.setText(commandInfo());

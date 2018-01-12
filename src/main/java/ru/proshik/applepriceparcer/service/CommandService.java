@@ -91,6 +91,10 @@ public class CommandService {
         return result;
     }
 
+    public String diff(String argument) {
+        return "Not implement yet!";
+    }
+
     private static String buildAssortment(Assortment assortment) {
         StringBuilder out = new StringBuilder("Date: " + DATE_TIME_FORMATTER.format(assortment.getCreatedDate()) + "\n");
 
