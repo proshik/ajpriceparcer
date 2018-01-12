@@ -4,24 +4,22 @@ import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-import ru.proshik.applepriceparcer.provider.ProviderFactory;
-import ru.proshik.applepriceparcer.provider.ProviderUtils;
-import ru.proshik.applepriceparcer.storage.Database;
-
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import ru.proshik.applepriceparcer.service.CommandService;
 
 public class ApplePricePriceBot extends TelegramLongPollingBot {
 
     private final String botUsername;
     private final String botToken;
 
-    private final Database db;
+    //    private ShopService shopService;
+    private CommandService commandService;
 
-    public ApplePricePriceBot(Database db, String botUsername, String botToken) {
-        this.db = db;
+    public ApplePricePriceBot(String botUsername,
+                              String botToken,
+                              CommandService commandService) {
         this.botUsername = botUsername;
         this.botToken = botToken;
+        this.commandService = commandService;
     }
 
     @Override
@@ -37,23 +35,22 @@ public class ApplePricePriceBot extends TelegramLongPollingBot {
                         message.setText(commandInfo());
                         break;
                     case "/shops":
-                        String shopsText = ProviderFactory.list().stream()
-                                .map(s -> "Title: " + s.supplier().getTitle() + " - URL: " + s.supplier().getUrl())
-                                .collect(Collectors.joining("", "", "\n"));
-
+                        String shopsText = commandService.shops();
                         message.setText(shopsText);
                         break;
                     case "/read":
-                        String readText = Stream.of(update.getMessage().getText().split(" "))
-                                .skip(1)
-                                .findFirst()
-                                .map(title -> ProviderFactory.findByTitle(title)
-                                        .map(screener -> ProviderUtils.buildAssortmentString(screener.screening()))
-                                        .orElse("Title unrecognized."))
+                        String readText = BotUtils.extractArgument(update.getMessage().getText())
+                                .map(s -> commandService.read(s))
                                 .orElse("Need set a argument for command. It is a title of shop.");
-
                         message.setText(readText);
                         break;
+                    case "/history":
+                        String historyText = BotUtils.extractArgument(update.getMessage().getText())
+                                .map(s -> commandService.history(s))
+                                .orElse("Need set a argument for command. It is a title of shop.");
+                        message.setText(historyText);
+                        break;
+
                     default:
                         message.setText(commandInfo());
                 }

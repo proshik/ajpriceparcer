@@ -1,4 +1,4 @@
-package ru.proshik.applepriceparcer.provider.model;
+package ru.proshik.applepriceparcer.model;
 
 public enum ProductType {
 

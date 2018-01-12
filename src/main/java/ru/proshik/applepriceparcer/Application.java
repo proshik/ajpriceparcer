@@ -5,6 +5,9 @@ import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.proshik.applepriceparcer.bot.ApplePricePriceBot;
+import ru.proshik.applepriceparcer.provider.ScreenerProviderFactory;
+import ru.proshik.applepriceparcer.service.CommandService;
+import ru.proshik.applepriceparcer.service.ShopService;
 import ru.proshik.applepriceparcer.storage.Database;
 
 public class Application {
@@ -25,13 +28,16 @@ public class Application {
         String dbPath = readSystemEnv(DB_PATH);
 
         Database db = new Database(dbPath);
-        db.init();
+        ScreenerProviderFactory screenerProviderFactory = new ScreenerProviderFactory();
+
+        ShopService shopService = new ShopService(db, screenerProviderFactory);
+        CommandService commandService = new CommandService(shopService, screenerProviderFactory);
 
         // Bot initialization
         ApiContextInitializer.init();
         TelegramBotsApi botsApi = new TelegramBotsApi();
         try {
-            botsApi.registerBot(new ApplePricePriceBot(db, telegramUsername, telegramToken));
+            botsApi.registerBot(new ApplePricePriceBot(telegramUsername, telegramToken, commandService));
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }

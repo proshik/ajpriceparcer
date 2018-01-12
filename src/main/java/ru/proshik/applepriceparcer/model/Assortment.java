@@ -1,4 +1,4 @@
-package ru.proshik.applepriceparcer.provider.model;
+package ru.proshik.applepriceparcer.model;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -8,6 +8,9 @@ public class Assortment {
 
     private LocalDateTime createdDate;
     private List<Product> products;
+
+    public Assortment() {
+    }
 
     public Assortment(LocalDateTime createdDate, List<Product> products) {
         this.createdDate = createdDate;

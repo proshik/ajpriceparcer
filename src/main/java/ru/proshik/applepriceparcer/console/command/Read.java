@@ -1,11 +1,7 @@
 package ru.proshik.applepriceparcer.console.command;
 
-import ru.proshik.applepriceparcer.console.command.utils.CommandUtils;
 import ru.proshik.applepriceparcer.console.command.model.Option;
-import ru.proshik.applepriceparcer.provider.screener.aj.AjScreener;
-import ru.proshik.applepriceparcer.console.storage.FileStorage;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 //import static ru.proshik.applepriceparcer.console.command.utils.CommandUtils.buildAssortmentString;

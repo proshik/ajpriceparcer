@@ -1,4 +1,4 @@
-package ru.proshik.applepriceparcer.provider.model;
+package ru.proshik.applepriceparcer.model;
 
 import java.util.List;
 import java.util.Objects;
@@ -9,6 +9,9 @@ public class Product {
     private ProductType productType;
     private String description;
     private List<Item> items;
+
+    public Product() {
+    }
 
     public Product(String title, ProductType productType, String description, List<Item> items) {
         this.title = title;

@@ -1,19 +1,8 @@
 package ru.proshik.applepriceparcer.console.command;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import ru.proshik.applepriceparcer.console.command.utils.CommandUtils;
 import ru.proshik.applepriceparcer.console.command.model.Option;
-import ru.proshik.applepriceparcer.provider.screener.aj.AjScreener;
-import ru.proshik.applepriceparcer.console.storage.FileStorage;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class Change extends Command {
 

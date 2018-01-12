@@ -1,10 +1,11 @@
-package ru.proshik.applepriceparcer.provider.screener.aj;
+package ru.proshik.applepriceparcer.screener.aj;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
 import org.apache.log4j.Logger;
-import ru.proshik.applepriceparcer.provider.model.*;
-import ru.proshik.applepriceparcer.provider.screener.Screener;
+import ru.proshik.applepriceparcer.exception.ProviderParseException;
+import ru.proshik.applepriceparcer.model.*;
+import ru.proshik.applepriceparcer.screener.Screener;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -17,15 +18,16 @@ public class AjScreener implements Screener {
 
     private static final Logger LOG = Logger.getLogger(AjScreener.class);
 
+    private static final String TITLE = "AJ";
     private static final String URL = "http://aj.ru";
 
     @Override
-    public Shop supplier() {
-        return new Shop("AJ", URL);
+    public Shop getShop() {
+        return new Shop(TITLE, URL);
     }
 
     @Override
-    public Assortment screening() {
+    public Assortment screeningPage() throws ProviderParseException {
         WebClient client = new WebClient();
         client.getOptions().setCssEnabled(false);
         client.getOptions().setJavaScriptEnabled(false);
@@ -34,8 +36,7 @@ public class AjScreener implements Screener {
         try {
             page = client.getPage(URL);
         } catch (IOException e) {
-            LOG.error("ERROR on extract page from aj.ru");
-            throw new RuntimeException("Error on read page from aj.ru");
+            throw new ProviderParseException("Error on read page from aj.ru", e);
         }
 
         HtmlElement ulContainer = page.getFirstByXPath("//ul[@class='container']");
@@ -90,7 +91,7 @@ public class AjScreener implements Screener {
                     try {
                         price = new BigDecimal(span.asText().replace(" ", ""));
                     } catch (Exception e) {
-                        LOG.error("Not found price for item=" + title);
+                        LOG.warn("Not found price for item=" + title);
                     }
                 }
                 String changedTitle = ili.getFirstChild().getNodeValue().substring(0, ili.getFirstChild().getNodeValue().length() - 3);
