@@ -2,9 +2,15 @@ package ru.proshik.applepriceparcer.bot;
 
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.proshik.applepriceparcer.service.CommandService;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ApplePricePriceBot extends TelegramLongPollingBot {
 
@@ -51,10 +57,11 @@ public class ApplePricePriceBot extends TelegramLongPollingBot {
                         message.setText(historyText);
                         break;
                     case "/diff":
-                        String diffText = BotUtils.extractArgument(update.getMessage().getText())
-                                .map(s -> commandService.history(s))
-                                .orElse("Need set a argument for command. It is a title of shop.");
-                        message.setText(diffText);
+//                        String diffText = BotUtils.extractArgument(update.getMessage().getText())
+//                                .map(s -> commandService.history(s))
+//                                .orElse("Need set a argument for command. It is a title of shop.");
+                        message.setReplyMarkup(keyboard());
+                        message.setText("Result diff command text");
                         break;
 
                     default:
@@ -97,6 +104,29 @@ public class ApplePricePriceBot extends TelegramLongPollingBot {
         System.out.println("Bot was closing");
     }
 //
+
+    public InlineKeyboardMarkup keyboard() {
+        final InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
+
+        InlineKeyboardButton button = new InlineKeyboardButton();
+        button.setText("button");
+        button.setCallbackData("callbackData");
+        keyboard.add(Arrays.asList(button));
+        markup.setKeyboard(keyboard);
+        return markup;
+    }
+
+
+//    public InlineKeyboardButton buttonMain() {
+//        InlineKeyboardButton button = new InlineKeyboardButtonBuilder()
+//                .setText("Начать!" + winking_face)
+//                .setCallbackData(new ActionBuilder(marshaller)
+//                        .setName(OPEN_MAIN)
+//                        .asString())
+//                .build();
+//        return button;
+//    }
 //
 //    public InlineKeyboardMarkup keyboardAnswer(Update update, ClsQuest quest) {
 //        final InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
