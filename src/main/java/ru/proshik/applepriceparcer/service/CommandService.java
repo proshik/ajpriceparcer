@@ -31,6 +31,12 @@ public class CommandService {
         this.screenerProviderFactory = screenerProviderFactory;
     }
 
+    public List<String> shopsKeyboard(){
+        return screenerProviderFactory.list().stream()
+                .map(screener -> screener.getShop().getTitle())
+                .sorted()
+                .collect(Collectors.toList());
+    }
 
     public String shops() {
         return screenerProviderFactory.list().stream()

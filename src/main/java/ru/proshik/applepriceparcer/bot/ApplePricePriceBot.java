@@ -1,6 +1,5 @@
 package ru.proshik.applepriceparcer.bot;
 
-import org.telegram.telegrambots.api.methods.BotApiMethod;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -10,14 +9,13 @@ import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardButto
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
-import org.telegram.telegrambots.updateshandlers.SentCallback;
+import ru.proshik.applepriceparcer.model.ProductType;
 import ru.proshik.applepriceparcer.service.CommandService;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ApplePricePriceBot extends TelegramLongPollingBot {
 
@@ -35,6 +33,14 @@ public class ApplePricePriceBot extends TelegramLongPollingBot {
         this.commandService = commandService;
     }
 
+    /*
+    By default:
+    Replay: Shops, Subscription
+    After in shops: list from provider
+    After provider show types of products
+    Inline: After show title of items and after click concret item you will see
+    command history or changes
+     */
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
@@ -45,7 +51,9 @@ public class ApplePricePriceBot extends TelegramLongPollingBot {
             if (update.getMessage().isCommand()) {
                 switch (update.getMessage().getText().split(" ")[0]) {
                     case "/start":
-                        message.setText(commandInfo());
+                        message.setReplyMarkup(replayKeyboard());
+                        message.setText("Replay keyboard test");
+//                        message.setText(commandInfo());
                         break;
                     case "/shops":
                         String shopsText = commandService.shops();
@@ -75,7 +83,39 @@ public class ApplePricePriceBot extends TelegramLongPollingBot {
                         message.setText(commandInfo());
                 }
             } else {
-                message.setText(commandInfo());
+//                List<String> shopList = commandService.shopsKeyboard();
+//                if (shopList.contains(update.getMessage().getText())){
+//
+//                }
+//                for (String shop : shopList) {
+//                    if (shop.equals(update.getMessage().getText())) {
+//
+//                    }
+//                }
+
+                switch (update.getMessage().getText()) {
+                    case "Shops":
+                        List<String> shopList = commandService.shopsKeyboard();
+//                        List<List<String>> group = shopList.stream()
+//                                .map(s -> {
+//                                    List<String> item = new ArrayList<>();
+//                                    item.add(s);
+//
+//                                    return item;
+//                                })
+//                                .collect(Collectors.toList());
+//
+//                        ReplyKeyboardMarkup markup = buildReplyKeyboard(group);
+                        InlineKeyboardMarkup markup = buildKeyboard(shopList);
+                        message.setReplyMarkup(markup);
+                        message.setText("Select shop");
+                        break;
+                    case "Subscription":
+                        message.setText("Not implement yet!");
+                        break;
+                }
+//                update.getMessage().getText();
+//                message.setText(commandInfo());
             }
             try {
                 execute(message); // Call method to send the message
@@ -86,8 +126,16 @@ public class ApplePricePriceBot extends TelegramLongPollingBot {
             SendMessage message = new SendMessage() // Create a SendMessage object with mandatory fields
                     .setChatId(String.valueOf(update.getCallbackQuery().getFrom().getId()));
 
-            message.setReplyMarkup(keyboard());
-            message.setText("Answer on command");
+            List<String> productTypes = Arrays.stream(ProductType.values())
+                    .map(ProductType::getValue)
+//                    .sorted()
+                    .collect(Collectors.toList());
+
+            InlineKeyboardMarkup markup = buildKeyboard(productTypes);
+            message.setReplyMarkup(markup);
+
+//            message.setReplyMarkup(keyboard());
+            message.setText("Select product type");
 
 //            AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
 //            answerCallbackQuery.setText("Async answer");
@@ -127,23 +175,61 @@ public class ApplePricePriceBot extends TelegramLongPollingBot {
         }
     }
 
-    class MyCallback implements SentCallback {
+    private InlineKeyboardMarkup buildKeyboard(List<String> items) {
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
-        @Override
-        public void onResult(BotApiMethod method, Serializable response) {
-            System.out.println("OnResult method");
+        List<InlineKeyboardButton> inlineButtons = new ArrayList<>();
+        for (String item : items) {
+            InlineKeyboardButton button = new InlineKeyboardButton();
+            button.setText(item);
+            button.setCallbackData(item + "_callback");
+            inlineButtons.add(button);
         }
 
-        @Override
-        public void onError(BotApiMethod method, TelegramApiRequestException apiException) {
-            System.out.println("OnError method");
-        }
-
-        @Override
-        public void onException(BotApiMethod method, Exception exception) {
-            System.out.println("On exception method");
-        }
+        keyboard.add(inlineButtons);
+        markup.setKeyboard(keyboard);
+        return markup;
     }
+
+    private ReplyKeyboardMarkup buildReplyKeyboard(List<List<String>> groups) {
+        ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
+
+        List<KeyboardRow> keyboardRows = new ArrayList<>();
+        for (List<String> group : groups) {
+            List<KeyboardButton> buttons = new ArrayList<>();
+            for (String item : group) {
+                KeyboardButton button = new KeyboardButton();
+                button.setText(item);
+                buttons.add(button);
+            }
+            KeyboardRow row = new KeyboardRow();
+            row.addAll(buttons);
+            keyboardRows.add(row);
+        }
+
+        markup.setKeyboard(keyboardRows);
+
+        return markup;
+    }
+
+//    class MyCallback implements SentCallback {
+//
+//        @Override
+//        public void onResult(BotApiMethod method, Serializable response) {
+//            System.out.println("OnResult method");
+//        }
+//
+//        @Override
+//        public void onError(BotApiMethod method, TelegramApiRequestException apiException) {
+//            System.out.println("OnError method");
+//        }
+//
+//        @Override
+//        public void onException(BotApiMethod method, Exception exception) {
+//            System.out.println("On exception method");
+//        }
+//    }
 
     private String commandInfo() {
         StringBuilder startText = new StringBuilder("Bot for show info about prices on Apple products from several online shop in SpB\n");
@@ -190,15 +276,21 @@ public class ApplePricePriceBot extends TelegramLongPollingBot {
     private ReplyKeyboardMarkup replayKeyboard() {
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
 
+        KeyboardButton shopButton = new KeyboardButton();
+        shopButton.setText("Shops");
 
-        KeyboardButton mainMenu = new KeyboardButton();
-        mainMenu.setText("Main menu");
+        KeyboardButton subscrptionButton = new KeyboardButton();
+        subscrptionButton.setText("Subscription");
 
-        KeyboardRow keyboardRow = new KeyboardRow();
-        keyboardRow.add(mainMenu);
+        KeyboardRow shopRow = new KeyboardRow();
+        shopRow.add(shopButton);
+
+        KeyboardRow subscriptionRow = new KeyboardRow();
+        subscriptionRow.add(subscrptionButton);
 
         List<KeyboardRow> keyboardRows = new ArrayList<>();
-        keyboardRows.add(keyboardRow);
+        keyboardRows.add(shopRow);
+        keyboardRows.add(subscriptionRow);
 
         replyKeyboardMarkup.setKeyboard(keyboardRows);
 
