@@ -5,7 +5,9 @@ public enum ProductType {
     IPHONE,
     IPAD,
     IMAC,
-    MACBOOK,
+    MAC_MINI,
+    MACBOOK_PRO,
+    MACBOOK_AIR,
     ACCESSORIES,
     OTHER
 

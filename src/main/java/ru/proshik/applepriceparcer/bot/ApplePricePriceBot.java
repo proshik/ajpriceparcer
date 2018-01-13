@@ -1,13 +1,20 @@
 package ru.proshik.applepriceparcer.bot;
 
+import org.telegram.telegrambots.api.methods.BotApiMethod;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardButton;
+import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
+import org.telegram.telegrambots.updateshandlers.SentCallback;
 import ru.proshik.applepriceparcer.service.CommandService;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -75,8 +82,66 @@ public class ApplePricePriceBot extends TelegramLongPollingBot {
             } catch (TelegramApiException e) {
                 e.printStackTrace();
             }
+        } else if (update.hasCallbackQuery()) {
+            SendMessage message = new SendMessage() // Create a SendMessage object with mandatory fields
+                    .setChatId(String.valueOf(update.getCallbackQuery().getFrom().getId()));
+
+            message.setReplyMarkup(keyboard());
+            message.setText("Answer on command");
+
+//            AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
+//            answerCallbackQuery.setText("Async answer");
+//            answerCallbackQuery.setCallbackQueryId(update.getCallbackQuery().getId());
+
+//            try {
+//                executeAsync(answerCallbackQuery, new MyCallback());
+//            } catch (TelegramApiException e) {
+//                e.printStackTrace();
+//            }
+//            try {
+//                Thread.sleep(2000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+            try {
+                execute(message);
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+            }
+
+//            System.out.println("Update not contains message");
         } else {
+            SendMessage message = new SendMessage() // Create a SendMessage object with mandatory fields
+                    .setChatId(update.getMessage().getChatId());
+            message.setReplyMarkup(replayKeyboard());
+            message.setText("Replay keyboard test");
+
+            try {
+                execute(message);
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+            }
             System.out.println("Update not contains message");
+//            SendMessage message = new SendMessage() // Create a SendMessage object with mandatory fields
+//                    .setChatId(String.valueOf(update.getCallbackQuery().getFrom().getId()));
+        }
+    }
+
+    class MyCallback implements SentCallback {
+
+        @Override
+        public void onResult(BotApiMethod method, Serializable response) {
+            System.out.println("OnResult method");
+        }
+
+        @Override
+        public void onError(BotApiMethod method, TelegramApiRequestException apiException) {
+            System.out.println("OnError method");
+        }
+
+        @Override
+        public void onException(BotApiMethod method, Exception exception) {
+            System.out.println("On exception method");
         }
     }
 
@@ -105,16 +170,39 @@ public class ApplePricePriceBot extends TelegramLongPollingBot {
     }
 //
 
-    public InlineKeyboardMarkup keyboard() {
+    private InlineKeyboardMarkup keyboard() {
         final InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
-        InlineKeyboardButton button = new InlineKeyboardButton();
-        button.setText("button");
-        button.setCallbackData("callbackData");
-        keyboard.add(Arrays.asList(button));
+        InlineKeyboardButton shopsButton = new InlineKeyboardButton();
+        shopsButton.setText("Shops");
+        shopsButton.setCallbackData("shopsButtonCallback");
+
+        InlineKeyboardButton subscriptionButton = new InlineKeyboardButton();
+        subscriptionButton.setText("Subscription");
+        subscriptionButton.setCallbackData("subscriptionButtonCallback");
+
+        keyboard.add(Arrays.asList(shopsButton, subscriptionButton));
         markup.setKeyboard(keyboard);
         return markup;
+    }
+
+    private ReplyKeyboardMarkup replayKeyboard() {
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+
+
+        KeyboardButton mainMenu = new KeyboardButton();
+        mainMenu.setText("Main menu");
+
+        KeyboardRow keyboardRow = new KeyboardRow();
+        keyboardRow.add(mainMenu);
+
+        List<KeyboardRow> keyboardRows = new ArrayList<>();
+        keyboardRows.add(keyboardRow);
+
+        replyKeyboardMarkup.setKeyboard(keyboardRows);
+
+        return replyKeyboardMarkup;
     }
 
 
