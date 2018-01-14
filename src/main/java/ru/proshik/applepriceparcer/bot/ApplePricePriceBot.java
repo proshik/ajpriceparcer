@@ -55,7 +55,7 @@ public class ApplePricePriceBot extends TelegramLongPollingBot {
         } else if (update.hasCallbackQuery()) {
             message = processCallbackOperation(update);
         } else {
-            message = processGreetingOperation(update);
+            message = cleanUpUserSpace(update);
         }
 
         try {
@@ -167,7 +167,7 @@ public class ApplePricePriceBot extends TelegramLongPollingBot {
 //                break;
 
             default:
-                message = processGreetingOperation(update);
+                message = cleanUpUserSpace(update);
 //                message.setText(commandInfo());
         }
 
@@ -198,10 +198,10 @@ public class ApplePricePriceBot extends TelegramLongPollingBot {
                 message.setText("Not implement yet!");
                 break;
             case RM_MAIN_MENU:
-                message = processGreetingOperation(update);
+                message = cleanUpUserSpace(update);
                 break;
             default:
-                message.setReplyMarkup(new ReplyKeyboardRemove());
+                message = cleanUpUserSpace(update);
         }
 
         return message;
@@ -216,6 +216,16 @@ public class ApplePricePriceBot extends TelegramLongPollingBot {
         }
 
         return buildInlineKeyboard(map, 1);
+    }
+
+    private SendMessage cleanUpUserSpace(Update update){
+        return new SendMessage()
+                .setChatId(update.getMessage().getChatId())
+                .setReplyMarkup(buildReplyKeyboard(ROOT_MENU))
+                .setText("For send text messages, please use a keyboard.\n\n" +
+                        "This is Bot for show price for apple products in show SPB and Moscow. " +
+                        "You may select shops for check prices and change history price and assortment in shops. " +
+                        "And subscribe on a change prices.");
     }
 
     private String commandInfo() {
