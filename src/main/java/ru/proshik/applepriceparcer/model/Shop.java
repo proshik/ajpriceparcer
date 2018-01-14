@@ -4,8 +4,11 @@ import java.util.Objects;
 
 public class Shop {
 
-    private final String title;
-    private final String url;
+    private String title;
+    private String url;
+
+    public Shop() {
+    }
 
     public Shop(String title, String url) {
         this.title = title;

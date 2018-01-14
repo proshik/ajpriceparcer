@@ -7,8 +7,8 @@ import ru.proshik.applepriceparcer.model.Assortment;
 import ru.proshik.applepriceparcer.model.Item;
 import ru.proshik.applepriceparcer.model.Product;
 import ru.proshik.applepriceparcer.model.Shop;
-import ru.proshik.applepriceparcer.provider.ScreenerProviderFactory;
-import ru.proshik.applepriceparcer.screener.Screener;
+import ru.proshik.applepriceparcer.provider.Provider;
+import ru.proshik.applepriceparcer.provider.ProviderFactory;
 import ru.proshik.applepriceparcer.storage.Database;
 
 import java.time.format.DateTimeFormatter;
@@ -24,22 +24,22 @@ public class CommandService {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
     private ShopService shopService;
-    private ScreenerProviderFactory screenerProviderFactory;
+    private ProviderFactory providerFactory;
 
-    public CommandService(ShopService shopService, ScreenerProviderFactory screenerProviderFactory) {
+    public CommandService(ShopService shopService, ProviderFactory providerFactory) {
         this.shopService = shopService;
-        this.screenerProviderFactory = screenerProviderFactory;
+        this.providerFactory = providerFactory;
     }
 
-    public List<String> shopsKeyboard(){
-        return screenerProviderFactory.list().stream()
-                .map(screener -> screener.getShop().getTitle())
+    public List<Shop> shopList(){
+        return providerFactory.list().stream()
+                .map(Provider::getShop)
                 .sorted()
                 .collect(Collectors.toList());
     }
 
-    public String shops() {
-        return screenerProviderFactory.list().stream()
+    public String shopsDescription() {
+        return providerFactory.list().stream()
                 .map(s -> "Title: " + s.getShop().getTitle() + " - URL: " + s.getShop().getUrl())
                 .collect(Collectors.joining("", "", "\n"));
     }
@@ -47,11 +47,11 @@ public class CommandService {
     public String read(String argument) {
         String result;
 
-        Screener screener = screenerProviderFactory.findByTitle(argument);
-        if (screener != null) {
+        Provider provider = providerFactory.findByTitle(argument);
+        if (provider != null) {
             try {
-                Shop shop = screener.getShop();
-                Assortment assortment = screener.screeningPage();
+                Shop shop = provider.getShop();
+                Assortment assortment = provider.screening();
 
                 try {
                     // TODO: 12.01.2018 will be need read from cache(in this class), method tryUpdateAssortment will be moved to scheduler
@@ -74,10 +74,10 @@ public class CommandService {
     public String history(String argument) {
         String result;
 
-        Screener screener = screenerProviderFactory.findByTitle(argument);
-        if (screener != null) {
+        Provider provider = providerFactory.findByTitle(argument);
+        if (provider != null) {
             try {
-                Shop shop = screener.getShop();
+                Shop shop = provider.getShop();
                 List<Assortment> assortments = shopService.history(shop);
 
                 List<Assortment> sortAssortments = assortments.stream()
@@ -105,11 +105,11 @@ public class CommandService {
         StringBuilder out = new StringBuilder("Date: " + DATE_TIME_FORMATTER.format(assortment.getCreatedDate()) + "\n");
 
         for (Product p : assortment.getProducts()) {
-            out.append("### ").append(p.getTitle()).append(" ###").append("\n");
+            out.append(p.getTitle()).append("\n");
             for (Item i : p.getItems()) {
                 out.append(i.getTitle()).append(" - ").append(i.getPrice()).append("\n");
             }
-            out.append("\r\n");
+            out.append("\n");
         }
 
         return out.toString();

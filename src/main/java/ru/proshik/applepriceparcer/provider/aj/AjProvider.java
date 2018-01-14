@@ -1,11 +1,11 @@
-package ru.proshik.applepriceparcer.screener.aj;
+package ru.proshik.applepriceparcer.provider.aj;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
 import org.apache.log4j.Logger;
 import ru.proshik.applepriceparcer.exception.ProviderParseException;
 import ru.proshik.applepriceparcer.model.*;
-import ru.proshik.applepriceparcer.screener.Screener;
+import ru.proshik.applepriceparcer.provider.Provider;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -14,9 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class AjScreener implements Screener {
+public class AjProvider implements Provider {
 
-    private static final Logger LOG = Logger.getLogger(AjScreener.class);
+    private static final Logger LOG = Logger.getLogger(AjProvider.class);
 
     private static final String TITLE = "AJ";
     private static final String URL = "http://aj.ru";
@@ -27,7 +27,7 @@ public class AjScreener implements Screener {
     }
 
     @Override
-    public Assortment screeningPage() throws ProviderParseException {
+    public Assortment screening() throws ProviderParseException {
         WebClient client = new WebClient();
         client.getOptions().setCssEnabled(false);
         client.getOptions().setJavaScriptEnabled(false);

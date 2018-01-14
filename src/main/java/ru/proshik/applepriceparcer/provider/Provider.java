@@ -1,13 +1,13 @@
-package ru.proshik.applepriceparcer.screener;
+package ru.proshik.applepriceparcer.provider;
 
 import ru.proshik.applepriceparcer.exception.ProviderParseException;
 import ru.proshik.applepriceparcer.model.Assortment;
 import ru.proshik.applepriceparcer.model.Shop;
 
-public interface Screener {
+public interface Provider {
 
     Shop getShop();
 
-    Assortment screeningPage() throws ProviderParseException;
+    Assortment screening() throws ProviderParseException;
 
 }

@@ -1,28 +1,42 @@
 package ru.proshik.applepriceparcer.bot;
 
+import org.apache.commons.lang3.StringUtils;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardButton;
-import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardRow;
+import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardRemove;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.proshik.applepriceparcer.model.ProductType;
+import ru.proshik.applepriceparcer.model.SelectedProduct;
+import ru.proshik.applepriceparcer.model.Shop;
 import ru.proshik.applepriceparcer.service.CommandService;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.singletonList;
+import static ru.proshik.applepriceparcer.bot.BotUtils.buildInlineKeyboard;
+import static ru.proshik.applepriceparcer.bot.BotUtils.buildReplyKeyboard;
+
 public class ApplePricePriceBot extends TelegramLongPollingBot {
+
+    private static final String RM_SHOPS = "Shops";
+    private static final String RM_SUBSCRIPTION = "Subscription";
+    private static final String RM_MAIN_MENU = "Main menu";
+
+    private static final List<List<String>> ROOT_MENU = Arrays.asList(
+            singletonList(RM_SHOPS),
+            singletonList(RM_SUBSCRIPTION),
+            singletonList(RM_MAIN_MENU));
 
     private final String botUsername;
     private final String botToken;
 
-    //    private ShopService shopService;
     private CommandService commandService;
 
     public ApplePricePriceBot(String botUsername,
@@ -33,211 +47,22 @@ public class ApplePricePriceBot extends TelegramLongPollingBot {
         this.commandService = commandService;
     }
 
-    /*
-    By default:
-    Replay: Shops, Subscription
-    After in shops: list from provider
-    After provider show types of products
-    Inline: After show title of items and after click concret item you will see
-    command history or changes
-     */
     @Override
     public void onUpdateReceived(Update update) {
+        SendMessage message;
         if (update.hasMessage() && update.getMessage().hasText()) {
-
-            SendMessage message = new SendMessage() // Create a SendMessage object with mandatory fields
-                    .setChatId(update.getMessage().getChatId());
-
-            if (update.getMessage().isCommand()) {
-                switch (update.getMessage().getText().split(" ")[0]) {
-                    case "/start":
-                        message.setReplyMarkup(replayKeyboard());
-                        message.setText("Replay keyboard test");
-//                        message.setText(commandInfo());
-                        break;
-                    case "/shops":
-                        String shopsText = commandService.shops();
-                        message.setText(shopsText);
-                        break;
-                    case "/read":
-                        String readText = BotUtils.extractArgument(update.getMessage().getText())
-                                .map(s -> commandService.read(s))
-                                .orElse("Need set a argument for command. It is a title of shop.");
-                        message.setText(readText);
-                        break;
-                    case "/history":
-                        String historyText = BotUtils.extractArgument(update.getMessage().getText())
-                                .map(s -> commandService.history(s))
-                                .orElse("Need set a argument for command. It is a title of shop.");
-                        message.setText(historyText);
-                        break;
-                    case "/diff":
-//                        String diffText = BotUtils.extractArgument(update.getMessage().getText())
-//                                .map(s -> commandService.history(s))
-//                                .orElse("Need set a argument for command. It is a title of shop.");
-                        message.setReplyMarkup(keyboard());
-                        message.setText("Result diff command text");
-                        break;
-
-                    default:
-                        message.setText(commandInfo());
-                }
-            } else {
-//                List<String> shopList = commandService.shopsKeyboard();
-//                if (shopList.contains(update.getMessage().getText())){
-//
-//                }
-//                for (String shop : shopList) {
-//                    if (shop.equals(update.getMessage().getText())) {
-//
-//                    }
-//                }
-
-                switch (update.getMessage().getText()) {
-                    case "Shops":
-                        List<String> shopList = commandService.shopsKeyboard();
-//                        List<List<String>> group = shopList.stream()
-//                                .map(s -> {
-//                                    List<String> item = new ArrayList<>();
-//                                    item.add(s);
-//
-//                                    return item;
-//                                })
-//                                .collect(Collectors.toList());
-//
-//                        ReplyKeyboardMarkup markup = buildReplyKeyboard(group);
-                        InlineKeyboardMarkup markup = buildKeyboard(shopList);
-                        message.setReplyMarkup(markup);
-                        message.setText("Select shop");
-                        break;
-                    case "Subscription":
-                        message.setText("Not implement yet!");
-                        break;
-                }
-//                update.getMessage().getText();
-//                message.setText(commandInfo());
-            }
-            try {
-                execute(message); // Call method to send the message
-            } catch (TelegramApiException e) {
-                e.printStackTrace();
-            }
+            message = processMessageOperation(update);
         } else if (update.hasCallbackQuery()) {
-            SendMessage message = new SendMessage() // Create a SendMessage object with mandatory fields
-                    .setChatId(String.valueOf(update.getCallbackQuery().getFrom().getId()));
-
-            List<String> productTypes = Arrays.stream(ProductType.values())
-                    .map(ProductType::getValue)
-//                    .sorted()
-                    .collect(Collectors.toList());
-
-            InlineKeyboardMarkup markup = buildKeyboard(productTypes);
-            message.setReplyMarkup(markup);
-
-//            message.setReplyMarkup(keyboard());
-            message.setText("Select product type");
-
-//            AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
-//            answerCallbackQuery.setText("Async answer");
-//            answerCallbackQuery.setCallbackQueryId(update.getCallbackQuery().getId());
-
-//            try {
-//                executeAsync(answerCallbackQuery, new MyCallback());
-//            } catch (TelegramApiException e) {
-//                e.printStackTrace();
-//            }
-//            try {
-//                Thread.sleep(2000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-            try {
-                execute(message);
-            } catch (TelegramApiException e) {
-                e.printStackTrace();
-            }
-
-//            System.out.println("Update not contains message");
+            message = processCallbackOperation(update);
         } else {
-            SendMessage message = new SendMessage() // Create a SendMessage object with mandatory fields
-                    .setChatId(update.getMessage().getChatId());
-            message.setReplyMarkup(replayKeyboard());
-            message.setText("Replay keyboard test");
-
-            try {
-                execute(message);
-            } catch (TelegramApiException e) {
-                e.printStackTrace();
-            }
-            System.out.println("Update not contains message");
-//            SendMessage message = new SendMessage() // Create a SendMessage object with mandatory fields
-//                    .setChatId(String.valueOf(update.getCallbackQuery().getFrom().getId()));
-        }
-    }
-
-    private InlineKeyboardMarkup buildKeyboard(List<String> items) {
-        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
-
-        List<InlineKeyboardButton> inlineButtons = new ArrayList<>();
-        for (String item : items) {
-            InlineKeyboardButton button = new InlineKeyboardButton();
-            button.setText(item);
-            button.setCallbackData(item + "_callback");
-            inlineButtons.add(button);
+            message = processGreetingOperation(update);
         }
 
-        keyboard.add(inlineButtons);
-        markup.setKeyboard(keyboard);
-        return markup;
-    }
-
-    private ReplyKeyboardMarkup buildReplyKeyboard(List<List<String>> groups) {
-        ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
-
-        List<KeyboardRow> keyboardRows = new ArrayList<>();
-        for (List<String> group : groups) {
-            List<KeyboardButton> buttons = new ArrayList<>();
-            for (String item : group) {
-                KeyboardButton button = new KeyboardButton();
-                button.setText(item);
-                buttons.add(button);
-            }
-            KeyboardRow row = new KeyboardRow();
-            row.addAll(buttons);
-            keyboardRows.add(row);
+        try {
+            execute(message);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
         }
-
-        markup.setKeyboard(keyboardRows);
-
-        return markup;
-    }
-
-//    class MyCallback implements SentCallback {
-//
-//        @Override
-//        public void onResult(BotApiMethod method, Serializable response) {
-//            System.out.println("OnResult method");
-//        }
-//
-//        @Override
-//        public void onError(BotApiMethod method, TelegramApiRequestException apiException) {
-//            System.out.println("OnError method");
-//        }
-//
-//        @Override
-//        public void onException(BotApiMethod method, Exception exception) {
-//            System.out.println("On exception method");
-//        }
-//    }
-
-    private String commandInfo() {
-        StringBuilder startText = new StringBuilder("Bot for show info about prices on Apple products from several online shop in SpB\n");
-        startText.append("/shops").append(" - ").append("list of shops for parsing").append("\n");
-        startText.append("/read <shop_title>").append(" - ")
-                .append("show current prices on assortment in this shop. Argument <shop_title> it is a title of show from result /shops command.")
-                .append("\n");
-        return startText.toString();
     }
 
     @Override
@@ -254,78 +79,152 @@ public class ApplePricePriceBot extends TelegramLongPollingBot {
     public void onClosing() {
         System.out.println("Bot was closing");
     }
-//
 
-    private InlineKeyboardMarkup keyboard() {
-        final InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
+    private SendMessage processMessageOperation(Update update) {
+        SendMessage message;
 
-        InlineKeyboardButton shopsButton = new InlineKeyboardButton();
-        shopsButton.setText("Shops");
-        shopsButton.setCallbackData("shopsButtonCallback");
-
-        InlineKeyboardButton subscriptionButton = new InlineKeyboardButton();
-        subscriptionButton.setText("Subscription");
-        subscriptionButton.setCallbackData("subscriptionButtonCallback");
-
-        keyboard.add(Arrays.asList(shopsButton, subscriptionButton));
-        markup.setKeyboard(keyboard);
-        return markup;
+        if (update.getMessage().isCommand()) {
+            message = processCommandMessageOperation(update);
+        } else {
+            message = processKeyboardMessageOperation(update);
+        }
+        message.setChatId(update.getMessage().getChatId());
+        return message;
     }
 
-    private ReplyKeyboardMarkup replayKeyboard() {
-        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+    private SendMessage processCallbackOperation(Update update) {
+        SendMessage message = new SendMessage() // Create a SendMessage object with mandatory fields
+                .setChatId(String.valueOf(update.getCallbackQuery().getFrom().getId()));
 
-        KeyboardButton shopButton = new KeyboardButton();
-        shopButton.setText("Shops");
+        String callbackData = update.getCallbackQuery().getData();
+        if (StringUtils.isNotEmpty(callbackData)) {
+            SelectedProduct selectedProduct;
+            try {
+                selectedProduct = BotUtils.objectMapper.readValue(callbackData, SelectedProduct.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException("Error on read value from callback");
+            }
 
-        KeyboardButton subscrptionButton = new KeyboardButton();
-        subscrptionButton.setText("Subscription");
+            if (selectedProduct != null) {
+//                if (selectedProduct.emptyShop()) {
+//                    InlineKeyboardMarkup inlineKeyboardMarkup = buildShopKeyboard();
+//
+//                    message.setReplyMarkup(inlineKeyboardMarkup);
+//                    message.setText("Select shop");
+//                } else
+                if (selectedProduct.emptyProductType()) {
+                    Map<String, SelectedProduct> map = new HashMap<>();
 
-        KeyboardRow shopRow = new KeyboardRow();
-        shopRow.add(shopButton);
+                    List<ProductType> productTypes = Arrays.stream(ProductType.values())
+                            .collect(Collectors.toList());
+                    for (ProductType pt : productTypes) {
+                        map.put(pt.getValue(), new SelectedProduct(selectedProduct.getShopTitle(), pt.name()));
+                    }
+                    message.setReplyMarkup(buildInlineKeyboard(map, 2));
 
-        KeyboardRow subscriptionRow = new KeyboardRow();
-        subscriptionRow.add(subscrptionButton);
+                    message.setText("Select product type");
+                } else {
+                    String history = commandService.history(selectedProduct.getShopTitle());
 
-        List<KeyboardRow> keyboardRows = new ArrayList<>();
-        keyboardRows.add(shopRow);
-        keyboardRows.add(subscriptionRow);
+                    message.setReplyMarkup(buildReplyKeyboard(ROOT_MENU));
+                    message.setText(history);
+                }
+            }
+        } else {
+            message.setReplyMarkup(buildReplyKeyboard(ROOT_MENU));
+            message.setText("Select operation");
+        }
 
-        replyKeyboardMarkup.setKeyboard(keyboardRows);
+        return message;
+    }
 
-        return replyKeyboardMarkup;
+    private SendMessage processCommandMessageOperation(Update update) {
+        SendMessage message;
+
+        switch (update.getMessage().getText().split(" ")[0]) {
+            case "/start":
+                message = processGreetingOperation(update);
+                break;
+//            case "/shopsDescription":
+//                String shopsText = commandService.shopsDescription();
+//                message.setText(shopsText);
+//                break;
+//            case "/read":
+//                String readText = BotUtils.extractArgument(update.getMessage().getText())
+//                        .map(s -> commandService.read(s))
+//                        .orElse("Need set a argument for command. It is a title of shop.");
+//                message.setText(readText);
+//                break;
+//            case "/history":
+//                String historyText = BotUtils.extractArgument(update.getMessage().getText())
+//                        .map(s -> commandService.history(s))
+//                        .orElse("Need set a argument for command. It is a title of shop.");
+//                message.setText(historyText);
+//                break;
+//            case "/diff":
+//                message.setText("Not implement yet!");
+//                break;
+
+            default:
+                message = processGreetingOperation(update);
+//                message.setText(commandInfo());
+        }
+
+        return message;
     }
 
 
-//    public InlineKeyboardButton buttonMain() {
-//        InlineKeyboardButton button = new InlineKeyboardButtonBuilder()
-//                .setText("Начать!" + winking_face)
-//                .setCallbackData(new ActionBuilder(marshaller)
-//                        .setName(OPEN_MAIN)
-//                        .asString())
-//                .build();
-//        return button;
-//    }
-//
-//    public InlineKeyboardMarkup keyboardAnswer(Update update, ClsQuest quest) {
-//        final InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
-//        List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
-//        for (ClsAnswer clsAnswer : quest.getClsAnswerCollection()) {
-//            keyboard.add(Arrays.asList(buttonAnswer(clsAnswer)));
-//        }
-//        markup.setKeyboard(keyboard);
-//        return markup;
-//    }
-//
-//    public InlineKeyboardButton buttonAnswer(ClsAnswer clsAnswer) {
-//        InlineKeyboardButton button = new InlineKeyboardButtonBuilder()
-//                .setText(clsAnswer.getAnswerText())
-//                .setCallbackData(new ActionBuilder(marshaller)
-//                        .setName(GET_ANSWER)
-//                        .setValue(clsAnswer.getId().toString())
-//                        .asString())
-//                .build();
-//        return button;
-//    }
+    private SendMessage processGreetingOperation(Update update) {
+        return new SendMessage()
+                .setChatId(update.getMessage().getChatId())
+                .setReplyMarkup(buildReplyKeyboard(ROOT_MENU))
+                .setText("Hello, this is Bot for show price for apple products in show SPB and Moscow. " +
+                        "You may select shops for check prices and change history price and assortment in shops. " +
+                        "And subscribe on a change prices.");
+    }
+
+    private SendMessage processKeyboardMessageOperation(Update update) {
+        SendMessage message = new SendMessage();
+
+        switch (update.getMessage().getText()) {
+            case RM_SHOPS:
+                InlineKeyboardMarkup inlineKeyboardMarkup = buildShopKeyboard();
+
+                message.setReplyMarkup(inlineKeyboardMarkup);
+                message.setText("Select shop");
+                break;
+            case RM_SUBSCRIPTION:
+                message.setText("Not implement yet!");
+                break;
+            case RM_MAIN_MENU:
+                message = processGreetingOperation(update);
+                break;
+            default:
+                message.setReplyMarkup(new ReplyKeyboardRemove());
+        }
+
+        return message;
+    }
+
+    private InlineKeyboardMarkup buildShopKeyboard() {
+        List<Shop> shopList = commandService.shopList();
+
+        Map<String, SelectedProduct> map = new HashMap<>();
+        for (Shop shop : shopList) {
+            map.put(shop.getTitle(), new SelectedProduct(shop.getTitle()));
+        }
+
+        return buildInlineKeyboard(map, 1);
+    }
+
+    private String commandInfo() {
+        StringBuilder startText = new StringBuilder("Bot for show info about prices on Apple products from several online shop in SpB\n");
+        startText.append("/shopsDescription").append(" - ").append("list of shopsDescription for parsing").append("\n");
+        startText.append("/read <shop_title>").append(" - ")
+                .append("show current prices on assortment in this shop. Argument <shop_title> it is a title of show from result /shopsDescription command.")
+                .append("\n");
+        return startText.toString();
+    }
+
 }

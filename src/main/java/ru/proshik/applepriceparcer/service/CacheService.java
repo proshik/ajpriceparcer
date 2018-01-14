@@ -1,7 +1,4 @@
 package ru.proshik.applepriceparcer.service;
 
-public class Scheduller {
-
-
-
+public class CacheService {
 }

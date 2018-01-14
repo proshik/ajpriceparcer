@@ -20,4 +20,5 @@ public enum ProductType {
     public String getValue() {
         return value;
     }
+
 }

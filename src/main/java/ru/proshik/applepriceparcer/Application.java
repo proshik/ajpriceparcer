@@ -5,7 +5,7 @@ import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.proshik.applepriceparcer.bot.ApplePricePriceBot;
-import ru.proshik.applepriceparcer.provider.ScreenerProviderFactory;
+import ru.proshik.applepriceparcer.provider.ProviderFactory;
 import ru.proshik.applepriceparcer.service.CommandService;
 import ru.proshik.applepriceparcer.service.ShopService;
 import ru.proshik.applepriceparcer.storage.Database;
@@ -28,10 +28,10 @@ public class Application {
         String dbPath = readSystemEnv(DB_PATH);
 
         Database db = new Database(dbPath);
-        ScreenerProviderFactory screenerProviderFactory = new ScreenerProviderFactory();
+        ProviderFactory providerFactory = new ProviderFactory();
 
-        ShopService shopService = new ShopService(db, screenerProviderFactory);
-        CommandService commandService = new CommandService(shopService, screenerProviderFactory);
+        ShopService shopService = new ShopService(db, providerFactory);
+        CommandService commandService = new CommandService(shopService, providerFactory);
 
         // Bot initialization
         ApiContextInitializer.init();
