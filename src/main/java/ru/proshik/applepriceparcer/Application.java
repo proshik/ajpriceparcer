@@ -2,12 +2,14 @@ package ru.proshik.applepriceparcer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.quartz.SchedulerException;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.proshik.applepriceparcer.bot.AppleProductPricesBot;
 import ru.proshik.applepriceparcer.provider.ProviderFactory;
 import ru.proshik.applepriceparcer.service.OperationService;
+import ru.proshik.applepriceparcer.service.scheduler.QuartzDefaultScheuduler;
 import ru.proshik.applepriceparcer.storage.Database;
 
 public class Application {
@@ -29,6 +31,14 @@ public class Application {
         String telegramToken = readSystemEnv(TELEGRAM_TOKEN);
         String dbPath = readSystemEnv(DB_PATH);
 
+        QuartzDefaultScheuduler quartzDefaultScheuduler = new QuartzDefaultScheuduler();
+        try {
+            quartzDefaultScheuduler.init();
+        } catch (SchedulerException e) {
+            LOG.error(e);
+            System.exit(0);
+        }
+
         Database db = new Database(dbPath);
         ProviderFactory providerFactory = new ProviderFactory();
 
@@ -41,6 +51,7 @@ public class Application {
             botsApi.registerBot(new AppleProductPricesBot(telegramUsername, telegramToken, operationService));
         } catch (TelegramApiException e) {
             LOG.error(e);
+            System.exit(0);
         }
 
         LOG.info("Application was started!");
