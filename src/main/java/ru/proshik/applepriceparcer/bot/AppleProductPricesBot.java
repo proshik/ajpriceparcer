@@ -10,8 +10,7 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.proshik.applepriceparcer.model.*;
 import ru.proshik.applepriceparcer.model.sequence.DataSequence;
-import ru.proshik.applepriceparcer.service.CommandService;
-import ru.proshik.applepriceparcer.storage.Database;
+import ru.proshik.applepriceparcer.service.OperationService;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -26,30 +25,31 @@ import static ru.proshik.applepriceparcer.bot.BotUtils.buildReplyKeyboard;
 
 public class AppleProductPricesBot extends TelegramLongPollingBot {
 
-    private static final Logger LOG = Logger.getLogger(Database.class);
+    private static final Logger LOG = Logger.getLogger(AppleProductPricesBot.class);
 
     private static final String COMMAND_START = "/start";
+    private static final String COMMAND_HELP = "/help";
 
     private final List<List<String>> ROOT_MENU = Arrays.asList(
             singletonList(OperationType.PRICES.getValue()),
             singletonList(OperationType.HISTORY.getValue()),
-//                singletonList(OperationType.COMPARE.getValue()),
+            singletonList(OperationType.COMPARE.getValue()),
             singletonList(OperationType.SUBSCRIPTION.getValue()),
             singletonList(OperationType.MAIN_MENU.getValue()));
 
     private final String botUsername;
     private final String botToken;
 
-    private CommandService commandService;
-
-    private Map<String, DataSequence> callbackSequence = new HashMap<>();
+    private OperationService operationService;
+    // Map for store a user sequence actions
+    private Map<String, DataSequence> sequenceOperationStorage = new HashMap<>();
 
     public AppleProductPricesBot(String botUsername,
                                  String botToken,
-                                 CommandService commandService) {
+                                 OperationService operationService) {
         this.botUsername = botUsername;
         this.botToken = botToken;
-        this.commandService = commandService;
+        this.operationService = operationService;
     }
 
     @Override
@@ -61,18 +61,19 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
             } else if (update.hasCallbackQuery()) {
                 message = processCallbackOperation(update);
             } else {
-                message = shopMainMenu(update);
+                message = buildMainMenuMessage(update);
             }
         } catch (Exception e) {
             LOG.error(e);
             message = new SendMessage()
-                    .setText("Error on execute PriceOperation! Connect with support!");
+                    .setChatId(String.valueOf(update.getMessage().getFrom().getId()))
+                    .setText("Error on execute operation! Connect with support!");
         }
 
         try {
             execute(message);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            LOG.error("Panic! Messages not sending!", e);
         }
     }
 
@@ -88,7 +89,7 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
 
     @Override
     public void onClosing() {
-        System.out.println("Bot was closing");
+        LOG.info("Bot was closing");
     }
 
     private SendMessage processMessageOperation(Update update) {
@@ -103,56 +104,67 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
         return message;
     }
 
+    private SendMessage processCommandMessageOperation(Update update) {
+        SendMessage message;
+
+        switch (update.getMessage().getText().split(" ")[0]) {
+            case COMMAND_START:
+                message = buildGreetingsMessage(update);
+                break;
+            case COMMAND_HELP:
+                message = buildCommandInfoMessage(update);
+                break;
+            default:
+                message = buildCommandInfoMessage(update);
+        }
+
+        return message;
+    }
+
+    private SendMessage processKeyboardMessageOperation(Update update) {
+        SendMessage message = new SendMessage();
+
+        OperationType operationType = OperationType.fromValue(update.getMessage().getText());
+        if (operationType != null) {
+            switch (operationType) {
+                case PRICES:
+                    message = buildShopStep(String.valueOf(update.getMessage().getChatId()));
+                    break;
+                case HISTORY:
+                    message.setText("Not implement yet!");
+                    break;
+                case COMPARE:
+                    message.setText("Not implement yet!");
+                    break;
+                case SUBSCRIPTION:
+                    message.setText("Not implement yet!");
+                    break;
+                case MAIN_MENU:
+                default:
+                    message = buildMainMenuMessage(update);
+            }
+        } else {
+            message = buildMainMenuMessage(update);
+        }
+        return message;
+    }
+
     private SendMessage processCallbackOperation(Update update) {
-        String chatId = String.valueOf(update.getCallbackQuery().getFrom().getId());
-
-        SendMessage message = new SendMessage()
-                .setChatId(String.valueOf(chatId));
-
-        // TODO: 15.01.2018 проверить для всех кейсов и если что - заменить
-        update.getCallbackQuery().getMessage().getChatId();
+        SendMessage message = new SendMessage();
 
         String data = update.getCallbackQuery().getData();
         if (StringUtils.isNotEmpty(data)) {
+
             CallbackInfo callbackInfo = extractCallbackInfo(data);
 
-            DataSequence sequenceData = callbackSequence.get(callbackInfo.getId());
-
+            DataSequence sequenceData = sequenceOperationStorage.get(callbackInfo.getId());
             if (sequenceData != null) {
                 switch (sequenceData.getOperationType()) {
                     case PRICES:
-                        switch (sequenceData.getStepType()) {
-                            case SHOP_SELECTED:
-                                Shop shop = commandService.findShopByTitle(callbackInfo.getValue());
-
-                                sequenceData.setStepType(StepType.PRODUCT_TYPE_SELECTED);
-                                sequenceData.getData().setShop(shop);
-                                callbackSequence.put(callbackInfo.getId(), sequenceData);
-
-                                Map<String, String> productTypes = commandService.productTypes(callbackInfo.getValue()).stream()
-                                        .collect(Collectors.toMap(Enum::name, ProductType::getValue));
-
-                                message.setReplyMarkup(buildInlineKeyboard(productTypes, callbackInfo.getId(), 3));
-                                message.setText("Shop: *" + shop.getTitle() + "*\n\n" +
-                                        "Select the type of product which is available for selected shop");
-                                message.enableMarkdown(true);
-                                break;
-                            case PRODUCT_TYPE_SELECTED:
-                                Shop shop1 = sequenceData.getData().getShop();
-                                ProductType productType = ProductType.fromValue(callbackInfo.getValue());
-
-                                String history = commandService.history(shop1, productType);
-
-                                message.enableMarkdown(true);
-                                message.setReplyMarkup(buildRootMenuKeyboard());
-                                message.setText("Shop: *" + shop1.getTitle() + "*\n" +
-                                        "Product type: *" + productType.getValue() + "*\n\n" +
-                                        history);
-                                break;
-                            default:
-                                message.setReplyMarkup(buildRootMenuKeyboard());
-                                message.setText("Error on execution PriceOperation. Please start from the beginning!");
-                        }
+                        message = priceOperation(callbackInfo);
+                        break;
+                    case SUBSCRIPTION:
+                        // TODO: 15.01.2018
                         break;
                     default:
                         message.setReplyMarkup(buildRootMenuKeyboard());
@@ -160,10 +172,62 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
                 }
 
             }
+            message.setChatId(update.getCallbackQuery().getMessage().getChatId());
         } else {
-            message = shopMainMenu(update);
+            message = buildMainMenuMessage(update);
         }
+        return message;
+    }
 
+    private SendMessage priceOperation(CallbackInfo callbackInfo) {
+        SendMessage message = new SendMessage();
+
+        Shop shop;
+        DataSequence sequenceData = sequenceOperationStorage.get(callbackInfo.getId());
+        switch (sequenceData.getStepType()) {
+            case SHOP_SELECTED:
+                shop = operationService.findShopByTitle(callbackInfo.getValue());
+                if (shop == null) {
+                    message.setReplyMarkup(buildRootMenuKeyboard());
+                    message.setText("Error on execution PriceOperation. Please start from the beginning!");
+                    break;
+                }
+
+                sequenceData.setStepType(StepType.PRODUCT_TYPE_SELECTED);
+                sequenceData.getData().setShop(shop);
+                sequenceOperationStorage.put(callbackInfo.getId(), sequenceData);
+
+                List<ProductType> productTypes = operationService.selectUniqueProductTypes(shop);
+                if (productTypes.isEmpty()) {
+                    message.setReplyMarkup(buildRootMenuKeyboard());
+                    message.setText("No available product types for selected shop");
+                    break;
+                }
+
+                Map<String, String> productTypeValueTyEnumNam = operationService.selectUniqueProductTypes(shop).stream()
+                        .collect(Collectors.toMap(Enum::name, ProductType::getValue));
+
+                message.setReplyMarkup(buildInlineKeyboard(productTypeValueTyEnumNam, callbackInfo.getId(), 3));
+                message.setText("Shop: *" + shop.getTitle() + "*\n\n" +
+                        "Select the type of product which is available for selected shop");
+                message.enableMarkdown(true);
+                break;
+            case PRODUCT_TYPE_SELECTED:
+                shop = sequenceData.getData().getShop();
+                ProductType productType = ProductType.fromValue(callbackInfo.getValue());
+
+                String history = operationService.read(shop, productType);
+
+                message.enableMarkdown(true);
+                message.setReplyMarkup(buildRootMenuKeyboard());
+                message.setText("Shop: *" + shop.getTitle() + "*\n" +
+                        "Product type: *" + productType.getValue() + "*\n\n" +
+                        history);
+                break;
+            default:
+                message.setReplyMarkup(buildRootMenuKeyboard());
+                message.setText("Error on execution PriceOperation. Please start from the beginning!");
+        }
         return message;
     }
 
@@ -176,44 +240,6 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
         }
     }
 
-    private SendMessage processCommandMessageOperation(Update update) {
-        SendMessage message;
-
-        switch (update.getMessage().getText().split(" ")[0]) {
-            case COMMAND_START:
-                message = showGreetings(update);
-                break;
-            default:
-                message = shopMainMenu(update);
-        }
-
-        return message;
-    }
-
-    private SendMessage processKeyboardMessageOperation(Update update) {
-        SendMessage message = new SendMessage();
-
-        OperationType operationType = OperationType.fromValue(update.getMessage().getText());
-        switch (operationType) {
-            case PRICES:
-                message = buildShopStep(String.valueOf(update.getMessage().getChatId()));
-                break;
-            case HISTORY:
-                message.setText("Not implement yet!");
-                break;
-            case COMPARE:
-                message.setText("Not implement yet!");
-                break;
-            case SUBSCRIPTION:
-                message.setText("Not implement yet!");
-                break;
-            case MAIN_MENU:
-            default:
-                message = shopMainMenu(update);
-        }
-        return message;
-    }
-
     private SendMessage buildShopStep(String chatId) {
         InlineKeyboardMarkup inlineKeyboardMarkup = buildShopKeyboard(chatId);
 
@@ -223,16 +249,16 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
     }
 
     private InlineKeyboardMarkup buildShopKeyboard(String chatId) {
-        List<Shop> shopList = commandService.shopList();
+        List<Shop> shopList = operationService.selectAvailableShops();
 
-        callbackSequence.put(chatId, new DataSequence(OperationType.PRICES, StepType.SHOP_SELECTED));
+        sequenceOperationStorage.put(chatId, new DataSequence(OperationType.PRICES, StepType.SHOP_SELECTED));
 
         Map<String, String> shopMap = shopList.stream()
                 .collect(Collectors.toMap(Shop::getTitle, Shop::getTitle));
         return buildInlineKeyboard(shopMap, chatId, 1);
     }
 
-    private SendMessage showGreetings(Update update) {
+    private SendMessage buildGreetingsMessage(Update update) {
         return new SendMessage()
                 .setChatId(update.getMessage().getChatId())
                 .setReplyMarkup(buildRootMenuKeyboard())
@@ -241,7 +267,15 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
                         "And subscribe on a change prices.");
     }
 
-    private SendMessage shopMainMenu(Update update) {
+    private SendMessage buildCommandInfoMessage(Update update) {
+        return new SendMessage()
+                .setChatId(update.getMessage().getChatId())
+                .setText("Show prices on Apple products by several shops in SPB and Moscow.\n\n" +
+                        "/start - for start work with bot\n" +
+                        "/help - show a help message\n");
+    }
+
+    private SendMessage buildMainMenuMessage(Update update) {
         return new SendMessage()
                 .setChatId(update.getMessage().getChatId())
                 .setReplyMarkup(buildRootMenuKeyboard())

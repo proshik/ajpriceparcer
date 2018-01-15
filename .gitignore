@@ -2,3 +2,4 @@
 *.iml
 /target
 database.db
+logs.log

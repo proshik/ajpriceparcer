@@ -24,6 +24,6 @@ public enum OperationType {
         return Arrays.stream(values())
                 .filter(operationType -> operationType.getValue().toUpperCase().equals(value.toUpperCase()))
                 .findFirst()
-                .orElseThrow(null);
+                .orElse(null);
     }
 }

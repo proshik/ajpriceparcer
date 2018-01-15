@@ -9,64 +9,68 @@ import ru.proshik.applepriceparcer.provider.ProviderFactory;
 import ru.proshik.applepriceparcer.storage.Database;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CommandService {
+public class OperationService {
 
-    private static final Logger LOG = Logger.getLogger(Database.class);
+    private static final Logger LOG = Logger.getLogger(OperationService.class);
 
     private static final int HISTORY_LIMIT = 5;
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
-    private ShopService shopService;
+    private Database db;
     private ProviderFactory providerFactory;
 
-    public CommandService(ShopService shopService, ProviderFactory providerFactory) {
-        this.shopService = shopService;
+    public OperationService(Database db, ProviderFactory providerFactory) {
+        this.db = db;
         this.providerFactory = providerFactory;
     }
 
-    public List<Shop> shopList() {
+    public Shop findShopByTitle(String title) {
+        Provider provider = providerFactory.list().stream()
+                .filter(p -> p.getShop().getTitle().toUpperCase().equals(title.toUpperCase()))
+                .findFirst()
+                .orElse(null);
+
+        if (provider != null) {
+            return provider.getShop();
+        } else {
+            return null;
+        }
+    }
+
+    public List<Shop> selectAvailableShops() {
         return providerFactory.list().stream()
                 .map(Provider::getShop)
                 .sorted()
                 .collect(Collectors.toList());
     }
 
-    public Shop findShopByTitle(String title) {
-        return providerFactory.list().stream()
-                .filter(p -> p.getShop().getTitle().toUpperCase().equals(title.toUpperCase()))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Unexpected ShopTitle=" + title))
-                .getShop();
-    }
-
-    public List<ProductType> productTypes(String shopTitle) {
-        Provider provider = providerFactory.findByShopTitle(shopTitle);
-
+    public List<ProductType> selectUniqueProductTypes(Shop shop) {
         try {
-            return shopService.availableProductTypes(provider.getShop());
+            List<Assortment> assortments = db.getAssortments(shop);
+
+            return assortments.stream()
+                    .flatMap(assortment -> assortment.getProducts().stream())
+                    .map(Product::getProductType)
+                    .distinct()
+                    .collect(Collectors.toList());
         } catch (DatabaseException e) {
             LOG.error(e);
         }
 
-        return null;
-    }
-
-    public String shopsDescription() {
-        return providerFactory.list().stream()
-                .map(s -> "Title: " + s.getShop().getTitle() + " - URL: " + s.getShop().getUrl())
-                .collect(Collectors.joining("", "", "\n"));
+        return Collections.emptyList();
     }
 
     public String read(Shop shop, ProductType productType) {
         String result;
 
         Provider provider = providerFactory.findByShop(shop);
-            try {
-                Assortment assortment = provider.screening();
+        try {
+            Assortment assortment = provider.screening();
 
 //                try {
 //                    // TODO: 12.01.2018 will be need read from cache(in this class), method tryUpdateAssortment will be moved to scheduler
@@ -75,11 +79,11 @@ public class CommandService {
 //                    LOG.error(e);
 //                }
 
-                result = buildAssortment(assortment);
-            } catch (ProviderParseException e) {
-                LOG.error(e);
-                result = "Error on executing command";
-            }
+            result = buildAssortment(assortment);
+        } catch (ProviderParseException e) {
+            LOG.error(e);
+            result = "Error on executing command";
+        }
 //        } else {
 //            result = "Title unrecognized";
 //        }
@@ -92,7 +96,7 @@ public class CommandService {
         Provider provider = providerFactory.findByShop(shop);
         if (provider != null) {
             try {
-                List<Assortment> assortments = shopService.history(shop);
+                List<Assortment> assortments = db.getAssortments(shop);
 
                 List<Assortment> sortAssortments = assortments.stream()
                         .sorted((o1, o2) -> o2.getCreatedDate().compareTo(o1.getCreatedDate()))

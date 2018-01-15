@@ -46,8 +46,7 @@ public class BotUtils {
             try {
                 callbackData = objectMapper.writeValueAsString(new CallbackInfo(callbackId, item.getKey()));
             } catch (JsonProcessingException e) {
-                e.printStackTrace();
-                throw new RuntimeException("Error on write value as string");
+                throw new RuntimeException("Error on write value as string", e);
             }
 
             InlineKeyboardButton button = new InlineKeyboardButton();

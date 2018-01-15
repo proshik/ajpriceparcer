@@ -1,86 +1,8 @@
 package ru.proshik.applepriceparcer.service;
 
-import ru.proshik.applepriceparcer.exception.DatabaseException;
-import ru.proshik.applepriceparcer.model.*;
-import ru.proshik.applepriceparcer.provider.ProviderFactory;
-import ru.proshik.applepriceparcer.storage.Database;
-
-import java.math.BigDecimal;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 public class ShopService {
 
-    private Database db;
-    private ProviderFactory providerFactory;
-
 //    private CacheService shopCache = new CacheService();
-
-    public ShopService(Database db, ProviderFactory providerFactory) {
-        this.db = db;
-        this.providerFactory = providerFactory;
-    }
-
-    public void tryUpdateAssortment(Shop shop, Assortment assortment) throws DatabaseException {
-        List<Assortment> existsAssortments = db.getAssortments(shop);
-
-        if (existsAssortments != null && !existsAssortments.isEmpty()) {
-            boolean wasChanges = wasChangeInAssortments(assortment, existsAssortments);
-            if (wasChanges) {
-                db.addAssortment(shop, assortment);
-            }
-        } else {
-            db.addAssortment(shop, assortment);
-        }
-    }
-
-    public List<Assortment> history(Shop shop) throws DatabaseException {
-        return db.getAssortments(shop);
-    }
-
-    public List<ProductType> availableProductTypes(Shop shop) throws DatabaseException {
-        List<Assortment> assortments = db.getAssortments(shop);
-
-        return assortments.stream()
-                .flatMap(assortment -> assortment.getProducts().stream())
-                .map(Product::getProductType)
-                .distinct()
-                .collect(Collectors.toList());
-    }
-
-    private static boolean wasChangeInAssortments(Assortment newAssortment, List<Assortment> existsAssortments) {
-        Assortment lastAssortment = getLastAssortment(existsAssortments);
-
-        Map<String, Product> productsByTitle = newAssortment.getProducts().stream()
-                .collect(Collectors.toMap(Product::getTitle, o -> o));
-
-        for (Product p : lastAssortment.getProducts()) {
-            Map<String, BigDecimal> itemPriceByTitle = p.getItems().stream()
-                    .collect(Collectors.toMap(Item::getTitle, Item::getPrice));
-
-            List<Item> newItemsInAssortment = productsByTitle.get(p.getTitle()).getItems();
-            for (Item i : newItemsInAssortment) {
-                BigDecimal bigDecimal = itemPriceByTitle.get(i.getTitle());
-                if (bigDecimal == null) {
-                    return true;
-                }
-                //if price from new assortment not equals
-                if (!itemPriceByTitle.get(i.getTitle()).equals(i.getPrice())) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private static Assortment getLastAssortment(List<Assortment> assortments) {
-        return assortments.stream()
-                .max(Comparator.comparing(Assortment::getCreatedDate))
-                .orElseThrow(() -> new IllegalArgumentException("Must be at least one element"));
-    }
 
     //        if (option != null && option.getTitle().equals("-h")) {
 //            System.out.println(printInfo());
