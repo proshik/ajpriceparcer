@@ -66,7 +66,7 @@ public class OperationService {
                     .distinct()
                     .collect(Collectors.toList());
         } catch (DatabaseException e) {
-            LOG.error(e);
+            LOG.error("Error on select unique product types", e);
         }
 
         return Collections.emptyList();
@@ -83,12 +83,12 @@ public class OperationService {
 //                    // TODO: 12.01.2018 will be need read from cache(in this class), method tryUpdateAssortment will be moved to scheduler
 //                    shopService.tryUpdateAssortment(shop, assortment);
 //                } catch (DatabaseException e) {
-//                    LOG.error(e);
+//                    LOG.error("error", e);
 //                }
 
             result = buildAssortment(assortment);
         } catch (ProviderParseException e) {
-            LOG.error(e);
+            LOG.error("Erorr on read data from provider with title=" + shop.getTitle(), e);
             result = "Error on executing command";
         }
 //        } else {
@@ -112,7 +112,7 @@ public class OperationService {
 
                 result = buildHistory(sortAssortments);
             } catch (DatabaseException e) {
-                LOG.error(e);
+                LOG.error("Error on execute history command", e);
                 result = "Error on executing command";
             }
         } else {

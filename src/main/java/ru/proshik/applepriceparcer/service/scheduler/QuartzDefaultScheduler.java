@@ -9,13 +9,13 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
-import static org.quartz.SimpleScheduleBuilder.repeatSecondlyForever;
+import static org.quartz.SimpleScheduleBuilder.repeatMinutelyForever;
 
 public class QuartzDefaultScheduler {
 
     private static final Logger LOG = Logger.getLogger(QuartzDefaultScheduler.class);
 
-    private static final int MINUTE_INTERVAL = 515;
+    private static final int MINUTE_INTERVAL = 5;
 
     private OperationService operationService;
 
@@ -35,7 +35,7 @@ public class QuartzDefaultScheduler {
         Trigger trigger = TriggerBuilder.newTrigger()
                 .withIdentity("ShopTrigger", "default")
                 .startAt(Date.from(now.atZone(ZoneId.systemDefault()).toInstant()))
-                .withSchedule(repeatSecondlyForever(MINUTE_INTERVAL)
+                .withSchedule(repeatMinutelyForever(MINUTE_INTERVAL)
                         .repeatForever())
                 .build();
 

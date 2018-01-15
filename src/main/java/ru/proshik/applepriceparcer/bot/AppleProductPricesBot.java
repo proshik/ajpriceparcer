@@ -27,9 +27,11 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
 
     private static final Logger LOG = Logger.getLogger(AppleProductPricesBot.class);
 
+    // Commands
     private static final String COMMAND_START = "/start";
     private static final String COMMAND_HELP = "/help";
 
+    // Root menu elements
     private final List<List<String>> ROOT_MENU = Arrays.asList(
             singletonList(OperationType.PRICES.getValue()),
             singletonList(OperationType.HISTORY.getValue()),
@@ -37,11 +39,13 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
             singletonList(OperationType.SUBSCRIPTION.getValue()),
             singletonList(OperationType.MAIN_MENU.getValue()));
 
+    // Telegram bot settings
     private final String botUsername;
     private final String botToken;
 
+    // Injected services
     private OperationService operationService;
-    // Map for store a user sequence actions
+    // In-memory map for user steps
     private Map<String, DataSequence> sequenceOperationStorage = new HashMap<>();
 
     public AppleProductPricesBot(String botUsername,
@@ -61,12 +65,13 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
             } else if (update.hasCallbackQuery()) {
                 message = processCallbackOperation(update);
             } else {
-                message = buildMainMenuMessage(update);
+                LOG.error("Unexpected situation. Unrecognized update operation. Update obj: " + update.toString());
+                return;
             }
         } catch (Exception e) {
-            LOG.error(e);
+            LOG.error("Error on build message", e);
             message = new SendMessage()
-                    .setChatId(String.valueOf(update.getMessage().getFrom().getId()))
+                    .setChatId(extractChatId(update))
                     .setText("Error on execute operation! Connect with support!");
         }
 
@@ -100,7 +105,6 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
         } else {
             message = processKeyboardMessageOperation(update);
         }
-        message.setChatId(update.getMessage().getChatId());
         return message;
     }
 
@@ -128,10 +132,11 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
         if (operationType != null) {
             switch (operationType) {
                 case PRICES:
-                    message = buildShopStep(String.valueOf(update.getMessage().getChatId()));
+                    message = buildShopStep(update);
                     break;
                 case HISTORY:
                     message.setText("Not implement yet!");
+
                     break;
                 case COMPARE:
                     message.setText("Not implement yet!");
@@ -156,30 +161,29 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
         if (StringUtils.isNotEmpty(data)) {
 
             CallbackInfo callbackInfo = extractCallbackInfo(data);
-
             DataSequence sequenceData = sequenceOperationStorage.get(callbackInfo.getId());
+
             if (sequenceData != null) {
                 switch (sequenceData.getOperationType()) {
                     case PRICES:
-                        message = priceOperation(callbackInfo);
+                        message = priceCallbackOperation(update, callbackInfo);
                         break;
                     case SUBSCRIPTION:
                         // TODO: 15.01.2018
                         break;
                     default:
                         message.setReplyMarkup(buildRootMenuKeyboard());
+                        message.setChatId(update.getCallbackQuery().getMessage().getChatId());
                         message.setText("Error on execution PriceOperation. Please start from the beginning!");
                 }
-
             }
-            message.setChatId(update.getCallbackQuery().getMessage().getChatId());
         } else {
             message = buildMainMenuMessage(update);
         }
         return message;
     }
 
-    private SendMessage priceOperation(CallbackInfo callbackInfo) {
+    private SendMessage priceCallbackOperation(Update update, CallbackInfo callbackInfo) {
         SendMessage message = new SendMessage();
 
         Shop shop;
@@ -228,34 +232,55 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
                 message.setReplyMarkup(buildRootMenuKeyboard());
                 message.setText("Error on execution PriceOperation. Please start from the beginning!");
         }
+        message.setChatId(update.getCallbackQuery().getMessage().getChatId());
         return message;
+    }
+
+    private Long extractChatId(Update update) {
+        Long chatId;
+        if (update.hasMessage()) {
+            chatId = update.getMessage().getChatId();
+        } else if (update.hasCallbackQuery()) {
+            if (update.getCallbackQuery().getMessage() != null) {
+                chatId = update.getCallbackQuery().getMessage().getChatId();
+            } else {
+                chatId = Long.valueOf(update.getCallbackQuery().getFrom().getId());
+            }
+        } else if (update.hasInlineQuery()) {
+            chatId = Long.valueOf(update.getInlineQuery().getFrom().getId());
+        } else if (update.hasChosenInlineQuery()) {
+            chatId = Long.valueOf(update.getChosenInlineQuery().getFrom().getId());
+        } else {
+            LOG.error("Error on exception. Unexpected situation. Unrecognized update operation. Update obj:" + update);
+            chatId = null;
+        }
+        return chatId;
     }
 
     private CallbackInfo extractCallbackInfo(String data) {
         try {
             return BotUtils.objectMapper.readValue(data, CallbackInfo.class);
         } catch (IOException e) {
-            LOG.error(e);
+            LOG.error("Error on extract callback info with Object mapper", e);
             throw new RuntimeException("Error on read value from callback", e);
         }
     }
 
-    private SendMessage buildShopStep(String chatId) {
-        InlineKeyboardMarkup inlineKeyboardMarkup = buildShopKeyboard(chatId);
+    private SendMessage buildShopStep(Update update) {
+        Map<String, String> shopMap = operationService.selectAvailableShops().stream()
+                .collect(Collectors.toMap(Shop::getTitle, Shop::getTitle));
 
-        return new SendMessage()
+        String chatId = String.valueOf(update.getMessage().getChatId());
+
+        InlineKeyboardMarkup inlineKeyboardMarkup = buildInlineKeyboard(shopMap, String.valueOf(chatId), 1);
+        SendMessage message = new SendMessage()
                 .setReplyMarkup(inlineKeyboardMarkup)
+                .setChatId(chatId)
                 .setText("Select the shop for continue");
-    }
-
-    private InlineKeyboardMarkup buildShopKeyboard(String chatId) {
-        List<Shop> shopList = operationService.selectAvailableShops();
 
         sequenceOperationStorage.put(chatId, new DataSequence(OperationType.PRICES, StepType.SHOP_SELECTED));
 
-        Map<String, String> shopMap = shopList.stream()
-                .collect(Collectors.toMap(Shop::getTitle, Shop::getTitle));
-        return buildInlineKeyboard(shopMap, chatId, 1);
+        return message;
     }
 
     private SendMessage buildGreetingsMessage(Update update) {

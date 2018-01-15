@@ -39,7 +39,7 @@ public class Application {
         try {
             quartzDefaultScheduler.init();
         } catch (SchedulerException e) {
-            LOG.error(e);
+            LOG.error("Eror on execute quartz scheduler", e);
             System.exit(0);
         }
 
@@ -49,7 +49,7 @@ public class Application {
         try {
             botsApi.registerBot(new AppleProductPricesBot(telegramUsername, telegramToken, operationService));
         } catch (TelegramApiException e) {
-            LOG.error(e);
+            LOG.error("Error on registration bot in Telegram api", e);
             System.exit(0);
         }
 
