@@ -33,7 +33,7 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
     private final List<List<String>> ROOT_MENU = Arrays.asList(
             singletonList(OperationType.PRICES.getValue()),
             singletonList(OperationType.HISTORY.getValue()),
-            singletonList(OperationType.COMPARE.getValue()),
+//            singletonList(OperationType.COMPARE.getValue()),
             singletonList(OperationType.SUBSCRIPTION.getValue()),
             singletonList(OperationType.MAIN_MENU.getValue()));
 

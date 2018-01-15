@@ -52,6 +52,10 @@ public class OperationService {
                 .collect(Collectors.toList());
     }
 
+    public List<Provider> selectAllProviders() {
+        return providerFactory.list();
+    }
+
     public List<ProductType> selectUniqueProductTypes(Shop shop) {
         try {
             List<Assortment> assortments = db.getAssortments(shop);
@@ -125,9 +129,11 @@ public class OperationService {
             boolean wasChanges = wasChangeInAssortments(assortment, existsAssortments);
             if (wasChanges) {
                 db.addAssortment(shop, assortment);
+                LOG.info("Success updated assortment for shop with title=" + shop.getTitle());
             }
         } else {
             db.addAssortment(shop, assortment);
+            LOG.info("Success added at first time assortment for shop with title=" + shop.getTitle());
         }
     }
 

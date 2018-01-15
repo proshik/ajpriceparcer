@@ -3,6 +3,7 @@ package ru.proshik.applepriceparcer.service.scheduler;
 import org.apache.log4j.Logger;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
+import ru.proshik.applepriceparcer.service.OperationService;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -10,11 +11,17 @@ import java.util.Date;
 
 import static org.quartz.SimpleScheduleBuilder.repeatSecondlyForever;
 
-public class QuartzDefaultScheuduler {
+public class QuartzDefaultScheduler {
 
-    private static final Logger LOG = Logger.getLogger(QuartzDefaultScheuduler.class);
+    private static final Logger LOG = Logger.getLogger(QuartzDefaultScheduler.class);
 
-    private static final int MINUTE_INTERVAL = 5;
+    private static final int MINUTE_INTERVAL = 515;
+
+    private OperationService operationService;
+
+    public QuartzDefaultScheduler(OperationService operationService) {
+        this.operationService = operationService;
+    }
 
     public void init() throws SchedulerException {
         Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
@@ -33,11 +40,12 @@ public class QuartzDefaultScheuduler {
                 .build();
 
         // Tell quartz to schedule the job using our trigger
+        scheduler.getContext().put(ShopJob.OPERATION_SERVICE_LABEL, operationService);
+
+        scheduler.scheduleJob(job, trigger);
         scheduler.start();
 
-        Date date = scheduler.scheduleJob(job, trigger);
-
-        LOG.info("Scheduler with repeat interval=" + MINUTE_INTERVAL + "was run in time: " + date);
+        LOG.info("Scheduler with repeat interval=" + MINUTE_INTERVAL + "was started!");
     }
 
 }

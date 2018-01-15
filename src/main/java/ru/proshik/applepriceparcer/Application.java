@@ -9,7 +9,7 @@ import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.proshik.applepriceparcer.bot.AppleProductPricesBot;
 import ru.proshik.applepriceparcer.provider.ProviderFactory;
 import ru.proshik.applepriceparcer.service.OperationService;
-import ru.proshik.applepriceparcer.service.scheduler.QuartzDefaultScheuduler;
+import ru.proshik.applepriceparcer.service.scheduler.QuartzDefaultScheduler;
 import ru.proshik.applepriceparcer.storage.Database;
 
 public class Application {
@@ -31,18 +31,17 @@ public class Application {
         String telegramToken = readSystemEnv(TELEGRAM_TOKEN);
         String dbPath = readSystemEnv(DB_PATH);
 
-        QuartzDefaultScheuduler quartzDefaultScheuduler = new QuartzDefaultScheuduler();
+        Database db = new Database(dbPath);
+        ProviderFactory providerFactory = new ProviderFactory();
+        OperationService operationService = new OperationService(db, providerFactory);
+
+        QuartzDefaultScheduler quartzDefaultScheduler = new QuartzDefaultScheduler(operationService);
         try {
-            quartzDefaultScheuduler.init();
+            quartzDefaultScheduler.init();
         } catch (SchedulerException e) {
             LOG.error(e);
             System.exit(0);
         }
-
-        Database db = new Database(dbPath);
-        ProviderFactory providerFactory = new ProviderFactory();
-
-        OperationService operationService = new OperationService(db, providerFactory);
 
         // Bot initialization
         ApiContextInitializer.init();
