@@ -23,3 +23,63 @@ ru.proshik.applepriceparcer.console.exception.NotFoundOptionException: Option wi
  at [Source: [{"createdDate":"2018-01-13T18:53:26.956846","products":[{"title":"iPhone X","productType":"IPHONE","description":"серебристый/«серый космос»","items":[{"title":"iPhone X 64GB","price":70990},{"title":"iPhone X 256GB","price":83990}]},{"title":"iPhone 8 / iPhone 8 Plus","productType":"IPHONE","description":"золотой/серебристый/«серый космос»","items":[{"title":"iPhone 8 64GB","price":48900},{"title":"iPhone 8 256GB","price":56900},{"title":"iPhone 8 Plus 64GB","price":55900},{"title":"iPhone 8 Plus 256GB","price":66500}]},{"title":"iPhone 7 / iPhone 7 Plus","productType":"IPHONE","description":"«розовое золото»/золотой/серебристый/чёрный/«чёрный оникс»","items":[{"title":"iPhone 7 32GB","price":38500},{"title":"iPhone 7 128GB","price":45500},{"title":"iPhone 7 256GB","price":47500},{"title":"iPhone 7 Plus 32GB","price":46000},{"title":"iPhone 7 Plus 128GB","price":55000},{"title":"iPhone 7 Plus 256GB","price":57000}]},{"title":"iPhone 7 / iPhone 7 Plus \n (PRODUCT)RED™","productType":"IPHONE","description":"красный","items":[{"title":"iPhone 7 128GB","price":45500},{"title":"iPhone 7 Plus 128GB","price":55000}]},{"title":"iPhone 6s / iPhone 6s Plus","productType":"IPHONE","description":"«серый космос»/золотой/серебристый/«розовое золото»","items":[{"title":"iPhone 6s 32GB","price":31990}]},{"title":"iPhone 6","productType":"IPHONE","description":"«серый космос»/золотой","items":[{"title":"iPhone 6 32GB","price":23900}]},{"title":"iPhone SE","productType":"IPHONE","description":"«серый космос»/золотой/серебристый/«розовое золото»","items":[{"title":"iPhone SE 32GB","price":18890}]}]}]; line: 1, column: 92] (through reference chain: Object[][0]->ru.proshik.applepriceparcer.model.Assortment["products"]->java.util.ArrayList[0]->ru.proshik.applepriceparcer.model.Product["productType"])
 2018-01-14 14:20:50 ERROR Database:90 - ru.proshik.applepriceparcer.exception.DatabaseException: com.fasterxml.jackson.databind.JsonMappingException: Can not construct instance of ru.proshik.applepriceparcer.model.ProductType, problem: Not found product type
  at [Source: [{"createdDate":"2018-01-13T18:53:26.956846","products":[{"title":"iPhone X","productType":"IPHONE","description":"серебристый/«серый космос»","items":[{"title":"iPhone X 64GB","price":70990},{"title":"iPhone X 256GB","price":83990}]},{"title":"iPhone 8 / iPhone 8 Plus","productType":"IPHONE","description":"золотой/серебристый/«серый космос»","items":[{"title":"iPhone 8 64GB","price":48900},{"title":"iPhone 8 256GB","price":56900},{"title":"iPhone 8 Plus 64GB","price":55900},{"title":"iPhone 8 Plus 256GB","price":66500}]},{"title":"iPhone 7 / iPhone 7 Plus","productType":"IPHONE","description":"«розовое золото»/золотой/серебристый/чёрный/«чёрный оникс»","items":[{"title":"iPhone 7 32GB","price":38500},{"title":"iPhone 7 128GB","price":45500},{"title":"iPhone 7 256GB","price":47500},{"title":"iPhone 7 Plus 32GB","price":46000},{"title":"iPhone 7 Plus 128GB","price":55000},{"title":"iPhone 7 Plus 256GB","price":57000}]},{"title":"iPhone 7 / iPhone 7 Plus \n (PRODUCT)RED™","productType":"IPHONE","description":"красный","items":[{"title":"iPhone 7 128GB","price":45500},{"title":"iPhone 7 Plus 128GB","price":55000}]},{"title":"iPhone 6s / iPhone 6s Plus","productType":"IPHONE","description":"«серый космос»/золотой/серебристый/«розовое золото»","items":[{"title":"iPhone 6s 32GB","price":31990}]},{"title":"iPhone 6","productType":"IPHONE","description":"«серый космос»/золотой","items":[{"title":"iPhone 6 32GB","price":23900}]},{"title":"iPhone SE","productType":"IPHONE","description":"«серый космос»/золотой/серебристый/«розовое золото»","items":[{"title":"iPhone SE 32GB","price":18890}]}]}]; line: 1, column: 92] (through reference chain: Object[][0]->ru.proshik.applepriceparcer.model.Assortment["products"]->java.util.ArrayList[0]->ru.proshik.applepriceparcer.model.Product["productType"])
+2018-01-15 15:23:07 ERROR Database:160 - com.fasterxml.jackson.core.JsonParseException: Unrecognized token 'ru': was expecting ('true', 'false' or 'null')
+ at [Source: ru.proshik.applepriceparcer.model.sequence.DataSequence@8cec3c4; line: 1, column: 3]
+2018-01-15 15:23:32 ERROR Database:160 - com.fasterxml.jackson.core.JsonParseException: Unrecognized token 'ru': was expecting ('true', 'false' or 'null')
+ at [Source: ru.proshik.applepriceparcer.model.sequence.DataSequence@8cec3c4; line: 1, column: 3]
+2018-01-15 15:24:05 ERROR Database:162 - com.fasterxml.jackson.core.JsonParseException: Unrecognized token 'ru': was expecting ('true', 'false' or 'null')
+ at [Source: ru.proshik.applepriceparcer.model.sequence.DataSequence@8cec3c4; line: 1, column: 3]
+2018-01-15 15:24:05 ERROR Database:67 - java.lang.RuntimeException: Error on read value from callback
+2018-01-15 15:24:31 ERROR Database:161 - com.fasterxml.jackson.core.JsonParseException: Unrecognized token 'ru': was expecting ('true', 'false' or 'null')
+ at [Source: ru.proshik.applepriceparcer.model.sequence.DataSequence@8cec3c4; line: 1, column: 3]
+2018-01-15 15:24:33 ERROR Database:67 - java.lang.RuntimeException: Error on read value from callback
+2018-01-15 15:24:38 ERROR Database:161 - com.fasterxml.jackson.core.JsonParseException: Unrecognized token 'ru': was expecting ('true', 'false' or 'null')
+ at [Source: ru.proshik.applepriceparcer.model.sequence.DataSequence@8cec3c4; line: 1, column: 3]
+2018-01-15 15:24:38 ERROR Database:67 - java.lang.RuntimeException: Error on read value from callback
+2018-01-15 15:26:28 ERROR Database:161 - com.fasterxml.jackson.core.JsonParseException: Unrecognized token 'ru': was expecting ('true', 'false' or 'null')
+ at [Source: ru.proshik.applepriceparcer.model.sequence.DataSequence@8cec3c4; line: 1, column: 3]
+2018-01-15 15:26:28 ERROR Database:67 - java.lang.RuntimeException: Error on read value from callback
+2018-01-15 15:41:12 ERROR Database:67 - java.lang.NullPointerException
+2018-01-15 15:48:16 ERROR Database:67 - java.lang.RuntimeException: Error on write value as string
+2018-01-15 15:48:41 ERROR Database:67 - java.lang.RuntimeException: Error on write value as string
+2018-01-15 15:49:24 ERROR Database:67 - java.lang.RuntimeException: Error on write value as string
+2018-01-15 15:50:49 ERROR Database:67 - java.lang.RuntimeException: Error on write value as string
+2018-01-15 15:51:13 ERROR Database:67 - java.lang.RuntimeException: Error on write value as string
+2018-01-15 15:51:26 ERROR Database:161 - com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException: Unrecognized field "shopTitle" (class ru.proshik.applepriceparcer.model.sequence.DataSequence), not marked as ignorable (2 known properties: "operationType", "data"])
+ at [Source: {"shopTitle":"t","productType":"t"}; line: 1, column: 15] (through reference chain: ru.proshik.applepriceparcer.model.sequence.DataSequence["shopTitle"])
+2018-01-15 15:51:26 ERROR Database:67 - java.lang.RuntimeException: Error on read value from callback
+2018-01-15 17:12:00 ERROR Database:174 - com.fasterxml.jackson.databind.JsonMappingException: Can not construct instance of ru.proshik.applepriceparcer.model.CallbackInfo: no int/Int-argument constructor/factory method to deserialize from Number value (128968477)
+ at [Source: 128968477; line: 1, column: 1]
+2018-01-15 17:12:00 ERROR Database:67 - java.lang.RuntimeException: Error on read value from callback
+2018-01-15 17:12:25 ERROR Database:174 - com.fasterxml.jackson.databind.JsonMappingException: Can not construct instance of ru.proshik.applepriceparcer.model.CallbackInfo: no int/Int-argument constructor/factory method to deserialize from Number value (128968477)
+ at [Source: 128968477; line: 1, column: 1]
+2018-01-15 17:12:25 ERROR Database:67 - java.lang.RuntimeException: Error on read value from callback
+2018-01-15 17:12:50 ERROR Database:174 - com.fasterxml.jackson.databind.JsonMappingException: Can not construct instance of ru.proshik.applepriceparcer.model.CallbackInfo: no int/Int-argument constructor/factory method to deserialize from Number value (128968477)
+ at [Source: 128968477; line: 1, column: 1]
+2018-01-15 17:12:50 ERROR Database:67 - java.lang.RuntimeException: Error on read value from callback
+2018-01-15 17:13:24 ERROR Database:174 - com.fasterxml.jackson.databind.JsonMappingException: Can not construct instance of ru.proshik.applepriceparcer.model.CallbackInfo: no int/Int-argument constructor/factory method to deserialize from Number value (128968477)
+ at [Source: 128968477; line: 1, column: 1]
+2018-01-15 17:13:24 ERROR Database:67 - java.lang.RuntimeException: Error on read value from callback
+2018-01-15 17:13:30 ERROR Database:174 - com.fasterxml.jackson.databind.JsonMappingException: Can not construct instance of ru.proshik.applepriceparcer.model.CallbackInfo: no int/Int-argument constructor/factory method to deserialize from Number value (128968477)
+ at [Source: 128968477; line: 1, column: 1]
+2018-01-15 17:13:30 ERROR Database:67 - java.lang.RuntimeException: Error on read value from callback
+2018-01-15 17:13:39 ERROR Database:174 - com.fasterxml.jackson.databind.JsonMappingException: Can not construct instance of ru.proshik.applepriceparcer.model.CallbackInfo: no int/Int-argument constructor/factory method to deserialize from Number value (128968477)
+ at [Source: 128968477; line: 1, column: 1]
+2018-01-15 17:13:39 ERROR Database:67 - java.lang.RuntimeException: Error on read value from callback
+2018-01-15 17:14:06 ERROR Database:174 - com.fasterxml.jackson.databind.JsonMappingException: Can not construct instance of ru.proshik.applepriceparcer.model.CallbackInfo: no int/Int-argument constructor/factory method to deserialize from Number value (128968477)
+ at [Source: 128968477; line: 1, column: 1]
+2018-01-15 17:14:06 ERROR Database:67 - java.lang.RuntimeException: Error on read value from callback
+2018-01-15 17:15:00 ERROR Database:67 - java.lang.IllegalStateException: Duplicate key iPhone
+2018-01-15 17:15:18 ERROR Database:67 - java.lang.IllegalArgumentException: Unexpected ProductType value=AJ
+2018-01-15 17:16:13 ERROR Database:67 - java.lang.IllegalArgumentException: Unexpected ProductType value=AJ
+2018-01-15 17:16:15 ERROR Database:67 - java.lang.IllegalArgumentException: Unexpected ProductType value=AJ
+2018-01-15 17:16:44 ERROR Database:67 - java.lang.IllegalArgumentException: Unexpected ProductType value=AJ
+2018-01-15 17:17:21 ERROR Database:67 - java.lang.IllegalStateException: Duplicate key iPhone
+2018-01-15 17:19:22 ERROR Database:67 - java.lang.IllegalStateException: Duplicate key iPhone
+2018-01-15 17:19:30 ERROR Database:67 - java.lang.IllegalStateException: Duplicate key iPhone
+2018-01-15 17:20:27 ERROR Database:67 - java.lang.IllegalStateException: Duplicate key iPhone
+2018-01-15 17:20:36 ERROR Database:67 - java.lang.IllegalArgumentException: Unexpected ProductType value=AJ
+2018-01-15 17:20:40 ERROR Database:67 - java.lang.IllegalArgumentException: Unexpected ProductType value=AJ
+2018-01-15 17:22:03 ERROR Database:67 - java.lang.IllegalStateException: Duplicate key iPhone
+2018-01-15 17:22:47 ERROR Database:67 - java.lang.IllegalStateException: Duplicate key iPhone
+2018-01-15 17:24:15 ERROR Database:67 - java.lang.IllegalStateException: Duplicate key iPhone

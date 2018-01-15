@@ -1,10 +1,7 @@
 package ru.proshik.applepriceparcer.service;
 
 import ru.proshik.applepriceparcer.exception.DatabaseException;
-import ru.proshik.applepriceparcer.model.Assortment;
-import ru.proshik.applepriceparcer.model.Item;
-import ru.proshik.applepriceparcer.model.Product;
-import ru.proshik.applepriceparcer.model.Shop;
+import ru.proshik.applepriceparcer.model.*;
 import ru.proshik.applepriceparcer.provider.ProviderFactory;
 import ru.proshik.applepriceparcer.storage.Database;
 
@@ -41,6 +38,16 @@ public class ShopService {
 
     public List<Assortment> history(Shop shop) throws DatabaseException {
         return db.getAssortments(shop);
+    }
+
+    public List<ProductType> availableProductTypes(Shop shop) throws DatabaseException {
+        List<Assortment> assortments = db.getAssortments(shop);
+
+        return assortments.stream()
+                .flatMap(assortment -> assortment.getProducts().stream())
+                .map(Product::getProductType)
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     private static boolean wasChangeInAssortments(Assortment newAssortment, List<Assortment> existsAssortments) {
@@ -170,7 +177,6 @@ public class ShopService {
 //
 //        return change.toString();
 //    }
-
 
 
 }

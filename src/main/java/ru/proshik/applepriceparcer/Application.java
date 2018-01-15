@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-import ru.proshik.applepriceparcer.bot.ApplePricePriceBot;
+import ru.proshik.applepriceparcer.bot.AppleProductPricesBot;
 import ru.proshik.applepriceparcer.provider.ProviderFactory;
 import ru.proshik.applepriceparcer.service.CommandService;
 import ru.proshik.applepriceparcer.service.ShopService;
@@ -37,7 +37,7 @@ public class Application {
         ApiContextInitializer.init();
         TelegramBotsApi botsApi = new TelegramBotsApi();
         try {
-            botsApi.registerBot(new ApplePricePriceBot(telegramUsername, telegramToken, commandService));
+            botsApi.registerBot(new AppleProductPricesBot(telegramUsername, telegramToken, commandService));
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }

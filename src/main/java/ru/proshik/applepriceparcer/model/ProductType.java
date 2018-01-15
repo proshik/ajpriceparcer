@@ -1,5 +1,7 @@
 package ru.proshik.applepriceparcer.model;
 
+import java.util.Arrays;
+
 public enum ProductType {
 
     IPHONE("iPhone"),
@@ -21,4 +23,10 @@ public enum ProductType {
         return value;
     }
 
+    public static ProductType fromValue(String value) {
+        return Arrays.stream(values())
+                .filter(pro -> pro.getValue().toUpperCase().equals(value.toUpperCase()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Unexpected ProductType value=" + value));
+    }
 }

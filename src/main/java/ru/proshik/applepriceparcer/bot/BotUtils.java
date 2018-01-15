@@ -1,15 +1,13 @@
 package ru.proshik.applepriceparcer.bot;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardRow;
-import ru.proshik.applepriceparcer.model.SelectedProduct;
+import ru.proshik.applepriceparcer.model.CallbackInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,20 +33,27 @@ public class BotUtils {
     }
 
 
-    public static InlineKeyboardMarkup buildInlineKeyboard(Map<String, SelectedProduct> items, int onLine) {
+    static InlineKeyboardMarkup buildInlineKeyboard(Map<String, String> items, String callbackId, int onLine) {
+        // In elements less then resolution of table buttons then change count elements on line
+        if (items.size() < onLine) {
+            onLine = items.size();
+        }
 
         List<InlineKeyboardButton> inlineButtons = new ArrayList<>();
-        for (Map.Entry<String, SelectedProduct> item : items.entrySet()) {
-            InlineKeyboardButton button = new InlineKeyboardButton();
-            button.setText(item.getKey());
+        for (Map.Entry<String, String> item : items.entrySet()) {
+
+            String callbackData;
             try {
-                String callbackObject = objectMapper.writeValueAsString(item.getValue());
-                button.setCallbackData(callbackObject);
-                inlineButtons.add(button);
+                callbackData = objectMapper.writeValueAsString(new CallbackInfo(callbackId, item.getKey()));
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
                 throw new RuntimeException("Error on write value as string");
             }
+
+            InlineKeyboardButton button = new InlineKeyboardButton();
+            button.setText(item.getValue());
+            button.setCallbackData(callbackData);
+            inlineButtons.add(button);
         }
 
         List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
@@ -69,7 +74,7 @@ public class BotUtils {
         return markup;
     }
 
-    public static ReplyKeyboardMarkup buildReplyKeyboard(List<List<String>> groups) {
+    static ReplyKeyboardMarkup buildReplyKeyboard(List<List<String>> groups) {
         ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
 
         List<KeyboardRow> keyboardRows = new ArrayList<>();
