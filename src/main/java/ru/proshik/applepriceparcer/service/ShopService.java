@@ -11,7 +11,7 @@ public class ShopService {
 //
 //        List<Assortment> newAjAssortments = ajScreener.printAjPrices();
 //
-//        List<AjAssortment> ajAssortments = fileStorage.read();
+//        List<AjAssortment> ajAssortments = fileStorage.priceAssortment();
 //
 //        if (!ajAssortments.isEmpty()) {
 //            // get last assortments for compare

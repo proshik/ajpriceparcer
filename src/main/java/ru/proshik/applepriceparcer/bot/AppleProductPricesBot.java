@@ -8,15 +8,13 @@ import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import ru.proshik.applepriceparcer.exception.ServiceLayerException;
 import ru.proshik.applepriceparcer.model.*;
 import ru.proshik.applepriceparcer.model.sequence.DataSequence;
 import ru.proshik.applepriceparcer.service.OperationService;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.singletonList;
@@ -132,11 +130,10 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
         if (operationType != null) {
             switch (operationType) {
                 case PRICES:
-                    message = buildShopStep(update);
+                    message = buildPricesFirstStep(update);
                     break;
                 case HISTORY:
                     message.setText("Not implement yet!");
-
                     break;
                 case COMPARE:
                     message.setText("Not implement yet!");
@@ -193,7 +190,7 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
                 shop = operationService.findShopByTitle(callbackInfo.getValue());
                 if (shop == null) {
                     message.setReplyMarkup(buildRootMenuKeyboard());
-                    message.setText("Error on execution PriceOperation. Please start from the beginning!");
+                    message.setText("Unexpected situation. Please start from the begin!");
                     break;
                 }
 
@@ -220,17 +217,20 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
                 shop = sequenceData.getData().getShop();
                 ProductType productType = ProductType.fromValue(callbackInfo.getValue());
 
-                String history = operationService.read(shop, productType);
-
                 message.enableMarkdown(true);
                 message.setReplyMarkup(buildRootMenuKeyboard());
-                message.setText("Shop: *" + shop.getTitle() + "*\n" +
-                        "Product type: *" + productType.getValue() + "*\n\n" +
-                        history);
+                try {
+                    String prices = PrintUtils.printAssortment(operationService.priceAssortment(shop, productType));
+                    message.setText("Shop: *" + shop.getTitle() + "*\n" +
+                            "Product type: *" + productType.getValue() + "*\n\n" +
+                            prices);
+                } catch (ServiceLayerException e) {
+                    message.setText("Operation ended with error. Please start from the begin!");
+                }
                 break;
             default:
                 message.setReplyMarkup(buildRootMenuKeyboard());
-                message.setText("Error on execution PriceOperation. Please start from the beginning!");
+                message.setText("Unexpected situation. Please start from the begin!");
         }
         message.setChatId(update.getCallbackQuery().getMessage().getChatId());
         return message;
@@ -262,11 +262,11 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
             return BotUtils.objectMapper.readValue(data, CallbackInfo.class);
         } catch (IOException e) {
             LOG.error("Error on extract callback info with Object mapper", e);
-            throw new RuntimeException("Error on read value from callback", e);
+            throw new RuntimeException("Error on priceAssortment value from callback", e);
         }
     }
 
-    private SendMessage buildShopStep(Update update) {
+    private SendMessage buildPricesFirstStep(Update update) {
         Map<String, String> shopMap = operationService.selectAvailableShops().stream()
                 .collect(Collectors.toMap(Shop::getTitle, Shop::getTitle));
 
@@ -287,15 +287,13 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
         return new SendMessage()
                 .setChatId(update.getMessage().getChatId())
                 .setReplyMarkup(buildRootMenuKeyboard())
-                .setText("Hello, this is Bot for show price for apple products in show SPB and Moscow. " +
-                        "You may select shops for check prices and change history price and assortment in shops. " +
-                        "And subscribe on a change prices.");
+                .setText("Hello, this is Bot for follow prices on apple products in several shops.");
     }
 
     private SendMessage buildCommandInfoMessage(Update update) {
         return new SendMessage()
                 .setChatId(update.getMessage().getChatId())
-                .setText("Show prices on Apple products by several shops in SPB and Moscow.\n\n" +
+                .setText("Please, used follow commands:\n\n" +
                         "/start - for start work with bot\n" +
                         "/help - show a help message\n");
     }
@@ -304,8 +302,7 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
         return new SendMessage()
                 .setChatId(update.getMessage().getChatId())
                 .setReplyMarkup(buildRootMenuKeyboard())
-                .setText("You are in Main menu. For send text messages, please use a keyboard.\n\n " +
-                        "Select one action from list below!");
+                .setText("You are in Main menu. For send text messages, please use a keyboard.\n");
     }
 
     private ReplyKeyboardMarkup buildRootMenuKeyboard() {

@@ -36,7 +36,7 @@ public class AjProvider implements Provider {
         try {
             page = client.getPage(URL);
         } catch (IOException e) {
-            throw new ProviderParseException("Error on read page from aj.ru", e);
+            throw new ProviderParseException("Error on priceAssortment page from aj.ru", e);
         }
 
         HtmlElement ulContainer = page.getFirstByXPath("//ul[@class='container']");

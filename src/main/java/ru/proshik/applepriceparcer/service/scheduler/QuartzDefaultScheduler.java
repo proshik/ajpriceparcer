@@ -34,7 +34,8 @@ public class QuartzDefaultScheduler {
 
         Trigger trigger = TriggerBuilder.newTrigger()
                 .withIdentity("ShopTrigger", "default")
-                .startAt(Date.from(now.atZone(ZoneId.systemDefault()).toInstant()))
+                .startNow()
+//                .startAt(Date.from(now.atZone(ZoneId.systemDefault()).toInstant()))
                 .withSchedule(repeatMinutelyForever(MINUTE_INTERVAL)
                         .repeatForever())
                 .build();

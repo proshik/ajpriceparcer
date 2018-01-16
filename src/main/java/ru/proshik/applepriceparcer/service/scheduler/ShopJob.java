@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.quartz.*;
 import ru.proshik.applepriceparcer.exception.DatabaseException;
 import ru.proshik.applepriceparcer.exception.ProviderParseException;
+import ru.proshik.applepriceparcer.exception.ServiceLayerException;
 import ru.proshik.applepriceparcer.model.Assortment;
 import ru.proshik.applepriceparcer.model.Shop;
 import ru.proshik.applepriceparcer.provider.Provider;
@@ -36,8 +37,8 @@ public class ShopJob implements Job {
                 operationService.tryUpdateAssortment(shop, assortment);
             } catch (ProviderParseException e) {
                 LOG.error("Error on screening shop with title=" + shop.getTitle(), e);
-            } catch (DatabaseException e) {
-                LOG.error("Error on save into database new assortment for shop with title=" + shop.getTitle(), e);
+            } catch (ServiceLayerException e) {
+                LOG.error("Error on try update into database new assortment for shop with title=" + shop.getTitle(), e);
             }
 
             LOG.info("Success screening shop with title=" + shop.getTitle());

@@ -2,7 +2,7 @@ package ru.proshik.applepriceparcer.service;
 
 import org.apache.log4j.Logger;
 import ru.proshik.applepriceparcer.exception.DatabaseException;
-import ru.proshik.applepriceparcer.exception.ProviderParseException;
+import ru.proshik.applepriceparcer.exception.ServiceLayerException;
 import ru.proshik.applepriceparcer.model.*;
 import ru.proshik.applepriceparcer.provider.Provider;
 import ru.proshik.applepriceparcer.provider.ProviderFactory;
@@ -10,10 +10,7 @@ import ru.proshik.applepriceparcer.storage.Database;
 
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class OperationService {
@@ -24,12 +21,13 @@ public class OperationService {
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
-    private Database db;
+    //    private Database db;
     private ProviderFactory providerFactory;
+    private AssortmentService assortmentService;
 
-    public OperationService(Database db, ProviderFactory providerFactory) {
-        this.db = db;
+    public OperationService(ProviderFactory providerFactory, AssortmentService assortmentService) {
         this.providerFactory = providerFactory;
+        this.assortmentService = assortmentService;
     }
 
     public Shop findShopByTitle(String title) {
@@ -58,7 +56,7 @@ public class OperationService {
 
     public List<ProductType> selectUniqueProductTypes(Shop shop) {
         try {
-            List<Assortment> assortments = db.getAssortments(shop);
+            List<Assortment> assortments = assortmentService.getAssortments(shop);
 
             return assortments.stream()
                     .flatMap(assortment -> assortment.getProducts().stream())
@@ -72,73 +70,61 @@ public class OperationService {
         return Collections.emptyList();
     }
 
-    public String read(Shop shop, ProductType productType) {
-        String result;
+    public Assortment priceAssortment(Shop shop, ProductType productType) throws ServiceLayerException {
 
-        Provider provider = providerFactory.findByShop(shop);
-        try {
-            Assortment assortment = provider.screening();
-
-//                try {
-//                    // TODO: 12.01.2018 will be need read from cache(in this class), method tryUpdateAssortment will be moved to scheduler
-//                    shopService.tryUpdateAssortment(shop, assortment);
-//                } catch (DatabaseException e) {
-//                    LOG.error("error", e);
-//                }
-
-            result = buildAssortment(assortment);
-        } catch (ProviderParseException e) {
-            LOG.error("Erorr on read data from provider with title=" + shop.getTitle(), e);
-            result = "Error on executing command";
+        List<Assortment> assortments = assortmentService.getAssortments(shop);
+        if (assortments.isEmpty()) {
+            return null;
         }
-//        } else {
-//            result = "Title unrecognized";
-//        }
-        return result;
+
+        Assortment lastAssortment = findLastAssortment(assortments);
+        List<Product> productsByType = lastAssortment.getProducts().stream()
+                .filter(product -> product.getProductType().equals(productType))
+                .collect(Collectors.toList());
+
+        return new Assortment(lastAssortment.getCreatedDate(), productsByType);
     }
 
-    public String history(Shop shop, ProductType productType) {
-        String result;
+    public List<Assortment> historyAssortments(Shop shop, ProductType productType) {
 
         Provider provider = providerFactory.findByShop(shop);
         if (provider != null) {
             try {
-                List<Assortment> assortments = db.getAssortments(shop);
+                List<Assortment> assortments = assortmentService.getAssortments(shop);
 
                 List<Assortment> sortAssortments = assortments.stream()
                         .sorted((o1, o2) -> o2.getCreatedDate().compareTo(o1.getCreatedDate()))
                         .limit(HISTORY_LIMIT)
                         .collect(Collectors.toList());
 
-                result = buildHistory(sortAssortments);
+                return sortAssortments;
             } catch (DatabaseException e) {
-                LOG.error("Error on execute history command", e);
-                result = "Error on executing command";
+                LOG.error("Error on execute historyAssortments command", e);
             }
         } else {
-            result = "Title unrecognized";
+            return Collections.emptyList();
         }
 
-        return result;
+        return Collections.emptyList();
     }
 
-    public void tryUpdateAssortment(Shop shop, Assortment assortment) throws DatabaseException {
-        List<Assortment> existsAssortments = db.getAssortments(shop);
+    public void tryUpdateAssortment(Shop shop, Assortment assortment) throws ServiceLayerException {
+        List<Assortment> existsAssortments = assortmentService.getAssortments(shop);
 
         if (existsAssortments != null && !existsAssortments.isEmpty()) {
             boolean wasChanges = wasChangeInAssortments(assortment, existsAssortments);
             if (wasChanges) {
-                db.addAssortment(shop, assortment);
+                assortmentService.addAssortment(shop, assortment);
                 LOG.info("Success updated assortment for shop with title=" + shop.getTitle());
             }
         } else {
-            db.addAssortment(shop, assortment);
-            LOG.info("Success added at first time assortment for shop with title=" + shop.getTitle());
+            assortmentService.addAssortment(shop, assortment);
+            LOG.info("Success2 added at first time assortment for shop with title=" + shop.getTitle());
         }
     }
 
     private static boolean wasChangeInAssortments(Assortment newAssortment, List<Assortment> existsAssortments) {
-        Assortment lastAssortment = getLastAssortment(existsAssortments);
+        Assortment lastAssortment = findLastAssortment(existsAssortments);
 
         Map<String, Product> productsByTitle = newAssortment.getProducts().stream()
                 .collect(Collectors.toMap(Product::getTitle, o -> o));
@@ -163,36 +149,10 @@ public class OperationService {
         return false;
     }
 
-    private static Assortment getLastAssortment(List<Assortment> assortments) {
+    private static Assortment findLastAssortment(List<Assortment> assortments) {
         return assortments.stream()
                 .max(Comparator.comparing(Assortment::getCreatedDate))
                 .orElseThrow(() -> new IllegalArgumentException("Must be at least one element"));
     }
 
-
-    private static String buildAssortment(Assortment assortment) {
-        StringBuilder out = new StringBuilder("Date: *" + DATE_TIME_FORMATTER.format(assortment.getCreatedDate()) + "*\n");
-
-        for (Product p : assortment.getProducts()) {
-            out.append(p.getTitle()).append("\n");
-            for (Item i : p.getItems()) {
-                out.append(i.getTitle()).append(" - ").append(i.getPrice()).append("\n");
-            }
-            out.append("\n");
-        }
-
-        return out.toString();
-    }
-
-    private String buildHistory(List<Assortment> assortments) {
-        StringBuilder history = new StringBuilder("History:\n");
-
-        for (Assortment a : assortments) {
-//            history.append("-----------------").append("\n");
-            history.append(buildAssortment(a));
-//            history.append("*****************").append("\n\n");
-        }
-
-        return history.toString();
-    }
 }
