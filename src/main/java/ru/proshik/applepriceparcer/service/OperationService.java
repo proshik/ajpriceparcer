@@ -106,7 +106,7 @@ public class OperationService {
         }
     }
 
-    public void tryUpdateAssortment(Shop shop, Assortment assortment) throws ServiceLayerException {
+    public boolean tryUpdateAssortment(Shop shop, Assortment assortment) throws ServiceLayerException {
         List<Assortment> existsAssortments = assortmentService.getAssortments(shop);
 
         if (existsAssortments != null && !existsAssortments.isEmpty()) {
@@ -114,11 +114,16 @@ public class OperationService {
             if (wasChanges) {
                 assortmentService.addAssortment(shop, assortment);
                 LOG.info("Success updated assortment for shop with title=" + shop.getTitle());
+                return true;
+            } else {
+                LOG.info("Not found changes in assortment for shop with title=" + shop.getTitle());
             }
         } else {
             assortmentService.addAssortment(shop, assortment);
             LOG.info("Success added at first time assortment for shop with title=" + shop.getTitle());
         }
+
+        return false;
     }
 
     private static boolean wasChangeInAssortments(Assortment newAssortment, List<Assortment> existsAssortments) {

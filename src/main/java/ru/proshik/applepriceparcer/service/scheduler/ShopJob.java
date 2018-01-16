@@ -34,8 +34,9 @@ public class ShopJob implements Job {
 
             try {
                 Assortment assortment = p.screening();
-                operationService.tryUpdateAssortment(shop, assortment);
-                LOG.info("Success screening shop with title=" + shop.getTitle());
+                boolean wasUpdated = operationService.tryUpdateAssortment(shop, assortment);
+                // TODO: 16.01.2018  
+                LOG.info("Success finish job for shop with title=" + shop.getTitle());
             } catch (ProviderParseException e) {
                 LOG.error("Error on screening shop with title=" + shop.getTitle(), e);
             } catch (ServiceLayerException e) {
