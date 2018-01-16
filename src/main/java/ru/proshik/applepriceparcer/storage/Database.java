@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -81,7 +80,7 @@ public class Database {
             String assortmentString = map.get(shop);
             if (assortmentString != null) {
                 Assortment[] assortmentsArray = mapper.readValue(assortmentString, Assortment[].class);
-               result = Arrays.asList(assortmentsArray);
+                result = Arrays.asList(assortmentsArray);
             }
         } catch (IOException e) {
             throw new DatabaseException(e);
@@ -90,6 +89,58 @@ public class Database {
         }
 
         return result;
+    }
+
+    public List<Shop> getUserShops(String chatId) throws DatabaseException {
+        List<Shop> result = new ArrayList<>();
+
+        DB db = open();
+        HTreeMap<String, String> map = createOrOpenUserBucket(db);
+        try {
+            String shopsString = map.get(chatId);
+            if (shopsString != null) {
+                Shop[] shopArray = mapper.readValue(shopsString, Shop[].class);
+                result = Arrays.asList(shopArray);
+            }
+        } catch (IOException e) {
+            throw new DatabaseException(e);
+        } finally {
+            db.close();
+        }
+
+        return result;
+    }
+
+    public void addUserShop(String chatId, Shop shop) throws DatabaseException {
+        DB db = open();
+
+        HTreeMap<String, String> map = createOrOpenUserBucket(db);
+        String userString = map.get(chatId);
+
+        List<Shop> shops = new ArrayList<>();
+        if (userString != null) {
+            try {
+                Shop[] shopArray = mapper.readValue(userString, Shop[].class);
+
+                if (shopArray != null) {
+                    shops = Stream.of(shopArray).collect(Collectors.toList());
+                }
+            } catch (IOException e) {
+                throw new DatabaseException(e);
+            } finally {
+                db.close();
+            }
+        }
+
+        shops.add(shop);
+
+        try {
+            map.put(chatId, mapper.writeValueAsString(shops));
+        } catch (JsonProcessingException e) {
+            throw new DatabaseException(e);
+        } finally {
+            db.close();
+        }
     }
 
     private DB open() {
@@ -102,6 +153,13 @@ public class Database {
     private HTreeMap<Shop, String> createOrOpenShopBucket(DB db) {
         return db.hashMap(SHOP_BUCKET)
                 .keySerializer(serializer)
+                .valueSerializer(Serializer.STRING)
+                .createOrOpen();
+    }
+
+    private HTreeMap<String, String> createOrOpenUserBucket(DB db) {
+        return db.hashMap(USER_BUCKET)
+                .keySerializer(Serializer.STRING)
                 .valueSerializer(Serializer.STRING)
                 .createOrOpen();
     }

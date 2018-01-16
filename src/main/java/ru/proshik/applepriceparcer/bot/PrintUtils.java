@@ -6,18 +6,38 @@ import ru.proshik.applepriceparcer.model.Product;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 
 public class PrintUtils {
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
-
     static String printAssortment(Assortment assortment) {
+        StringBuilder out = new StringBuilder();
+        out.append("*Date last change prices: *")
+                .append(DATE_TIME_FORMATTER.format(assortment.getCreatedDate()))
+                .append("\n");
+        out.append(printProducts(assortment.getProducts()));
 
-        StringBuilder out = new StringBuilder("Date last change prices: *" + DATE_TIME_FORMATTER.format(assortment.getCreatedDate()) + "*\n");
+        return out.toString();
+    }
 
-        for (Product p : assortment.getProducts()) {
+    static String buildHistory(List<Assortment> assortments) {
+        StringBuilder out = new StringBuilder();
+
+        for (Assortment a : assortments) {
+            out.append("*Date last change prices: *")
+                    .append(DATE_TIME_FORMATTER.format(a.getCreatedDate()))
+                    .append("\n");
+            out.append(printProducts(a.getProducts()));
+        }
+
+        return out.toString();
+    }
+
+    private static String printProducts(List<Product> products) {
+        StringBuilder out = new StringBuilder();
+
+        for (Product p : products) {
             out.append(p.getTitle()).append("\n");
             for (Item i : p.getItems()) {
                 out.append(i.getTitle()).append(" - ").append(i.getPrice()).append("\n");
@@ -26,18 +46,6 @@ public class PrintUtils {
         }
 
         return out.toString();
-    }
-
-    static String buildHistory(List<Assortment> assortments) {
-        StringBuilder history = new StringBuilder("History:\n");
-
-        for (Assortment a : assortments) {
-//            historyAssortments.append("-----------------").append("\n");
-            history.append(printAssortment(a));
-//            historyAssortments.append("*****************").append("\n\n");
-        }
-
-        return history.toString();
     }
 
 }

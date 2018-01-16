@@ -1,6 +1,7 @@
 package ru.proshik.applepriceparcer.bot;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Update;
@@ -8,18 +9,25 @@ import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import ru.proshik.applepriceparcer.exception.DatabaseException;
 import ru.proshik.applepriceparcer.exception.ServiceLayerException;
 import ru.proshik.applepriceparcer.model.*;
 import ru.proshik.applepriceparcer.model.sequence.DataSequence;
 import ru.proshik.applepriceparcer.service.OperationService;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.singletonList;
 import static ru.proshik.applepriceparcer.bot.BotUtils.buildInlineKeyboard;
 import static ru.proshik.applepriceparcer.bot.BotUtils.buildReplyKeyboard;
+import static ru.proshik.applepriceparcer.bot.PrintUtils.buildHistory;
+import static ru.proshik.applepriceparcer.bot.PrintUtils.printAssortment;
+import static ru.proshik.applepriceparcer.model.StepType.SHOP_SELECTED;
 
 public class AppleProductPricesBot extends TelegramLongPollingBot {
 
@@ -56,6 +64,7 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
+
         SendMessage message;
         try {
             if (update.hasMessage()) {
@@ -96,6 +105,7 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
     }
 
     private SendMessage processMessageOperation(Update update) {
+
         SendMessage message;
 
         if (update.getMessage().isCommand()) {
@@ -107,6 +117,7 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
     }
 
     private SendMessage processCommandMessageOperation(Update update) {
+
         SendMessage message;
 
         switch (update.getMessage().getText().split(" ")[0]) {
@@ -124,22 +135,28 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
     }
 
     private SendMessage processKeyboardMessageOperation(Update update) {
+
         SendMessage message = new SendMessage();
 
         OperationType operationType = OperationType.fromValue(update.getMessage().getText());
         if (operationType != null) {
+            // clean sequence if before was started other operation
+            sequenceOperationStorage.remove(String.valueOf(update.getMessage().getChatId()));
+            // select need operationType
             switch (operationType) {
                 case PRICES:
-                    message = buildPricesFirstStep(update);
+                    message = buildPricesFirstStep(update, OperationType.PRICES);
                     break;
                 case HISTORY:
-                    message.setText("Not implement yet!");
+                    message = buildPricesFirstStep(update, OperationType.HISTORY);
                     break;
                 case COMPARE:
-                    message.setText("Not implement yet!");
+                    message.setText("Not implement yet!")
+                            .setChatId(update.getMessage().getChatId())
+                            .setReplyMarkup(buildRootMenuKeyboard());
                     break;
                 case SUBSCRIPTION:
-                    message.setText("Not implement yet!");
+                    message = buildFirstStepSubscription(update);
                     break;
                 case MAIN_MENU:
                 default:
@@ -152,6 +169,7 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
     }
 
     private SendMessage processCallbackOperation(Update update) {
+
         SendMessage message = new SendMessage();
 
         String data = update.getCallbackQuery().getData();
@@ -163,15 +181,18 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
             if (sequenceData != null) {
                 switch (sequenceData.getOperationType()) {
                     case PRICES:
-                        message = priceCallbackOperation(update, callbackInfo);
+                        message = callbackSimpleOperation(update, sequenceData, callbackInfo);
+                        break;
+                    case HISTORY:
+                        message = callbackSimpleOperation(update, sequenceData, callbackInfo);
                         break;
                     case SUBSCRIPTION:
-                        // TODO: 15.01.2018
+                        message = callbackSubscriptionOperation(update, callbackInfo);
                         break;
                     default:
-                        message.setReplyMarkup(buildRootMenuKeyboard());
-                        message.setChatId(update.getCallbackQuery().getMessage().getChatId());
-                        message.setText("Error on execution PriceOperation. Please start from the beginning!");
+                        message.setReplyMarkup(buildRootMenuKeyboard())
+                                .setChatId(update.getCallbackQuery().getMessage().getChatId())
+                                .setText("Operation ended with error. Please start from the begin!");
                 }
             }
         } else {
@@ -180,64 +201,123 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
         return message;
     }
 
-    private SendMessage priceCallbackOperation(Update update, CallbackInfo callbackInfo) {
+    private SendMessage callbackSubscriptionOperation(Update update,
+                                                      CallbackInfo callbackInfo) {
         SendMessage message = new SendMessage();
+        String chatId = String.valueOf(update.getCallbackQuery().getMessage().getChatId());
 
-        Shop shop;
-        DataSequence sequenceData = sequenceOperationStorage.get(callbackInfo.getId());
+        Shop shop = operationService.findShopByTitle(callbackInfo.getValue());
+        if (shop == null) {
+            return message.setReplyMarkup(buildRootMenuKeyboard())
+                    .setText("Unexpected situation. Please start from the begin!");
+        }
+
+        try {
+            operationService.updateUserSubscriptions(chatId, shop);
+
+            message.setChatId(update.getCallbackQuery().getMessage().getChatId())
+//                        .setReplyMarkup(buildRootMenuKeyboard())
+                    .enableMarkdown(true)
+                    .setText("You add subscription fot shop *" + shop.getTitle() + " - " + shop.getUrl() + "*");
+        } catch (DatabaseException e) {
+            message.setReplyMarkup(buildRootMenuKeyboard())
+                    .setChatId(update.getCallbackQuery().getMessage().getChatId())
+                    .setText("Operation ended with error. Please start from the begin!");
+        }
+
+        sequenceOperationStorage.remove(chatId);
+
+        return message;
+    }
+
+    private SendMessage callbackSimpleOperation(Update update, DataSequence sequenceData, CallbackInfo callbackInfo) {
+
+        SendMessage message = new SendMessage();
+        String chatId = String.valueOf(update.getCallbackQuery().getMessage().getChatId());
+
         switch (sequenceData.getStepType()) {
             case SHOP_SELECTED:
-                shop = operationService.findShopByTitle(callbackInfo.getValue());
-                if (shop == null) {
-                    message.setReplyMarkup(buildRootMenuKeyboard());
-                    message.setText("Unexpected situation. Please start from the begin!");
-                    break;
-                }
-
-                sequenceData.setStepType(StepType.PRODUCT_TYPE_SELECTED);
-                sequenceData.getData().setShop(shop);
-                sequenceOperationStorage.put(callbackInfo.getId(), sequenceData);
-
-                List<ProductType> productTypes = operationService.selectUniqueProductTypes(shop);
-                if (productTypes.isEmpty()) {
-                    message.setReplyMarkup(buildRootMenuKeyboard());
-                    message.setText("No available product types for selected shop");
-                    break;
-                }
-
-                Map<String, String> productTypeValueTyEnumNam = operationService.selectUniqueProductTypes(shop).stream()
-                        .collect(Collectors.toMap(Enum::name, ProductType::getValue));
-
-                message.setReplyMarkup(buildInlineKeyboard(productTypeValueTyEnumNam, callbackInfo.getId(), 3));
-                message.setText("Shop: *" + shop.getTitle() + "*\n\n" +
-                        "Select the type of product which is available for selected shop");
-                message.enableMarkdown(true);
+                message = buildShopSelectedStep(callbackInfo, sequenceData);
                 break;
             case PRODUCT_TYPE_SELECTED:
-                shop = sequenceData.getData().getShop();
+                Shop shop = sequenceData.getData().getShop();
                 ProductType productType = ProductType.fromValue(callbackInfo.getValue());
 
                 message.enableMarkdown(true);
                 message.setReplyMarkup(buildRootMenuKeyboard());
-                try {
-                    String prices = PrintUtils.printAssortment(operationService.priceAssortment(shop, productType));
-                    message.setText("Shop: *" + shop.getTitle() + "*\n" +
-                            "Product type: *" + productType.getValue() + "*\n\n" +
-                            prices);
-                } catch (ServiceLayerException e) {
-                    message.setText("Operation ended with error. Please start from the begin!");
+                switch (sequenceData.getOperationType()) {
+                    case PRICES:
+                        try {
+                            String prices = printAssortment(operationService.priceAssortment(shop, productType));
+                            message.setText("*Price* operation\n" +
+                                    "Shop: *" + shop.getTitle() + "*\n" +
+                                    "Product type: *" + productType.getValue() + "*\n\n" +
+                                    prices);
+                        } catch (ServiceLayerException e) {
+                            message.setText("Operation ended with error. Please start from the begin!");
+                        }
+                        break;
+                    case HISTORY:
+                        try {
+                            String history = buildHistory(operationService.historyAssortments(shop, productType));
+                            message.setText("*History* operation\n" +
+                                    "Shop: *" + shop.getTitle() + "*\n" +
+                                    "Product type: *" + productType.getValue() + "*\n\n" +
+                                    history);
+                        } catch (ServiceLayerException e) {
+                            message.setText("Operation ended with error. Please start from the begin!");
+                        }
+                        break;
+                    default:
+//                        message.setReplyMarkup(buildRootMenuKeyboard());
+                        message.setText("Unexpected situation. Please start from the begin!");
                 }
+
+                sequenceOperationStorage.remove(chatId);
                 break;
             default:
                 message.setReplyMarkup(buildRootMenuKeyboard());
                 message.setText("Unexpected situation. Please start from the begin!");
         }
-        message.setChatId(update.getCallbackQuery().getMessage().getChatId());
+        message.setChatId(chatId);
+        return message;
+    }
+
+    private SendMessage buildShopSelectedStep(CallbackInfo callbackInfo, DataSequence sequenceData) {
+
+        SendMessage message = new SendMessage();
+
+        Shop shop = operationService.findShopByTitle(callbackInfo.getValue());
+        if (shop == null) {
+            message.setReplyMarkup(buildRootMenuKeyboard());
+            message.setText("Unexpected situation. Please start from the begin!");
+            return message;
+        }
+
+        sequenceData.setStepType(StepType.PRODUCT_TYPE_SELECTED);
+        sequenceData.getData().setShop(shop);
+        sequenceOperationStorage.put(callbackInfo.getId(), sequenceData);
+
+        List<ProductType> productTypes = operationService.selectUniqueProductTypes(shop);
+        if (productTypes.isEmpty()) {
+            message.setReplyMarkup(buildRootMenuKeyboard());
+            message.setText("No available product types for selected shop");
+            return message;
+        }
+
+        Map<String, String> productTypeValueTyEnumNam = operationService.selectUniqueProductTypes(shop).stream()
+                .collect(Collectors.toMap(Enum::name, ProductType::getValue));
+
+        message.setReplyMarkup(buildInlineKeyboard(productTypeValueTyEnumNam, callbackInfo.getId(), 3));
+        message.setText("Shop: *" + shop.getTitle() + "*\n\n" +
+                "Select product type: ");
+        message.enableMarkdown(true);
         return message;
     }
 
     private Long extractChatId(Update update) {
         Long chatId;
+
         if (update.hasMessage()) {
             chatId = update.getMessage().getChatId();
         } else if (update.hasCallbackQuery()) {
@@ -266,7 +346,7 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
         }
     }
 
-    private SendMessage buildPricesFirstStep(Update update) {
+    private SendMessage buildPricesFirstStep(Update update, OperationType operationType) {
         Map<String, String> shopMap = operationService.selectAvailableShops().stream()
                 .collect(Collectors.toMap(Shop::getTitle, Shop::getTitle));
 
@@ -278,7 +358,48 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
                 .setChatId(chatId)
                 .setText("Select the shop for continue");
 
-        sequenceOperationStorage.put(chatId, new DataSequence(OperationType.PRICES, StepType.SHOP_SELECTED));
+        sequenceOperationStorage.put(chatId, new DataSequence(operationType, SHOP_SELECTED));
+
+        return message;
+    }
+
+    private SendMessage buildFirstStepSubscription(Update update) {
+        SendMessage message = new SendMessage();
+
+        String chatId = String.valueOf(update.getMessage().getChatId());
+        try {
+            Pair<List<Shop>, List<Shop>> subscriptions =
+                    operationService.userSubscriptions(chatId);
+
+            StringBuilder builder = new StringBuilder();
+
+            if (!subscriptions.getLeft().isEmpty()) {
+                String userShops = subscriptions.getLeft().stream()
+                        .map(shop -> "*" + shop.getTitle() + " - " + shop.getUrl() + "*")
+                        .collect(Collectors.joining(", "));
+                builder.append("You subscription on next shops: ").append(userShops);
+            } else {
+                builder.append("*You not have any one subscriptions.*\n\n");
+            }
+            if (!subscriptions.getRight().isEmpty()) {
+                Map<String, String> shopMap = operationService.selectAvailableShops().stream()
+                        .collect(Collectors.toMap(Shop::getTitle, Shop::getTitle));
+
+                InlineKeyboardMarkup keyboard = buildInlineKeyboard(shopMap, String.valueOf(chatId), 3);
+                message.setReplyMarkup(keyboard);
+
+                builder.append("For subscribe on new shops used follow key: ");
+            }
+            message.setChatId(chatId)
+                    .enableMarkdown(true)
+//                    .setReplyMarkup(buildRootMenuKeyboard())
+                    .setText(builder.toString());
+            sequenceOperationStorage.put(chatId, new DataSequence(OperationType.SUBSCRIPTION, SHOP_SELECTED));
+        } catch (DatabaseException e) {
+            message.setChatId(chatId)
+                    .setReplyMarkup(buildRootMenuKeyboard())
+                    .setText("Unexpected situation. Please start from the begin!");
+        }
 
         return message;
     }

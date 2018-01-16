@@ -35,13 +35,15 @@ public class ShopJob implements Job {
             try {
                 Assortment assortment = p.screening();
                 operationService.tryUpdateAssortment(shop, assortment);
+                LOG.info("Success screening shop with title=" + shop.getTitle());
             } catch (ProviderParseException e) {
                 LOG.error("Error on screening shop with title=" + shop.getTitle(), e);
             } catch (ServiceLayerException e) {
                 LOG.error("Error on try update into database new assortment for shop with title=" + shop.getTitle(), e);
+            } catch (Exception e) {
+                LOG.error("Unexpected error in scheduler service on execute operation " +
+                        "for request assortment for shop with title=" + shop.getTitle(), e);
             }
-
-            LOG.info("Success screening shop with title=" + shop.getTitle());
         }
     }
 

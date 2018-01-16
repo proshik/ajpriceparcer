@@ -10,6 +10,7 @@ import ru.proshik.applepriceparcer.bot.AppleProductPricesBot;
 import ru.proshik.applepriceparcer.provider.ProviderFactory;
 import ru.proshik.applepriceparcer.service.AssortmentService;
 import ru.proshik.applepriceparcer.service.OperationService;
+import ru.proshik.applepriceparcer.service.UserService;
 import ru.proshik.applepriceparcer.service.scheduler.QuartzDefaultScheduler;
 import ru.proshik.applepriceparcer.storage.Database;
 
@@ -36,7 +37,8 @@ public class Application {
         ProviderFactory providerFactory = new ProviderFactory();
 
         AssortmentService assortmentService = new AssortmentService(db);
-        OperationService operationService = new OperationService(providerFactory, assortmentService);
+        UserService userService = new UserService(db);
+        OperationService operationService = new OperationService(providerFactory, assortmentService, userService);
 
         QuartzDefaultScheduler quartzDefaultScheduler = new QuartzDefaultScheduler(operationService);
         try {

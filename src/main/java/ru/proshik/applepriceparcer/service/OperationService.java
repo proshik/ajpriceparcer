@@ -1,12 +1,13 @@
 package ru.proshik.applepriceparcer.service;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import ru.proshik.applepriceparcer.exception.DatabaseException;
 import ru.proshik.applepriceparcer.exception.ServiceLayerException;
 import ru.proshik.applepriceparcer.model.*;
 import ru.proshik.applepriceparcer.provider.Provider;
 import ru.proshik.applepriceparcer.provider.ProviderFactory;
-import ru.proshik.applepriceparcer.storage.Database;
 
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
@@ -19,15 +20,16 @@ public class OperationService {
 
     private static final int HISTORY_LIMIT = 5;
 
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-
-    //    private Database db;
     private ProviderFactory providerFactory;
     private AssortmentService assortmentService;
+    private UserService userService;
 
-    public OperationService(ProviderFactory providerFactory, AssortmentService assortmentService) {
+    public OperationService(ProviderFactory providerFactory,
+                            AssortmentService assortmentService,
+                            UserService userService) {
         this.providerFactory = providerFactory;
         this.assortmentService = assortmentService;
+        this.userService = userService;
     }
 
     public Shop findShopByTitle(String title) {
@@ -85,27 +87,23 @@ public class OperationService {
         return new Assortment(lastAssortment.getCreatedDate(), productsByType);
     }
 
-    public List<Assortment> historyAssortments(Shop shop, ProductType productType) {
+    public List<Assortment> historyAssortments(Shop shop, ProductType productType) throws DatabaseException {
 
         Provider provider = providerFactory.findByShop(shop);
         if (provider != null) {
-            try {
-                List<Assortment> assortments = assortmentService.getAssortments(shop);
+            List<Assortment> assortments = assortmentService.getAssortments(shop);
 
-                List<Assortment> sortAssortments = assortments.stream()
-                        .sorted((o1, o2) -> o2.getCreatedDate().compareTo(o1.getCreatedDate()))
-                        .limit(HISTORY_LIMIT)
-                        .collect(Collectors.toList());
-
-                return sortAssortments;
-            } catch (DatabaseException e) {
-                LOG.error("Error on execute historyAssortments command", e);
-            }
+            return assortments.stream()
+                    .filter(a -> !a.getProducts().stream()
+                            .filter(product -> product.getProductType().equals(productType))
+                            .collect(Collectors.toList())
+                            .isEmpty())
+                    .sorted((o1, o2) -> o2.getCreatedDate().compareTo(o1.getCreatedDate()))
+                    .limit(HISTORY_LIMIT)
+                    .collect(Collectors.toList());
         } else {
             return Collections.emptyList();
         }
-
-        return Collections.emptyList();
     }
 
     public void tryUpdateAssortment(Shop shop, Assortment assortment) throws ServiceLayerException {
@@ -119,7 +117,7 @@ public class OperationService {
             }
         } else {
             assortmentService.addAssortment(shop, assortment);
-            LOG.info("Success2 added at first time assortment for shop with title=" + shop.getTitle());
+            LOG.info("Success added at first time assortment for shop with title=" + shop.getTitle());
         }
     }
 
@@ -155,4 +153,24 @@ public class OperationService {
                 .orElseThrow(() -> new IllegalArgumentException("Must be at least one element"));
     }
 
+    public Pair<List<Shop>, List<Shop>> userSubscriptions(String chatId) throws DatabaseException {
+
+        List<Shop> availableShops = providerFactory.list().stream()
+                .map(Provider::getShop)
+                .collect(Collectors.toList());
+
+        List<Shop> userSubscriptions = userService.userSubscriptions(chatId);
+
+        availableShops.removeAll(new ArrayList<>(userSubscriptions));
+
+        return new ImmutablePair<>(userSubscriptions, availableShops);
+    }
+
+    public void updateUserSubscriptions(String chatId, Shop shop) throws DatabaseException {
+        userService.addSubscription(chatId, shop);
+    }
+
+    public void cancelSubscriptions(String chatId, Shop shop) {
+
+    }
 }

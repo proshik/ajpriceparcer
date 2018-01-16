@@ -10,6 +10,7 @@ import java.time.ZoneId;
 import java.util.Date;
 
 import static org.quartz.SimpleScheduleBuilder.repeatMinutelyForever;
+import static org.quartz.SimpleScheduleBuilder.repeatSecondlyForever;
 
 public class QuartzDefaultScheduler {
 
@@ -34,10 +35,8 @@ public class QuartzDefaultScheduler {
 
         Trigger trigger = TriggerBuilder.newTrigger()
                 .withIdentity("ShopTrigger", "default")
-                .startNow()
-//                .startAt(Date.from(now.atZone(ZoneId.systemDefault()).toInstant()))
-                .withSchedule(repeatMinutelyForever(MINUTE_INTERVAL)
-                        .repeatForever())
+                .startAt(Date.from(now.atZone(ZoneId.systemDefault()).toInstant()))
+                .withSchedule(repeatMinutelyForever(MINUTE_INTERVAL))
                 .build();
 
         // Tell quartz to schedule the job using our trigger
