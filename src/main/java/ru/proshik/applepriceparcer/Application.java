@@ -44,7 +44,7 @@ public class Application {
         try {
             quartzDefaultScheduler.init();
         } catch (SchedulerException e) {
-            LOG.error("Eror on execute quartz scheduler", e);
+            LOG.error("Error on execute quartz scheduler", e);
             System.exit(0);
         }
 
