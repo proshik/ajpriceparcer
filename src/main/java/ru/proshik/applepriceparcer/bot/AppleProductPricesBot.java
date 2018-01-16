@@ -218,7 +218,7 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
             message.setChatId(update.getCallbackQuery().getMessage().getChatId())
 //                        .setReplyMarkup(buildRootMenuKeyboard())
                     .enableMarkdown(true)
-                    .setText("You add subscription fot shop *" + shop.getTitle() + " - " + shop.getUrl() + "*");
+                    .setText("You add subscription on update from shops:*" + shop.getTitle() + " - " + shop.getUrl() + "*");
         } catch (DatabaseException e) {
             message.setReplyMarkup(buildRootMenuKeyboard())
                     .setChatId(update.getCallbackQuery().getMessage().getChatId())
@@ -248,7 +248,7 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
                 switch (sequenceData.getOperationType()) {
                     case PRICES:
                         try {
-                            String prices = printAssortment(operationService.priceAssortment(shop, productType));
+                            String prices = printAssortment(operationService.priceAssortment(shop, productType), productType);
                             message.setText("*Price* operation\n" +
                                     "Shop: *" + shop.getTitle() + "*\n" +
                                     "Product type: *" + productType.getValue() + "*\n\n" +
@@ -259,7 +259,7 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
                         break;
                     case HISTORY:
                         try {
-                            String history = buildHistory(operationService.historyAssortments(shop, productType));
+                            String history = buildHistory(operationService.historyAssortments(shop, productType), productType);
                             message.setText("*History* operation\n" +
                                     "Shop: *" + shop.getTitle() + "*\n" +
                                     "Product type: *" + productType.getValue() + "*\n\n" +

@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class AjProvider implements Provider {
@@ -97,10 +98,10 @@ public class AjProvider implements Provider {
                 String changedTitle = ili.getFirstChild().getNodeValue().substring(0, ili.getFirstChild().getNodeValue().length() - 3);
                 items.add(new Item(changedTitle, price));
             }
-            products.add(new Product(title, ProductType.IPHONE, description, items));
+            products.add(new Product(title, description, items));
         }
 
-        return new Assortment(LocalDateTime.now(), products);
+        return new Assortment(LocalDateTime.now(), Map.of(ProductType.IPHONE, products));
     }
 
 
