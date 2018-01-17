@@ -220,6 +220,7 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
                     .enableMarkdown(true)
                     .setText("You add subscription on update from shops:*" + shop.getTitle() + " - " + shop.getUrl() + "*");
         } catch (DatabaseException e) {
+            LOG.error("Error on execute database operation", e);
             message.setReplyMarkup(buildRootMenuKeyboard())
                     .setChatId(update.getCallbackQuery().getMessage().getChatId())
                     .setText("Operation ended with error. Please start from the begin!");
@@ -377,7 +378,7 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
                 String userShops = subscriptions.getLeft().stream()
                         .map(shop -> "*" + shop.getTitle() + " - " + shop.getUrl() + "*")
                         .collect(Collectors.joining(", "));
-                builder.append("You subscription on next shops: ").append(userShops);
+                builder.append("Your subscriptions: ").append(userShops);
             } else {
                 builder.append("*You not have any one subscriptions.*\n\n");
             }
@@ -396,6 +397,7 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
                     .setText(builder.toString());
             sequenceOperationStorage.put(chatId, new DataSequence(OperationType.SUBSCRIPTION, SHOP_SELECTED));
         } catch (DatabaseException e) {
+            LOG.error("Error on execute database operation", e);
             message.setChatId(chatId)
                     .setReplyMarkup(buildRootMenuKeyboard())
                     .setText("Unexpected situation. Please start from the begin!");

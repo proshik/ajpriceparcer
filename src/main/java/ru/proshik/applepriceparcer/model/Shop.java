@@ -1,8 +1,9 @@
 package ru.proshik.applepriceparcer.model;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Shop {
+public class Shop implements Serializable{
 
     private String title;
     private String url;
