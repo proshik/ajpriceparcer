@@ -31,8 +31,10 @@ public class AssortmentService {
             LOG.info("Value for shop=" + shop.getTitle() + " not found in cache. He will be updated.");
 
             assortments = db.getAssortments(shop);
-            cacheAssortment.computeIfAbsent(shop, k -> new ArrayList<>())
-                    .addAll(assortments);
+            if (assortments != null){
+                cacheAssortment.computeIfAbsent(shop, k -> new ArrayList<>())
+                        .addAll(assortments);
+            }
             return assortments;
         }
     }

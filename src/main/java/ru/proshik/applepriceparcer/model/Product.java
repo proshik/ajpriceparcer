@@ -1,9 +1,10 @@
 package ru.proshik.applepriceparcer.model;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
-public class Product {
+public class Product implements Serializable {
 
     private String title;
     private String description;

@@ -1,14 +1,16 @@
 package ru.proshik.applepriceparcer.model;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class Assortment {
+public class Assortment implements Serializable {
 
     private LocalDateTime createdDate;
-    private Map<ProductType, List<Product>> products;
+    private Map<ProductType, List<Product>> products = new HashMap<>();
 
     public Assortment() {
     }
@@ -26,7 +28,7 @@ public class Assortment {
         return products;
     }
 
-    public List<Product> byProductType(ProductType productType){
+    public List<Product> byProductType(ProductType productType) {
         return products.get(productType);
     }
 }

@@ -1,7 +1,5 @@
 package ru.proshik.applepriceparcer.storage;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
@@ -12,11 +10,12 @@ import ru.proshik.applepriceparcer.model.Assortment;
 import ru.proshik.applepriceparcer.model.Shop;
 import ru.proshik.applepriceparcer.model.User;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Database {
 
@@ -36,55 +35,28 @@ public class Database {
     }
 
     public void addAssortment(Shop shop, Assortment assortment) throws DatabaseException {
-        DB db = open();
-
-        HTreeMap<Shop, String> map = createOrOpenShopBucket(db);
-        String assortmentString = map.get(shop);
-
-        List<Assortment> assortments = new ArrayList<>();
-        if (assortmentString != null) {
-            try {
-                Assortment[] assortmentsArray = mapper.readValue(assortmentString, Assortment[].class);
-                if (assortmentsArray != null) {
-                    assortments = Stream.of(assortmentsArray).collect(Collectors.toList());
-                }
-            } catch (IOException e) {
-                throw new DatabaseException(e);
-            } finally {
-                db.close();
+        try (DB db = open()) {
+            HTreeMap<Shop, List<Assortment>> map = createOrOpenShopBucket(db);
+            List<Assortment> assortments = map.get(shop);
+            if (assortments == null) {
+                List<Assortment> a = new ArrayList<>();
+                a.add(assortment);
+                map.put(shop, a);
+            } else {
+                assortments.add(assortment);
             }
-        }
-
-        assortments.add(assortment);
-
-        try {
-            String updatedAssortmentString = mapper.writeValueAsString(assortments);
-            map.put(shop, updatedAssortmentString);
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             throw new DatabaseException(e);
-        } finally {
-            db.close();
         }
     }
 
     public List<Assortment> getAssortments(Shop shop) throws DatabaseException {
-        List<Assortment> result = new ArrayList<>();
-
-        DB db = open();
-        HTreeMap<Shop, String> map = createOrOpenShopBucket(db);
-        try {
-            String assortmentString = map.get(shop);
-            if (assortmentString != null) {
-                result = mapper.readValue(assortmentString, new TypeReference<List<Assortment>>() {
-                });
-            }
-        } catch (IOException e) {
+        try (DB db = open()) {
+            HTreeMap<Shop, List<Assortment>> map = createOrOpenShopBucket(db);
+            return map.get(shop);
+        } catch (Exception e) {
             throw new DatabaseException(e);
-        } finally {
-            db.close();
         }
-
-        return result;
     }
 
     public void addUserShop(String chatId, Shop shop) throws DatabaseException {
@@ -121,10 +93,10 @@ public class Database {
                 .make();
     }
 
-    private HTreeMap<Shop, String> createOrOpenShopBucket(DB db) {
+    private HTreeMap<Shop, List<Assortment>> createOrOpenShopBucket(DB db) {
         return db.hashMap(SHOP_BUCKET)
                 .keySerializer(serializer)
-                .valueSerializer(Serializer.STRING)
+                .valueSerializer(new AssormentListSerializer())
                 .createOrOpen();
     }
 
@@ -149,15 +121,31 @@ public class Database {
         }
     }
 
+    private class AssormentListSerializer implements Serializer<List<Assortment>>, Serializable {
+
+        @Override
+        public void serialize(@NotNull DataOutput2 out, @NotNull List<Assortment> value) throws IOException {
+            ObjectOutputStream oos = new ObjectOutputStream(out);
+            oos.writeObject(value);
+        }
+
+        @Override
+        public List<Assortment> deserialize(@NotNull DataInput2 input, int available) throws IOException {
+            try {
+                ObjectInputStream in2 = new ObjectInputStream(new DataInput2.DataInputToStream(input));
+                return (List) in2.readObject();
+            } catch (ClassNotFoundException e) {
+                throw new IOException(e);
+            }
+        }
+    }
+
     private class UserSerializer implements Serializer<User>, Serializable {
 
         @Override
         public void serialize(@NotNull DataOutput2 out, @NotNull User value) throws IOException {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            ObjectOutputStream oos = new ObjectOutputStream(out);
             oos.writeObject(value);
-
-            out.write(bos.toByteArray());
         }
 
         @Override

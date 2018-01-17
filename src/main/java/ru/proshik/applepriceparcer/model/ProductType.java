@@ -1,8 +1,9 @@
 package ru.proshik.applepriceparcer.model;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
-public enum ProductType {
+public enum ProductType implements Serializable {
 
     IPHONE("iPhone"),
     IPAD("iPad"),

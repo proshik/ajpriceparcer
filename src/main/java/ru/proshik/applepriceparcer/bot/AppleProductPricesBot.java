@@ -218,7 +218,7 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
             message.setChatId(update.getCallbackQuery().getMessage().getChatId())
 //                        .setReplyMarkup(buildRootMenuKeyboard())
                     .enableMarkdown(true)
-                    .setText("You add subscription on update from shops:*" + shop.getTitle() + " - " + shop.getUrl() + "*");
+                    .setText("You add subscription on update from shops: *" + shop.getTitle() + " - " + shop.getUrl() + "*");
         } catch (DatabaseException e) {
             LOG.error("Error on execute database operation", e);
             message.setReplyMarkup(buildRootMenuKeyboard())

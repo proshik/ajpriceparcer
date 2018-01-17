@@ -1,9 +1,10 @@
 package ru.proshik.applepriceparcer.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-public class Item {
+public class Item implements Serializable {
 
     private String title;
     private BigDecimal price;
