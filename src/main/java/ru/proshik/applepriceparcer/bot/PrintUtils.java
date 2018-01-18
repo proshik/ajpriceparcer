@@ -12,26 +12,32 @@ public class PrintUtils {
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
-    static String printAssortment(Assortment assortment, ProductType productType) {
-        StringBuilder out = new StringBuilder();
-        out.append("*Date last change prices: *")
-                .append(DATE_TIME_FORMATTER.format(assortment.getCreatedDate()))
-                .append("\n");
-        out.append(printProducts(assortment.byProductType(productType)));
-
-        return out.toString();
+    static String printAssortment(String shopTitle, Assortment assortment, ProductType productType) {
+        return "*Price* operation\n" +
+                "Shop: *" + shopTitle + "*\n" +
+                "Product type: *" + productType.getValue() + "*\n\n" +
+                "*Date last change prices: *" +
+                DATE_TIME_FORMATTER.format(assortment.getCreatedDate()) +
+                "\n" +
+                printProducts(assortment.byProductType(productType));
     }
 
-    static String buildHistory(List<Assortment> assortments, ProductType productType) {
+    static String buildHistory(String shopTitle, List<Assortment> assortments, ProductType productType) {
         StringBuilder out = new StringBuilder();
+        out.append("*History* operation\n")
+                .append("Shop: *").append(shopTitle).append("*\n")
+                .append("Product type: *").append(productType.getValue()).append("*\n\n");
 
-        for (Assortment a : assortments) {
-            out.append("*Date last change prices: *")
-                    .append(DATE_TIME_FORMATTER.format(a.getCreatedDate()))
-                    .append("\n");
-            out.append(printProducts(a.byProductType(productType)));
+        if (assortments.isEmpty()) {
+            out.append("There were no changes in the prices");
+        } else {
+            for (Assortment a : assortments) {
+                out.append("*Date last change prices: *")
+                        .append(DATE_TIME_FORMATTER.format(a.getCreatedDate()))
+                        .append("\n");
+                out.append(printProducts(a.byProductType(productType)));
+            }
         }
-
         return out.toString();
     }
 

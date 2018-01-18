@@ -10,6 +10,7 @@ import ru.proshik.applepriceparcer.provider.Provider;
 import ru.proshik.applepriceparcer.provider.ProviderFactory;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -81,18 +82,51 @@ public class OperationService {
     }
 
     public List<Assortment> historyAssortments(Shop shop, ProductType productType) throws DatabaseException {
-
         Provider provider = providerFactory.findByShop(shop);
         if (provider != null) {
             List<Assortment> assortments = assortmentService.getAssortments(shop);
 
-            return assortments.stream()
-                    .sorted((o1, o2) -> o2.getCreatedDate().compareTo(o1.getCreatedDate()))
-                    .limit(HISTORY_LIMIT)
-                    .collect(Collectors.toList());
+            List<History> result = new ArrayList<>();
+
+//            if (assortments.size() > 1) {
+                for (int i = 0; i < assortments.size() - 1; i++) {
+                    History history = historyChanges(assortments.get(i), assortments.get(i + 1), productType);
+                    result.add(history);
+                }
+//            }
+
+            if (assortments.size() > 1) {
+                return assortments.stream()
+                        .sorted((o1, o2) -> o2.getCreatedDate().compareTo(o1.getCreatedDate()))
+                        .limit(HISTORY_LIMIT)
+                        .collect(Collectors.toList());
+            } else {
+                return Collections.emptyList();
+            }
         } else {
             return Collections.emptyList();
         }
+    }
+
+    public Pair<List<Shop>, List<Shop>> userSubscriptions(String chatId) throws DatabaseException {
+        List<Shop> availableShops = providerFactory.list().stream()
+                .map(Provider::getShop)
+                .collect(Collectors.toList());
+
+        List<Shop> userSubscriptions = userService.userSubscriptions(chatId);
+
+        availableShops.removeAll(new ArrayList<>(userSubscriptions));
+
+        return new ImmutablePair<>(userSubscriptions, availableShops);
+    }
+
+    public void updateUserSubscriptions(String chatId, Shop shop) throws DatabaseException {
+        userService.addSubscription(chatId, shop);
+    }
+
+    // TODO: 18.01.2018
+    public void cancelSubscriptions(String chatId, Shop shop) {
+
     }
 
     public boolean tryUpdateAssortment(Shop shop, Assortment assortment) throws ServiceLayerException {
@@ -115,7 +149,7 @@ public class OperationService {
         return false;
     }
 
-    private static boolean wasChangeInAssortments(Assortment newAssortment, List<Assortment> existsAssortments) {
+    private boolean wasChangeInAssortments(Assortment newAssortment, List<Assortment> existsAssortments) {
         Assortment lastAssortment = findLastAssortment(existsAssortments);
 
         for (Map.Entry<ProductType, List<Product>> entry : lastAssortment.getProducts().entrySet()) {
@@ -144,30 +178,84 @@ public class OperationService {
         return false;
     }
 
-    private static Assortment findLastAssortment(List<Assortment> assortments) {
+    private Assortment findLastAssortment(List<Assortment> assortments) {
         return assortments.stream()
                 .max(Comparator.comparing(Assortment::getCreatedDate))
                 .orElseThrow(() -> new IllegalArgumentException("Must be at least one element"));
     }
 
-    public Pair<List<Shop>, List<Shop>> userSubscriptions(String chatId) throws DatabaseException {
+    /**
+     * Data: 2017-01-01
+     * Iphone X
+     * Iphone 64 Gb:
+     * Old price: 77000; New Price: 70000
+     * ...
+     */
+    private History historyChanges(Assortment firstA, Assortment secondA, ProductType productType) {
+        Map<String, Map<String, Prices>> productResultData = new TreeMap<>();
 
-        List<Shop> availableShops = providerFactory.list().stream()
-                .map(Provider::getShop)
-                .collect(Collectors.toList());
+        for (Map.Entry<ProductType, List<Product>> entry : firstA.getProducts().entrySet()) {
+            if (entry.getKey().equals(productType)) {
+                Map<String, Product> productsByTitle = secondA.byProductType(entry.getKey()).stream()
+                        .collect(Collectors.toMap(Product::getTitle, o -> o));
 
-        List<Shop> userSubscriptions = userService.userSubscriptions(chatId);
+                for (Product p1 : entry.getValue()) {
+                    Product p2 = productsByTitle.get(p1.getTitle());
 
-        availableShops.removeAll(new ArrayList<>(userSubscriptions));
+                    Map<String, BigDecimal> itemPriceByTitle = p2.getItems().stream()
+                            .collect(Collectors.toMap(Item::getTitle, Item::getPrice));
 
-        return new ImmutablePair<>(userSubscriptions, availableShops);
+                    Map<String, Prices> itemResultData = new TreeMap<>();
+                    for (Item i1 : p1.getItems()) {
+                        BigDecimal priceI1 = i1.getPrice();
+                        BigDecimal priceI2 = itemPriceByTitle.get(i1.getTitle());
+
+                        if (!priceI1.equals(priceI2)) {
+                            itemResultData.put(i1.getTitle(), new Prices(priceI1, priceI2));
+                        }
+                    }
+                    productResultData.put(p1.getTitle(), itemResultData);
+                }
+
+            }
+        }
+        return new History(firstA.getCreatedDate(), productResultData);
     }
 
-    public void updateUserSubscriptions(String chatId, Shop shop) throws DatabaseException {
-        userService.addSubscription(chatId, shop);
+    class Prices {
+        private BigDecimal oldPrice;
+        private BigDecimal newPrice;
+
+        public Prices(BigDecimal oldPrice, BigDecimal newPrice) {
+            this.oldPrice = oldPrice;
+            this.newPrice = newPrice;
+        }
+
+        public BigDecimal getOldPrice() {
+            return oldPrice;
+        }
+
+        public BigDecimal getNewPrice() {
+            return newPrice;
+        }
     }
 
-    public void cancelSubscriptions(String chatId, Shop shop) {
+    class History {
+        private LocalDateTime date;
+        private Map<String, Map<String, Prices>> history;
 
+        public History(LocalDateTime date, Map<String, Map<String, Prices>> history) {
+            this.date = date;
+            this.history = history;
+        }
+
+        public LocalDateTime getDate() {
+            return date;
+        }
+
+        public Map<String, Map<String, Prices>> getHistory() {
+            return history;
+        }
     }
+
 }

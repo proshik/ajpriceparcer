@@ -249,24 +249,20 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
                 switch (sequenceData.getOperationType()) {
                     case PRICES:
                         try {
-                            String prices = printAssortment(operationService.priceAssortment(shop, productType), productType);
-                            message.setText("*Price* operation\n" +
-                                    "Shop: *" + shop.getTitle() + "*\n" +
-                                    "Product type: *" + productType.getValue() + "*\n\n" +
-                                    prices);
+                            Assortment assortment = operationService.priceAssortment(shop, productType);
+                            String prices = printAssortment(shop.getTitle(), assortment, productType);
+                            message.setText(prices);
                         } catch (ServiceLayerException e) {
-                            message.setText("Operation ended with error. Please start from the begin!");
+                            message.setText("Operation \"Prices\" ended with error. Please start from the begin!");
                         }
                         break;
                     case HISTORY:
                         try {
-                            String history = buildHistory(operationService.historyAssortments(shop, productType), productType);
-                            message.setText("*History* operation\n" +
-                                    "Shop: *" + shop.getTitle() + "*\n" +
-                                    "Product type: *" + productType.getValue() + "*\n\n" +
-                                    history);
+                            List<Assortment> assortments = operationService.historyAssortments(shop, productType);
+                            String history = buildHistory(shop.getTitle(), assortments, productType);
+                            message.setText(history);
                         } catch (ServiceLayerException e) {
-                            message.setText("Operation ended with error. Please start from the begin!");
+                            message.setText("Operation \"History\" ended with error. Please start from the begin!");
                         }
                         break;
                     default:
