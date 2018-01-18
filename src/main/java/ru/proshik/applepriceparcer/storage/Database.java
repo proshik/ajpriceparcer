@@ -1,19 +1,17 @@
 package ru.proshik.applepriceparcer.storage;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
-import org.jetbrains.annotations.NotNull;
-import org.mapdb.*;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+import org.mapdb.HTreeMap;
+import org.mapdb.Serializer;
 import ru.proshik.applepriceparcer.exception.DatabaseException;
 import ru.proshik.applepriceparcer.model.Assortment;
 import ru.proshik.applepriceparcer.model.Shop;
 import ru.proshik.applepriceparcer.model.User;
+import ru.proshik.applepriceparcer.storage.serializer.AssortmentListSerializer;
+import ru.proshik.applepriceparcer.storage.serializer.ShopSerializer;
+import ru.proshik.applepriceparcer.storage.serializer.UserSerializer;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,14 +22,8 @@ public class Database {
 
     private final String dbPath;
 
-    private ObjectMapper mapper = new ObjectMapper();
-    private Serializer<Shop> serializer = new ShopSerializer();
-
     public Database(String dbPath) {
         this.dbPath = dbPath;
-
-        mapper.registerModule(new JSR310Module());
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
     }
 
     public void addAssortment(Shop shop, Assortment assortment) throws DatabaseException {
@@ -95,8 +87,8 @@ public class Database {
 
     private HTreeMap<Shop, List<Assortment>> createOrOpenShopBucket(DB db) {
         return db.hashMap(SHOP_BUCKET)
-                .keySerializer(serializer)
-                .valueSerializer(new AssormentListSerializer())
+                .keySerializer(new ShopSerializer())
+                .valueSerializer(new AssortmentListSerializer())
                 .createOrOpen();
     }
 
@@ -107,56 +99,5 @@ public class Database {
                 .createOrOpen();
     }
 
-    private class ShopSerializer implements Serializer<Shop>, Serializable {
-
-        @Override
-        public void serialize(@NotNull DataOutput2 out, @NotNull Shop value) throws IOException {
-            out.writeUTF(value.getTitle());
-            out.writeUTF(value.getUrl());
-        }
-
-        @Override
-        public Shop deserialize(@NotNull DataInput2 input, int available) throws IOException {
-            return new Shop(input.readUTF(), input.readUTF());
-        }
-    }
-
-    private class AssormentListSerializer implements Serializer<List<Assortment>>, Serializable {
-
-        @Override
-        public void serialize(@NotNull DataOutput2 out, @NotNull List<Assortment> value) throws IOException {
-            ObjectOutputStream oos = new ObjectOutputStream(out);
-            oos.writeObject(value);
-        }
-
-        @Override
-        public List<Assortment> deserialize(@NotNull DataInput2 input, int available) throws IOException {
-            try {
-                ObjectInputStream in2 = new ObjectInputStream(new DataInput2.DataInputToStream(input));
-                return (List) in2.readObject();
-            } catch (ClassNotFoundException e) {
-                throw new IOException(e);
-            }
-        }
-    }
-
-    private class UserSerializer implements Serializer<User>, Serializable {
-
-        @Override
-        public void serialize(@NotNull DataOutput2 out, @NotNull User value) throws IOException {
-            ObjectOutputStream oos = new ObjectOutputStream(out);
-            oos.writeObject(value);
-        }
-
-        @Override
-        public User deserialize(@NotNull DataInput2 input, int available) throws IOException {
-            try {
-                ObjectInputStream in2 = new ObjectInputStream(new DataInput2.DataInputToStream(input));
-                return (User) in2.readObject();
-            } catch (ClassNotFoundException e) {
-                throw new IOException(e);
-            }
-        }
-    }
 }
 
