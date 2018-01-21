@@ -34,10 +34,6 @@ public class BotUtils {
 
 
     static InlineKeyboardMarkup buildInlineKeyboard(Map<String, String> items, String callbackId, int onLine) {
-        // In elements less then resolution of table buttons then change count elements on line
-        if (items.size() < onLine) {
-            onLine = items.size();
-        }
 
         List<InlineKeyboardButton> inlineButtons = new ArrayList<>();
         for (Map.Entry<String, String> item : items.entrySet()) {
@@ -57,14 +53,27 @@ public class BotUtils {
 
         List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
-        int n = 0;
-        for (int i = 0; i < inlineButtons.size(); i += onLine) {
-            List<InlineKeyboardButton> rowButton = new ArrayList<>();
-            for (int y = 0; y < onLine; y++) {
-                rowButton.add(inlineButtons.get(i + y));
+        // In elements less then resolution of table buttons then change count elements on line
+        if (items.size() < onLine) {
+            onLine = items.size();
+        }
+
+        int i = 1;
+        List<InlineKeyboardButton> rowButton = new ArrayList<>();
+        for (int n = 0; n < inlineButtons.size(); n++) {
+            if (i == onLine) {
+                rowButton.add(inlineButtons.get(n));
+                keyboard.add(rowButton);
+
+                rowButton = new ArrayList<>();
+                i = 1;
+            } else {
+                rowButton.add(inlineButtons.get(n));
+                i++;
             }
-            keyboard.add(n, rowButton);
-            n++;
+            if (n == inlineButtons.size() - 1) {
+                keyboard.add(rowButton);
+            }
         }
 
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();

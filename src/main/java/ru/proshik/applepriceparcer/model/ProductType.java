@@ -8,9 +8,9 @@ public enum ProductType implements Serializable {
     IPHONE("iPhone"),
     IPAD("iPad"),
     IMAC("iMac"),
-    MAC_MINI("Mac Mini"),
-    MACBOOK_PRO("Macbook Pro"),
-    MACBOOK_AIR("Macbook Air"),
+    MAC_MINI("MacMini"),
+    MACBOOK_PRO("MacbookPro"),
+    MACBOOK_AIR("MacbookAir"),
     ACCESSORIES("Accessories"),
     OTHER("Other");
 

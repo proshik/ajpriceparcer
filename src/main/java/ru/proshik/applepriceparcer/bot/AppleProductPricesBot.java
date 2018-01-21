@@ -242,7 +242,7 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
                 break;
             case PRODUCT_TYPE_SELECTED:
                 Shop shop = sequenceData.getData().getShop();
-                ProductType productType = ProductType.fromValue(callbackInfo.getValue());
+                ProductType productType = ProductType.valueOf(callbackInfo.getValue());
 
                 message.enableMarkdown(true);
                 message.setReplyMarkup(buildRootMenuKeyboard());
@@ -305,9 +305,9 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
         Map<String, String> productTypeValueTyEnumNam = operationService.selectUniqueProductTypes(shop).stream()
                 .collect(Collectors.toMap(Enum::name, ProductType::getValue));
 
-        message.setReplyMarkup(buildInlineKeyboard(productTypeValueTyEnumNam, callbackInfo.getId(), 3));
+        message.setReplyMarkup(buildInlineKeyboard(productTypeValueTyEnumNam, callbackInfo.getId(), 2));
         message.setText("Shop: *" + shop.getTitle() + "*\n\n" +
-                "Select product type: ");
+                "Select product type for continue: ");
         message.enableMarkdown(true);
         return message;
     }
@@ -382,7 +382,7 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
                 Map<String, String> shopMap = operationService.selectAvailableShops().stream()
                         .collect(Collectors.toMap(Shop::getTitle, Shop::getTitle));
 
-                InlineKeyboardMarkup keyboard = buildInlineKeyboard(shopMap, String.valueOf(chatId), 3);
+                InlineKeyboardMarkup keyboard = buildInlineKeyboard(shopMap, String.valueOf(chatId), 2);
                 message.setReplyMarkup(keyboard);
 
                 builder.append("For subscribe on new shops used follow key: ");
