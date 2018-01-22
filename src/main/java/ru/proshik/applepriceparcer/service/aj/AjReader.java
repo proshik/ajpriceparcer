@@ -56,7 +56,7 @@ public class AjReader {
                 DomNodeList<DomNode> childNodes = h2.getChildNodes();
                 title = childNodes.stream()
                         .map(DomNode::asText)
-                        .filter(value -> !value.equals("\r\n"))
+                        .filter(value -> !value.equals("\n") && !value.equals("\r\n"))
                         .collect(Collectors.joining(" "));
             }
             List<Item> items = new ArrayList<>();
