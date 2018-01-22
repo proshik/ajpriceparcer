@@ -36,6 +36,7 @@ public class Database {
                 map.put(shop, a);
             } else {
                 assortments.add(assortment);
+                map.put(shop, assortments);
             }
         } catch (Exception e) {
             throw new DatabaseException(e);
