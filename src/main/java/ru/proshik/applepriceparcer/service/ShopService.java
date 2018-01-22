@@ -11,17 +11,17 @@ public class ShopService {
 //
 //        List<Assortment> newAjAssortments = ajScreener.printAjPrices();
 //
-//        List<AjAssortment> ajAssortments = fileStorage.priceAssortment();
+//        List<Aj> ajAssortments = fileStorage.priceAssortment();
 //
 //        if (!ajAssortments.isEmpty()) {
 //            // get last assortments for compare
-//            AjAssortment lastAssortment = CommandUtils.getLastAssortment(ajAssortments);
+//            Aj lastAssortment = CommandUtils.getLastAssortment(ajAssortments);
 //            // searching changes in assortments
 //            Map<String, List<ImmutablePair<Item, BigDecimal>>> assortmentChanges =
 //                    buildAssortmentChanges(newAjAssortments, lastAssortment.getAssortments());
 //            // if changes from last date regarding this moment was found then save new assortment and print diff
 //            if (!assortmentChanges.isEmpty()) {
-//                fileStorage.save(new AjAssortment(LocalDateTime.now(), newAjAssortments));
+//                fileStorage.save(new Aj(LocalDateTime.now(), newAjAssortments));
 //
 //                System.out.println("Change WAS FOUND!");
 //                System.out.println(buildChangesString(lastAssortment.getCreatedDate(), assortmentChanges));
@@ -29,7 +29,7 @@ public class ShopService {
 //                System.out.println("Change NOT was found!");
 //            }
 //        } else {
-//            fileStorage.save(new AjAssortment(LocalDateTime.now(), newAjAssortments));
+//            fileStorage.save(new Aj(LocalDateTime.now(), newAjAssortments));
 //            System.out.println("Values was saved in first time");
 //        }
 

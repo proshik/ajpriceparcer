@@ -88,14 +88,15 @@ public class OperationService {
 
             List<History> result = new ArrayList<>();
 
-//            if (assortments.size() > 1) {
+            //temporary decision
+            if (assortments.stream().flatMap(a -> a.getProducts().keySet().stream().filter(pt -> productType == pt)).count() > 1) {
                 for (int i = 0; i < assortments.size() - 1; i++) {
                     History history = historyChanges(assortments.get(i), assortments.get(i + 1), productType);
                     result.add(history);
                 }
-//            }
+            }
 
-            if (assortments.size() > 1) {
+            if (assortments.stream().flatMap(a -> a.getProducts().keySet().stream().filter(pt -> productType == pt)).count() > 1) {
                 return assortments.stream()
                         .sorted((o1, o2) -> o2.getCreatedDate().compareTo(o1.getCreatedDate()))
                         .limit(HISTORY_LIMIT)
@@ -201,6 +202,10 @@ public class OperationService {
 
                 for (Product p1 : entry.getValue()) {
                     Product p2 = productsByTitle.get(p1.getTitle());
+
+                    if (p2 == null) {
+                        continue;
+                    }
 
                     Map<String, BigDecimal> itemPriceByTitle = p2.getItems().stream()
                             .collect(Collectors.toMap(Item::getTitle, Item::getPrice));

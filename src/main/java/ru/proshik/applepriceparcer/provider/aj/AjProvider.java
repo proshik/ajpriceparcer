@@ -73,7 +73,9 @@ public class AjProvider implements Provider {
                 DomNodeList<DomNode> childNodes = h2.getChildNodes();
                 title = childNodes.stream()
                         .map(DomNode::asText)
-                        .filter(value -> !value.equals("\r\n"))
+                        // this need because in aj.ru was found example: bla-bla-bla... \n RED (c) ...bla
+                        // This symbol will be ignored
+                        .filter(value -> !value.equals("\n") && !value.equals("\r\n"))
                         .collect(Collectors.joining(" "));
             }
 
@@ -150,13 +152,13 @@ public class AjProvider implements Provider {
 //        client.getOptions().setJavaScriptEnabled(false);
 //        client.getOptions().setThrowExceptionOnFailingStatusCode(false);
 //
-//        HtmlPage page = client.getPage(Paths.get("aj.html").toUri().toURL());
+//        HtmlPage page = client.getPage(Paths.get("Aj.html").toUri().toURL());
 ////
 ////        HtmlPage page;
 ////        try {
 ////            page = client.getPage(URL);
 ////        } catch (IOException e) {
-////            throw new ProviderParseException("Error on priceAssortment page from aj.ru", e);
+////            throw new ProviderParseException("Error on priceAssortment page from Aj.ru", e);
 ////        }
 //
 //        AjProvider apP = new AjProvider();
