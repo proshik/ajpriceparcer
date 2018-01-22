@@ -8,7 +8,9 @@ import ru.proshik.applepriceparcer.exception.ServiceLayerException;
 import ru.proshik.applepriceparcer.model.*;
 import ru.proshik.applepriceparcer.provider.Provider;
 import ru.proshik.applepriceparcer.provider.ProviderFactory;
+import ru.proshik.applepriceparcer.storage.Database;
 
+import javax.xml.crypto.Data;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -162,7 +164,13 @@ public class OperationService {
                 Map<String, BigDecimal> itemPriceByTitle = p.getItems().stream()
                         .collect(Collectors.toMap(Item::getTitle, Item::getPrice));
 
-                List<Item> newItemsInAssortment = productsByTitle.get(p.getTitle()).getItems();
+                Product product = productsByTitle.get(p.getTitle());
+                if (product == null) {
+                    LOG.warn("Not found product in last assortment, " +
+                            "for new assortment with product title=" + p.getTitle());
+                    continue;
+                }
+                List<Item> newItemsInAssortment = product.getItems();
                 for (Item i : newItemsInAssortment) {
                     BigDecimal bigDecimal = itemPriceByTitle.get(i.getTitle());
                     if (bigDecimal == null) {
