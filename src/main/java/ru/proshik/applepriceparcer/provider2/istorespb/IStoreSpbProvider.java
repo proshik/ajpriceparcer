@@ -9,7 +9,7 @@ import org.w3c.css.sac.CSSException;
 import org.w3c.css.sac.CSSParseException;
 import org.w3c.css.sac.ErrorHandler;
 import ru.proshik.applepriceparcer.model2.*;
-import ru.proshik.applepriceparcer.provider2.Provider2;
+import ru.proshik.applepriceparcer.provider2.Provider;
 import ru.proshik.applepriceparcer.provider2.ProviderUtils;
 
 import java.io.IOException;
@@ -20,17 +20,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static ru.proshik.applepriceparcer.provider2.ProviderUtils.printAssortments;
-
-public class IStoreSpbProvider implements Provider2 {
+public class IStoreSpbProvider implements Provider {
 
     private static final Logger LOG = Logger.getLogger(ru.proshik.applepriceparcer.provider2.gsmstore.GsmStoreProvider.class);
 
-    private static final String URL = "http://istorespb.ru";
+    public static final String TITLE = "ISTORESPB.ru";
+    public static final String URL = "http://istorespb.ru";
 
     private WebClient client = new WebClient();
 
-    IStoreSpbProvider() {
+    public IStoreSpbProvider() {
         client.getOptions().setCssEnabled(false);
         client.getOptions().setJavaScriptEnabled(false);
         client.setCssErrorHandler(new CustomErrorHandler());

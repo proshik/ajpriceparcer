@@ -4,7 +4,7 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
 import org.apache.log4j.Logger;
 import ru.proshik.applepriceparcer.model2.*;
-import ru.proshik.applepriceparcer.provider2.Provider2;
+import ru.proshik.applepriceparcer.provider2.Provider;
 import ru.proshik.applepriceparcer.provider2.ProviderUtils;
 
 import java.io.IOException;
@@ -15,18 +15,19 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class GsmStoreProvider implements Provider2 {
+public class GsmStoreProvider implements Provider {
 
     private static final Logger LOG = Logger.getLogger(ru.proshik.applepriceparcer.provider2.gsmstore.GsmStoreProvider.class);
 
-    private static final String URL = "http://gsm-store.ru";
+    public static final String TITLE = "GSM-STORE.ru";
+    public static final String URL = "http://gsm-store.ru";
 
     private static final String IN_STOCK = "В наличии";
     private static final String OUT_STOCK = "Товар закончился";
 
     private WebClient client = new WebClient();
 
-    GsmStoreProvider() {
+    public GsmStoreProvider() {
         client.getOptions().setCssEnabled(false);
         client.getOptions().setJavaScriptEnabled(false);
     }

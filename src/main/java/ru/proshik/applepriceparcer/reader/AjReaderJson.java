@@ -54,7 +54,7 @@ public class AjReaderJson {
 //            productTypeListMap.put(ProductType.IPHONE, products);
 //
 //            Assortment assortment = new Assortment(a.getCreatedDate(), productTypeListMap);
-//            db.addAssortment(s, assortment);
+//            db.addFetch(s, assortment);
 //        }
 //
 //        aj = db.getAssortments(new Shop("AJ", "http://aj.ru"));

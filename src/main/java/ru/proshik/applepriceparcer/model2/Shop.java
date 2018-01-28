@@ -1,13 +1,12 @@
 package ru.proshik.applepriceparcer.model2;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Objects;
 
 public class Shop implements Serializable {
 
     private String title;
     private String url;
-    private List<Fetch> assortments;
 
     public Shop() {
     }
@@ -15,12 +14,6 @@ public class Shop implements Serializable {
     public Shop(String title, String url) {
         this.title = title;
         this.url = url;
-    }
-
-    public Shop(String title, String url, List<Fetch> assortments) {
-        this.title = title;
-        this.url = url;
-        this.assortments = assortments;
     }
 
     public String getTitle() {
@@ -31,7 +24,26 @@ public class Shop implements Serializable {
         return url;
     }
 
-    public List<Fetch> getAssortments() {
-        return assortments;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Shop shop = (Shop) o;
+        return Objects.equals(title, shop.title) &&
+                Objects.equals(url, shop.url);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(title, url);
+    }
+
+    @Override
+    public String toString() {
+        return "Shop{" +
+                "title='" + title + '\'' +
+                ", url='" + url + '\'' +
+                '}';
     }
 }

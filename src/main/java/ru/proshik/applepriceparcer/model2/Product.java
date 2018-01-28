@@ -3,6 +3,7 @@ package ru.proshik.applepriceparcer.model2;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 
 public class Product implements Serializable {
@@ -57,5 +58,36 @@ public class Product implements Serializable {
 
     public Map<String, String> getParameters() {
         return parameters;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return Objects.equals(title, product.title) &&
+                Objects.equals(description, product.description) &&
+                Objects.equals(presence, product.presence) &&
+                Objects.equals(price, product.price) &&
+                productType == product.productType &&
+                Objects.equals(parameters, product.parameters);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(title, description, presence, price, productType, parameters);
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", presence=" + presence +
+                ", price=" + price +
+                ", productType=" + productType +
+                ", parameters=" + parameters +
+                '}';
     }
 }

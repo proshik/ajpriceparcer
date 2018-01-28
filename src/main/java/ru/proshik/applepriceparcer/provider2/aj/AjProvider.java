@@ -8,7 +8,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlSpan;
 import org.apache.log4j.Logger;
 import ru.proshik.applepriceparcer.exception.ProviderParseException;
 import ru.proshik.applepriceparcer.model2.*;
-import ru.proshik.applepriceparcer.provider2.Provider2;
+import ru.proshik.applepriceparcer.provider2.Provider;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -21,18 +21,17 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static ru.proshik.applepriceparcer.provider2.ProviderUtils.extractParameters;
-import static ru.proshik.applepriceparcer.provider2.ProviderUtils.printAssortments;
 
-public class AjProvider implements Provider2 {
+public class AjProvider implements Provider {
 
     private static final Logger LOG = Logger.getLogger(ru.proshik.applepriceparcer.provider2.aj.AjProvider.class);
 
-    private static final String TITLE = "AJ.ru";
-    private static final String URL = "http://aj.ru";
+    public static final String URL = "http://aj.ru";
+    public static final String TITLE = "AJ.ru";
 
     private WebClient client = new WebClient();
 
-    AjProvider() {
+    public AjProvider() {
         client.getOptions().setCssEnabled(false);
         client.getOptions().setJavaScriptEnabled(false);
     }

@@ -2,7 +2,6 @@ package ru.proshik.applepriceparcer.service.scheduler;
 
 import org.apache.log4j.Logger;
 import org.quartz.*;
-import ru.proshik.applepriceparcer.exception.DatabaseException;
 import ru.proshik.applepriceparcer.exception.ProviderParseException;
 import ru.proshik.applepriceparcer.exception.ServiceLayerException;
 import ru.proshik.applepriceparcer.model.Assortment;
