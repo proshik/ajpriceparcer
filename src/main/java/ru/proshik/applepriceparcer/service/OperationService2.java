@@ -4,18 +4,12 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import ru.proshik.applepriceparcer.exception.DatabaseException;
-import ru.proshik.applepriceparcer.exception.ServiceLayerException;
-import ru.proshik.applepriceparcer.model2.Assortment;
-import ru.proshik.applepriceparcer.model2.Product;
-import ru.proshik.applepriceparcer.model2.ProductType;
 import ru.proshik.applepriceparcer.model2.Shop;
-import ru.proshik.applepriceparcer.provider2.Provider;
 import ru.proshik.applepriceparcer.provider2.ProviderFactory;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public class OperationService2 {
 
@@ -24,14 +18,14 @@ public class OperationService2 {
     private static final int HISTORY_LIMIT = 5;
 
     private ProviderFactory providerFactory;
-    private AssortmentService assortmentService;
-    private UserService userService;
+    private FetchService fetchService;
+    private UserService2 userService;
 
     public OperationService2(ProviderFactory providerFactory,
-                             AssortmentService assortmentService,
-                             UserService userService) {
+                             FetchService fetchService,
+                             UserService2 userService) {
         this.providerFactory = providerFactory;
-        this.assortmentService = assortmentService;
+        this.fetchService = fetchService;
         this.userService = userService;
     }
 
@@ -74,7 +68,7 @@ public class OperationService2 {
 //        return Collections.emptyList();
 //    }
 
-//    public Assortment priceAssortment(Shop shop, ProductType productType) throws ServiceLayerException {
+    //    public Assortment priceAssortment(Shop shop, ProductType productType) throws ServiceLayerException {
 //
 //        List<Assortment> assortments = assortmentService.getAssortments(shop);
 //        if (assortments.isEmpty()) {
@@ -112,26 +106,25 @@ public class OperationService2 {
 //        }
 //    }
 //
-//    public Pair<List<Shop>, List<Shop>> userSubscriptions(String chatId) throws DatabaseException {
-//        List<Shop> availableShops = providerFactory.list().stream()
-//                .map(Provider::getShop)
-//                .collect(Collectors.toList());
-//
-//        List<Shop> userSubscriptions = userService.userSubscriptions(chatId);
-//
-//        availableShops.removeAll(new ArrayList<>(userSubscriptions));
-//
-//        return new ImmutablePair<>(userSubscriptions, availableShops);
-//    }
-//
-//    public void updateUserSubscriptions(String chatId, Shop shop) throws DatabaseException {
-//        userService.addSubscription(chatId, shop);
-//    }
-//
-//    // TODO: 18.01.2018
-//    public void cancelSubscriptions(String chatId, Shop shop) {
-//
-//    }
+    public Pair<Set<Shop>, Set<Shop>> userSubscriptions(String chatId) throws DatabaseException {
+        Set<Shop> availableShops = providerFactory.shops();
+
+        Set<Shop> userSubscriptions = userService.userSubscriptions(chatId);
+
+        availableShops.removeAll(new ArrayList<>(userSubscriptions));
+
+        return new ImmutablePair<>(userSubscriptions, availableShops);
+    }
+
+    //
+    public void updateUserSubscriptions(String chatId, Shop shop) throws DatabaseException {
+        userService.addSubscription(chatId, shop);
+    }
+
+    // TODO: 18.01.2018
+    public void cancelSubscriptions(String chatId, Shop shop) {
+
+    }
 
 
 //    /**

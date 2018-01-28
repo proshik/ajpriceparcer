@@ -1,23 +1,21 @@
 package ru.proshik.applepriceparcer.model2;
 
-import ru.proshik.applepriceparcer.model2.Shop;
-
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class User implements Serializable {
 
-    private List<Shop> subscriptions = new ArrayList<>();
+    private Set<Shop> subscriptions = new HashSet<>();
 
     public User() {
     }
 
-    public User(List<Shop> subscriptions) {
+    public User(Set<Shop> subscriptions) {
         this.subscriptions = subscriptions;
     }
 
-    public List<Shop> getSubscriptions() {
+    public Set<Shop> getSubscriptions() {
         return subscriptions;
     }
 }
