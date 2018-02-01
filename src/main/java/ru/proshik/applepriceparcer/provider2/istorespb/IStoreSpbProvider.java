@@ -8,7 +8,10 @@ import org.apache.log4j.Logger;
 import org.w3c.css.sac.CSSException;
 import org.w3c.css.sac.CSSParseException;
 import org.w3c.css.sac.ErrorHandler;
-import ru.proshik.applepriceparcer.model2.*;
+import ru.proshik.applepriceparcer.model2.AssortmentType;
+import ru.proshik.applepriceparcer.model2.Fetch;
+import ru.proshik.applepriceparcer.model2.Product;
+import ru.proshik.applepriceparcer.model2.ProductType;
 import ru.proshik.applepriceparcer.provider2.Provider;
 import ru.proshik.applepriceparcer.provider2.ProviderUtils;
 
@@ -80,19 +83,15 @@ public class IStoreSpbProvider implements Provider {
                     params = ProviderUtils.extractParameters(description);
                 }
 
-                products.add(new Product(title, description, null, price, ptp.productType, params));
+                products.add(new Product(title, description, null, price, AssortmentType.IPHONE, ptp.productType, params));
             }
         }
-
-        List<Assortment> assortments = new ArrayList<>();
-//        products.sort(Comparator.comparing(Product::getDescription));
-        assortments.add(new Assortment(AssortmentType.IPHONE.getValue(), null, AssortmentType.IPHONE, products));
 
 //        printAssortments(assortments);
 
         LOG.info("Screening has ended for " + TITLE);
 
-        return new Fetch(LocalDateTime.now(), assortments);
+        return new Fetch(LocalDateTime.now(), products);
     }
 
 

@@ -3,7 +3,10 @@ package ru.proshik.applepriceparcer.provider2.gsmstore;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
 import org.apache.log4j.Logger;
-import ru.proshik.applepriceparcer.model2.*;
+import ru.proshik.applepriceparcer.model2.AssortmentType;
+import ru.proshik.applepriceparcer.model2.Fetch;
+import ru.proshik.applepriceparcer.model2.Product;
+import ru.proshik.applepriceparcer.model2.ProductType;
 import ru.proshik.applepriceparcer.provider2.Provider;
 import ru.proshik.applepriceparcer.provider2.ProviderUtils;
 
@@ -87,19 +90,15 @@ public class GsmStoreProvider implements Provider {
                     params = ProviderUtils.extractParameters(description);
                 }
 
-                products.add(new Product(title, description, presence, price, ptp.productType, params));
+                products.add(new Product(title, description, presence, price, AssortmentType.IPHONE, ptp.productType, params));
             }
         }
-
-        List<Assortment> assortments = new ArrayList<>();
-//        products.sort(Comparator.comparing(Product::getDescription));
-        assortments.add(new Assortment(AssortmentType.IPHONE.getValue(), null, AssortmentType.IPHONE, products));
 
 //        printAssortments(assortments);
 
         LOG.info("Screening has ended for " + TITLE);
 
-        return new Fetch(LocalDateTime.now(), assortments);
+        return new Fetch(LocalDateTime.now(), products);
     }
 
 
@@ -131,9 +130,9 @@ public class GsmStoreProvider implements Provider {
     /**
      * Run
      */
-//    public static void main(String[] args) {
-//        GsmStoreProvider gsmStoreProvider = new GsmStoreProvider();
-//        gsmStoreProvider.screening();
-//    }
+    public static void main(String[] args) {
+        GsmStoreProvider gsmStoreProvider = new GsmStoreProvider();
+        gsmStoreProvider.screening();
+    }
 
 }

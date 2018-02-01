@@ -7,21 +7,21 @@ import java.util.List;
 public class Fetch implements Serializable {
 
     private LocalDateTime createdDate;
-    private List<Assortment> assortments;
+    private List<Product> products;
 
     public Fetch() {
     }
 
-    public Fetch(LocalDateTime createdDate, List<Assortment> assortments) {
+    public Fetch(LocalDateTime createdDate, List<Product> products) {
         this.createdDate = createdDate;
-        this.assortments = assortments;
+        this.products = products;
     }
 
     public LocalDateTime getCreatedDate() {
         return createdDate;
     }
 
-    public List<Assortment> getAssortments() {
-        return assortments;
+    public List<Product> getProducts() {
+        return products;
     }
 }

@@ -38,7 +38,7 @@ public class AjProvider implements Provider {
 
     @Override
     public Fetch screening() throws ProviderParseException {
-        LOG.debug("Screening has started for " + TITLE);
+        LOG.info("Screening has started for " + TITLE);
 
         HtmlPage page;
         try {
@@ -46,7 +46,7 @@ public class AjProvider implements Provider {
         } catch (IOException e) {
             throw new ProviderParseException("Error on priceAssortment page from aj.ru", e);
         }
-        List<Assortment> assortments = new ArrayList<>();
+        List<Product> products = new ArrayList<>();
 
         Map<AssortmentType, List<ProductTypePointer>> groupByAssortmentType = productTypeClassHolder().stream()
                 .collect(Collectors.groupingBy(o -> o.assortmentType));
@@ -54,11 +54,8 @@ public class AjProvider implements Provider {
 
             for (ProductTypePointer ptp : entry.getValue()) {
 
-                List<Product> products = new ArrayList<>();
-
                 Pattern p = Pattern.compile(ptp.liTitleRegexp);
 
-                String assortmentDescription = null;
                 List<HtmlElement> articles = page.getByXPath("//article[@class='" + ptp.articleClass + "']");
                 for (HtmlElement article : articles) {
 //                HtmlElement article = page.getFirstByXPath("//article[@class='" + ptp.articleClass + "']");
@@ -82,7 +79,7 @@ public class AjProvider implements Provider {
                         List<HtmlSpan> spans = ili.getByXPath("./span");
                         if (spans.isEmpty()) {
                             if (ili.getFirstChild() != null && ili.getFirstChild().getNodeValue() != null) {
-                                assortmentDescription = ili.getFirstChild().asText();
+//                                assortmentDescription = ili.getFirstChild().asText();
                             }
                             // if not a description, then not and info
                             continue;
@@ -114,23 +111,17 @@ public class AjProvider implements Provider {
                                     + ", productType=" + ptp.productType);
                         }
 
-                        products.add(new Product(title, productDescription, null, price, ptp.productType, params));
+                        products.add(new Product(title, productDescription, null, price, ptp.assortmentType, ptp.productType, params));
                     }
                 }
-                if (products.isEmpty()) {
-                    continue;
-                }
-                assortments.add(new Assortment(ptp.assortmentType.getValue(), assortmentDescription,
-                        ptp.assortmentType, products));
-
             }
         }
 
 //        printAssortments(assortments);
 
-        LOG.debug("Screening has ended for " + TITLE);
+        LOG.info("Screening has ended for " + TITLE);
 
-        return new Fetch(LocalDateTime.now(), assortments);
+        return new Fetch(LocalDateTime.now(), products);
     }
 
     private List<ProductTypePointer> productTypeClassHolder() {

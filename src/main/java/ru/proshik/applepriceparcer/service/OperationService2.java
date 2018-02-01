@@ -4,6 +4,8 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import ru.proshik.applepriceparcer.exception.DatabaseException;
+import ru.proshik.applepriceparcer.model2.Fetch;
+import ru.proshik.applepriceparcer.model2.ProductType;
 import ru.proshik.applepriceparcer.model2.Shop;
 import ru.proshik.applepriceparcer.provider2.ProviderFactory;
 
@@ -106,6 +108,12 @@ public class OperationService2 {
 //        }
 //    }
 //
+
+    public Fetch read(String shopTitle, String productType) {
+
+        return null;
+    }
+
     public Pair<Set<Shop>, Set<Shop>> userSubscriptions(String chatId) throws DatabaseException {
         Set<Shop> availableShops = providerFactory.shops();
 

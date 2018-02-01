@@ -12,26 +12,30 @@ public class Product implements Serializable {
     private String description;
     private Boolean presence;
     private BigDecimal price;
+    private AssortmentType assortmentType;
     private ProductType productType;
     private Map<String, String> parameters = new TreeMap<>();
 
     public Product() {
     }
 
-    public Product(String title, String description, Boolean presence, BigDecimal price, ProductType productType) {
+    public Product(String title, String description, Boolean presence, BigDecimal price, AssortmentType assortmentType,
+                   ProductType productType) {
         this.title = title;
         this.description = description;
         this.presence = presence;
         this.price = price;
+        this.assortmentType = assortmentType;
         this.productType = productType;
     }
 
-    public Product(String title, String description, Boolean presence, BigDecimal price, ProductType productType,
-                   Map<String, String> parameters) {
+    public Product(String title, String description, Boolean presence, BigDecimal price, AssortmentType assortmentType,
+                   ProductType productType, Map<String, String> parameters) {
         this.title = title;
         this.description = description;
         this.presence = presence;
         this.price = price;
+        this.assortmentType = assortmentType;
         this.productType = productType;
         this.parameters = parameters;
     }
@@ -52,6 +56,10 @@ public class Product implements Serializable {
         return price;
     }
 
+    public AssortmentType getAssortmentType() {
+        return assortmentType;
+    }
+
     public ProductType getProductType() {
         return productType;
     }
@@ -69,6 +77,7 @@ public class Product implements Serializable {
                 Objects.equals(description, product.description) &&
                 Objects.equals(presence, product.presence) &&
                 Objects.equals(price, product.price) &&
+                assortmentType == product.assortmentType &&
                 productType == product.productType &&
                 Objects.equals(parameters, product.parameters);
     }
@@ -76,7 +85,7 @@ public class Product implements Serializable {
     @Override
     public int hashCode() {
 
-        return Objects.hash(title, description, presence, price, productType, parameters);
+        return Objects.hash(title, description, presence, price, assortmentType, productType, parameters);
     }
 
     @Override
@@ -86,6 +95,7 @@ public class Product implements Serializable {
                 ", description='" + description + '\'' +
                 ", presence=" + presence +
                 ", price=" + price +
+                ", assortmentType=" + assortmentType +
                 ", productType=" + productType +
                 ", parameters=" + parameters +
                 '}';

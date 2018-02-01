@@ -3,20 +3,15 @@ package ru.proshik.applepriceparcer.bot;
 import org.apache.log4j.Logger;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Update;
-import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-import ru.proshik.applepriceparcer.model.OperationType;
 import ru.proshik.applepriceparcer.model.sequence.DataSequence;
+import ru.proshik.applepriceparcer.model2.Fetch;
 import ru.proshik.applepriceparcer.service.OperationService2;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static java.util.Collections.singletonList;
-import static ru.proshik.applepriceparcer.bot.BotUtils.buildReplyKeyboard;
 
 public class AppleProductPricesBot2 extends TelegramLongPollingBot {
 
@@ -120,7 +115,7 @@ public class AppleProductPricesBot2 extends TelegramLongPollingBot {
                 message = buildGreetingsMessage(update);
                 break;
             case COMMAND_READ:
-                message = buildGreetingsMessage(update);
+                message = readCommand(update);
                 break;
             case COMMAND_SUBSCRIPTION:
                 message = buildGreetingsMessage(update);
@@ -133,6 +128,22 @@ public class AppleProductPricesBot2 extends TelegramLongPollingBot {
         }
 
         return message;
+    }
+
+    private SendMessage readCommand(Update update) {
+        List<String> arguments = BotUtils.extractArguments(update.getMessage().getText());
+        if (arguments.size() != 2) {
+            return new SendMessage()
+                    .setChatId(update.getMessage().getChatId())
+//                .setReplyMarkup(buildRootMenuKeyboard())
+                    .setText("List of arguments is incorrect");
+        }
+        Fetch fetch = operationService.read(arguments.get(0), arguments.get(1));
+
+        return new SendMessage()
+                .setChatId(update.getMessage().getChatId())
+//                .setReplyMarkup(buildRootMenuKeyboard())
+                .setText("Not implemented yet!");
     }
 
     //

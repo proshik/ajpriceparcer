@@ -84,13 +84,9 @@ public class ShopJob2 implements Job {
     private boolean wasChangeInAssortments(Fetch newFetch, List<Fetch> existsFetches) {
         Fetch lastFetch = findLastAssortment(existsFetches);
 
-        Set<Product> newProducts = newFetch.getAssortments().stream()
-                .flatMap(a -> a.getProducts().stream())
-                .collect(Collectors.toSet());
+        List<Product> newProducts = newFetch.getProducts();
 
-        List<Product> lastFetchProducts = lastFetch.getAssortments().stream()
-                .flatMap(a -> a.getProducts().stream())
-                .collect(Collectors.toList());
+        List<Product> lastFetchProducts = lastFetch.getProducts();
 
         for (Product p : lastFetchProducts) {
             boolean notFound = newProducts.contains(p);
