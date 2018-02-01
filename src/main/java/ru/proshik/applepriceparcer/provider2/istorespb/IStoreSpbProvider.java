@@ -37,6 +37,7 @@ public class IStoreSpbProvider implements Provider {
 
     @Override
     public Fetch screening() {
+        LOG.info("Screening has started for " + TITLE);
 
         List<Product> products = new ArrayList<>();
         for (ProductTypePointer ptp : productTypeClassHolder()) {
@@ -88,6 +89,8 @@ public class IStoreSpbProvider implements Provider {
         assortments.add(new Assortment(AssortmentType.IPHONE.getValue(), null, AssortmentType.IPHONE, products));
 
 //        printAssortments(assortments);
+
+        LOG.info("Screening has ended for " + TITLE);
 
         return new Fetch(LocalDateTime.now(), assortments);
     }

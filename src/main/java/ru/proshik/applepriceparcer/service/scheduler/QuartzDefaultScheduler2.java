@@ -11,6 +11,7 @@ import java.time.ZoneId;
 import java.util.Date;
 
 import static org.quartz.SimpleScheduleBuilder.repeatHourlyForever;
+import static org.quartz.SimpleScheduleBuilder.repeatMinutelyForever;
 
 public class QuartzDefaultScheduler2 {
 
@@ -38,7 +39,7 @@ public class QuartzDefaultScheduler2 {
         Trigger trigger = TriggerBuilder.newTrigger()
                 .withIdentity("ShopTrigger", "default")
                 .startAt(Date.from(now.atZone(ZoneId.systemDefault()).toInstant()))
-                .withSchedule(repeatHourlyForever(HOUR_INTERVAL))
+                .withSchedule(repeatMinutelyForever(HOUR_INTERVAL))
                 .build();
 
         // Tell quartz to schedule the job using our trigger
@@ -48,7 +49,7 @@ public class QuartzDefaultScheduler2 {
         scheduler.scheduleJob(job, trigger);
         scheduler.start();
 
-        LOG.info("Scheduler with hour repeat interval=" + HOUR_INTERVAL + "was started!");
+        LOG.info("Scheduler with hour repeat interval=" + HOUR_INTERVAL + "h was started!");
     }
 
 }

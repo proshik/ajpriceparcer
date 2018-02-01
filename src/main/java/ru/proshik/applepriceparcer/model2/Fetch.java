@@ -1,9 +1,10 @@
 package ru.proshik.applepriceparcer.model2;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class Fetch {
+public class Fetch implements Serializable {
 
     private LocalDateTime createdDate;
     private List<Assortment> assortments;

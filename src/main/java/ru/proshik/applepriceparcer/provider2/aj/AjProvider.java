@@ -38,6 +38,8 @@ public class AjProvider implements Provider {
 
     @Override
     public Fetch screening() throws ProviderParseException {
+        LOG.debug("Screening has started for " + TITLE);
+
         HtmlPage page;
         try {
             page = client.getPage(URL);
@@ -125,6 +127,8 @@ public class AjProvider implements Provider {
         }
 
 //        printAssortments(assortments);
+
+        LOG.debug("Screening has ended for " + TITLE);
 
         return new Fetch(LocalDateTime.now(), assortments);
     }

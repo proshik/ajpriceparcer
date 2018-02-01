@@ -1,8 +1,9 @@
 package ru.proshik.applepriceparcer.model2;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
-public enum AssortmentType {
+public enum AssortmentType implements Serializable {
 
     IPHONE("iPhone"),
     IPAD("iPad"),
