@@ -3,6 +3,7 @@ package ru.proshik.applepriceparcer.service;
 import org.apache.log4j.Logger;
 import ru.proshik.applepriceparcer.exception.DatabaseException;
 import ru.proshik.applepriceparcer.model2.Fetch;
+import ru.proshik.applepriceparcer.model2.ProductType;
 import ru.proshik.applepriceparcer.model2.Shop;
 import ru.proshik.applepriceparcer.storage.Database2;
 

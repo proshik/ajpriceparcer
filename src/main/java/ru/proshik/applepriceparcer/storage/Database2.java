@@ -7,23 +7,34 @@ import org.mapdb.Serializer;
 import ru.proshik.applepriceparcer.exception.DatabaseException;
 import ru.proshik.applepriceparcer.model2.Fetch;
 import ru.proshik.applepriceparcer.model2.Shop;
-import ru.proshik.applepriceparcer.model2.User;
+import ru.proshik.applepriceparcer.model2.UserSubscriptions;
 import ru.proshik.applepriceparcer.storage.serializer2.FetchListSerializer;
 import ru.proshik.applepriceparcer.storage.serializer2.ShopSerializer;
 import ru.proshik.applepriceparcer.storage.serializer2.UserSerializer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Database2 {
 
     private static final String SHOP_BUCKET = "shop";
-    private static final String USER_BUCKET = "user";
+    private static final String USER_SUBSCRIPTIONS_BUCKET = "userSubscriptions";
 
     private final String dbPath;
 
     public Database2(String dbPath) {
         this.dbPath = dbPath;
+    }
+
+    public List<Fetch> getFetches(Shop shop) throws DatabaseException {
+        try (DB db = open()) {
+            HTreeMap<Shop, List<Fetch>> map = createOrOpenShopBucket(db);
+            return map.get(shop);
+        } catch (Exception e) {
+            throw new DatabaseException(e);
+        }
     }
 
     public void addFetch(Shop shop, Fetch fetch) throws DatabaseException {
@@ -43,36 +54,63 @@ public class Database2 {
         }
     }
 
-    public List<Fetch> getFetches(Shop shop) throws DatabaseException {
+    public Map<String, UserSubscriptions> allSubscribers() throws DatabaseException {
         try (DB db = open()) {
-            HTreeMap<Shop, List<Fetch>> map = createOrOpenShopBucket(db);
-            return map.get(shop);
-        } catch (Exception e) {
-            throw new DatabaseException(e);
-        }
-    }
+            HTreeMap<String, UserSubscriptions> map = createOrOpenUserBucket(db);
 
-    public void addUserShop(String chatId, Shop shop) throws DatabaseException {
-        try (DB db = open()) {
-            HTreeMap<String, User> map = createOrOpenUserBucket(db);
-            User user = map.get(chatId);
-
-            if (user == null) {
-                user = new User();
+            Map<String, UserSubscriptions> subscribers = new HashMap<>();
+            for (HTreeMap.Entry<String, UserSubscriptions> entry : map.getEntries()) {
+                subscribers.put(entry.getKey(), entry.getValue());
             }
 
-            user.getSubscriptions().add(shop);
-
-            map.put(chatId, user);
+            return subscribers;
         } catch (Exception e) {
             throw new DatabaseException(e);
         }
     }
 
-    public User getUser(String chatId) throws DatabaseException {
+    public UserSubscriptions getUserSubscriptions(String userId) throws DatabaseException {
         try (DB db = open()) {
-            HTreeMap<String, User> map = createOrOpenUserBucket(db);
-            return map.get(chatId);
+            HTreeMap<String, UserSubscriptions> map = createOrOpenUserBucket(db);
+            UserSubscriptions userSubscriptions = map.get(userId);
+
+            if (userSubscriptions == null) {
+                return new UserSubscriptions();
+            }
+
+            return userSubscriptions;
+        } catch (Exception e) {
+            throw new DatabaseException(e);
+        }
+    }
+
+    public void addSubscription(String userId, Shop shop) throws DatabaseException {
+        try (DB db = open()) {
+            HTreeMap<String, UserSubscriptions> map = createOrOpenUserBucket(db);
+            UserSubscriptions userSubscriptions = map.get(userId);
+
+            if (userSubscriptions == null) {
+                userSubscriptions = new UserSubscriptions();
+            }
+
+            userSubscriptions.getShops().add(shop);
+
+            map.put(userId, userSubscriptions);
+        } catch (Exception e) {
+            throw new DatabaseException(e);
+        }
+    }
+
+    public boolean removeSubscription(String userId, Shop shop) throws DatabaseException {
+        try (DB db = open()) {
+            HTreeMap<String, UserSubscriptions> map = createOrOpenUserBucket(db);
+            UserSubscriptions userSubscriptions = map.get(userId);
+
+            if (userSubscriptions == null) {
+                return false;
+            }
+
+            return userSubscriptions.getShops().remove(shop);
         } catch (Exception e) {
             throw new DatabaseException(e);
         }
@@ -93,12 +131,11 @@ public class Database2 {
                 .createOrOpen();
     }
 
-    private HTreeMap<String, User> createOrOpenUserBucket(DB db) {
-        return db.hashMap(USER_BUCKET)
+    private HTreeMap<String, UserSubscriptions> createOrOpenUserBucket(DB db) {
+        return db.hashMap(USER_SUBSCRIPTIONS_BUCKET)
                 .keySerializer(Serializer.STRING)
                 .valueSerializer(new UserSerializer())
                 .createOrOpen();
     }
 
 }
-

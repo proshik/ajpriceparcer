@@ -27,7 +27,7 @@ public class AjProvider implements Provider {
     private static final Logger LOG = Logger.getLogger(ru.proshik.applepriceparcer.provider2.aj.AjProvider.class);
 
     public static final String URL = "http://aj.ru";
-    public static final String TITLE = "AJ.ru";
+    public static final String TITLE = "AJ";
 
     private WebClient client = new WebClient();
 

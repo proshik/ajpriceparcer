@@ -10,22 +10,24 @@ import ru.proshik.applepriceparcer.model2.Shop;
 import ru.proshik.applepriceparcer.provider2.Provider;
 import ru.proshik.applepriceparcer.provider2.ProviderFactory;
 import ru.proshik.applepriceparcer.service.FetchService;
+import ru.proshik.applepriceparcer.service.SubscriberService;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-public class ShopJob2 implements Job {
+import static ru.proshik.applepriceparcer.FetchUtils.findLastFetch;
 
-    private static final Logger LOG = Logger.getLogger(ShopJob2.class);
+public class ScreeningJob implements Job {
+
+    private static final Logger LOG = Logger.getLogger(ScreeningJob.class);
 
     public static final String PROVIDER_LABEL = "ProviderFactory";
     public static final String FETCH_SERVICE_LABEL = "FetchService";
+    public static final String SUBSCRIBER_SERVICE_LABEL = "SubscriberService";
 
     private ProviderFactory providerFactory;
     private FetchService fetchService;
+    private SubscriberService subscriberService;
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
@@ -34,7 +36,6 @@ public class ShopJob2 implements Job {
         } catch (SchedulerException e) {
             throw new JobExecutionException(e);
         }
-
 
         Map<Shop, Provider> providers = providerFactory.providers();
         for (Map.Entry<Shop, Provider> p : providers.entrySet()) {
@@ -50,7 +51,6 @@ public class ShopJob2 implements Job {
                 LOG.error("Unexpected error in scheduler service on execute operation " +
                         "for request assortment for shop with title=" + p.getKey().getTitle(), e);
             }
-
         }
     }
 
@@ -82,10 +82,9 @@ public class ShopJob2 implements Job {
     }
 
     private boolean wasChangeInAssortments(Fetch newFetch, List<Fetch> existsFetches) {
-        Fetch lastFetch = findLastAssortment(existsFetches);
+        Fetch lastFetch = findLastFetch(existsFetches);
 
         List<Product> newProducts = newFetch.getProducts();
-
         List<Product> lastFetchProducts = lastFetch.getProducts();
 
         for (Product p : lastFetchProducts) {
@@ -95,12 +94,6 @@ public class ShopJob2 implements Job {
             }
         }
         return false;
-    }
-
-    private Fetch findLastAssortment(List<Fetch> fetch) {
-        return fetch.stream()
-                .max(Comparator.comparing(Fetch::getCreatedDate))
-                .orElseThrow(() -> new IllegalArgumentException("Must be at least one element"));
     }
 
 }

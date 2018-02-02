@@ -218,7 +218,7 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
             message.setChatId(update.getCallbackQuery().getMessage().getChatId())
 //                        .setReplyMarkup(buildRootMenuKeyboard())
                     .enableMarkdown(true)
-                    .setText("You add subscription on update from shops: *" + shop.getTitle() + " - " + shop.getUrl() + "*");
+                    .setText("You add subscription on update from getShops: *" + shop.getTitle() + " - " + shop.getUrl() + "*");
         } catch (DatabaseException e) {
             LOG.error("Error on execute database operation", e);
             message.setReplyMarkup(buildRootMenuKeyboard())
@@ -385,7 +385,7 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
                 InlineKeyboardMarkup keyboard = buildInlineKeyboard(shopMap, String.valueOf(chatId), 2);
                 message.setReplyMarkup(keyboard);
 
-                builder.append("For subscribe on new shops used follow key: ");
+                builder.append("For subscribe on new getShops used follow key: ");
             }
             message.setChatId(chatId)
                     .enableMarkdown(true)
@@ -406,7 +406,7 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
         return new SendMessage()
                 .setChatId(update.getMessage().getChatId())
                 .setReplyMarkup(buildRootMenuKeyboard())
-                .setText("Hello, this is Bot for follow prices on apple products in several shops.");
+                .setText("Hello, this is Bot for follow prices on apple products in several getShops.");
     }
 
     private SendMessage buildCommandInfoMessage(Update update) {

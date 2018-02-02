@@ -27,7 +27,7 @@ public class IStoreSpbProvider implements Provider {
 
     private static final Logger LOG = Logger.getLogger(ru.proshik.applepriceparcer.provider2.gsmstore.GsmStoreProvider.class);
 
-    public static final String TITLE = "ISTORESPB.ru";
+    public static final String TITLE = "ISTORESPB";
     public static final String URL = "http://istorespb.ru";
 
     private WebClient client = new WebClient();

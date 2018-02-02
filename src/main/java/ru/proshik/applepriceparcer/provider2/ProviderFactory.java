@@ -22,11 +22,11 @@ public class ProviderFactory {
         return PROVIDERS;
     }
 
-    public List<Provider> providerList() {
+    public List<Provider> getProviders() {
         return new ArrayList<>(PROVIDERS.values());
     }
 
-    public Set<Shop> shops() {
+    public Set<Shop> getShops() {
         return PROVIDERS.keySet();
     }
 

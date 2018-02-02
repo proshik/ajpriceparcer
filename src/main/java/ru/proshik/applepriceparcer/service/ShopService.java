@@ -1,8 +1,37 @@
 package ru.proshik.applepriceparcer.service;
 
+import ru.proshik.applepriceparcer.model2.ProductType;
+import ru.proshik.applepriceparcer.model2.Shop;
+import ru.proshik.applepriceparcer.provider2.ProviderFactory;
+
+import java.util.Set;
+import java.util.stream.Stream;
+
 public class ShopService {
 
+    private ProviderFactory providerFactory;
 
+    public ShopService(ProviderFactory providerFactory) {
+        this.providerFactory = providerFactory;
+    }
+
+    public Set<Shop> getShops() {
+        return providerFactory.getShops();
+    }
+
+    public Shop findShop(String shopTitle) {
+        return providerFactory.getShops().stream()
+                .filter(shop -> shop.getTitle().toUpperCase().equals(shopTitle.toUpperCase()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public ProductType findProductType(String productTypeTitle) {
+        return Stream.of(ProductType.values())
+                .filter(pt -> pt.getValue().toUpperCase().equals(productTypeTitle.replace("-", " ").toUpperCase()))
+                .findFirst()
+                .orElse(null);
+    }
 
 //    private CacheService shopCache = new CacheService();
 

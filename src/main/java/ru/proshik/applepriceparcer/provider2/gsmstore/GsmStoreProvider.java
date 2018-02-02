@@ -22,7 +22,7 @@ public class GsmStoreProvider implements Provider {
 
     private static final Logger LOG = Logger.getLogger(ru.proshik.applepriceparcer.provider2.gsmstore.GsmStoreProvider.class);
 
-    public static final String TITLE = "GSM-STORE.ru";
+    public static final String TITLE = "GSM-STORE";
     public static final String URL = "http://gsm-store.ru";
 
     private static final String IN_STOCK = "В наличии";

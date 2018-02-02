@@ -8,9 +8,10 @@ import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.proshik.applepriceparcer.bot.AppleProductPricesBot2;
 import ru.proshik.applepriceparcer.provider2.ProviderFactory;
+import ru.proshik.applepriceparcer.service.CommandService;
 import ru.proshik.applepriceparcer.service.FetchService;
-import ru.proshik.applepriceparcer.service.OperationService2;
-import ru.proshik.applepriceparcer.service.UserService2;
+import ru.proshik.applepriceparcer.service.ShopService;
+import ru.proshik.applepriceparcer.service.SubscriberService;
 import ru.proshik.applepriceparcer.service.scheduler.QuartzDefaultScheduler2;
 import ru.proshik.applepriceparcer.storage.Database2;
 
@@ -36,11 +37,13 @@ public class Application2 {
         Database2 db = new Database2(dbPath);
         ProviderFactory providerFactory = new ProviderFactory();
 
+        ShopService shopService = new ShopService(providerFactory);
         FetchService fetchService = new FetchService(db);
-        UserService2 userService = new UserService2(db);
-        OperationService2 operationService = new OperationService2(providerFactory, fetchService, userService);
+        SubscriberService subscriberService = new SubscriberService(db);
+        CommandService operationService = new CommandService(shopService, fetchService, subscriberService);
 
-        QuartzDefaultScheduler2 quartzDefaultScheduler = new QuartzDefaultScheduler2(providerFactory, fetchService);
+        QuartzDefaultScheduler2 quartzDefaultScheduler =
+                new QuartzDefaultScheduler2(providerFactory, fetchService,subscriberService);
         try {
             quartzDefaultScheduler.init();
         } catch (SchedulerException e) {

@@ -127,11 +127,6 @@ public class OperationService {
         userService.addSubscription(chatId, shop);
     }
 
-    // TODO: 18.01.2018
-    public void cancelSubscriptions(String chatId, Shop shop) {
-
-    }
-
     public boolean tryUpdateAssortment(Shop shop, Assortment assortment) throws ServiceLayerException {
         List<Assortment> existsAssortments = assortmentService.getAssortments(shop);
 
