@@ -137,18 +137,18 @@ public class AppleProductPricesBot2 extends TelegramLongPollingBot {
     }
 
     private String subscriptionCommand(Update update) {
-        return commandService.subscriptions(String.valueOf(update.getUpdateId()));
+        return commandService.subscriptions(String.valueOf(update.getMessage().getChatId()));
     }
 
     private String subscribeCommand(Update update) {
         return extractArgument(update.getMessage().getText())
-                .map(argument -> commandService.subscribe(String.valueOf(update.getUpdateId()), argument))
+                .map(argument -> commandService.subscribe(String.valueOf(update.getMessage().getChatId()), argument))
                 .orElse("Needed argument for the entered command, write /subscription for give information about shops.");
     }
 
     private String unsubscribeCommand(Update update) {
         return extractArgument(update.getMessage().getText())
-                .map(argument -> commandService.unsubscribe(String.valueOf(update.getUpdateId()), argument))
+                .map(argument -> commandService.unsubscribe(String.valueOf(update.getMessage().getChatId()), argument))
                 .orElse("Needed argument for the entered command, write /subscription for give information about shops.");
     }
 

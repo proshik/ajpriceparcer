@@ -6,10 +6,7 @@ import ru.proshik.applepriceparcer.provider2.aj.AjProvider;
 import ru.proshik.applepriceparcer.provider2.gsmstore.GsmStoreProvider;
 import ru.proshik.applepriceparcer.provider2.istorespb.IStoreSpbProvider;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class ProviderFactory {
 
@@ -27,7 +24,7 @@ public class ProviderFactory {
     }
 
     public Set<Shop> getShops() {
-        return PROVIDERS.keySet();
+        return new HashSet<>(PROVIDERS.keySet());
     }
 
     public Provider findByShop(Shop shop) {

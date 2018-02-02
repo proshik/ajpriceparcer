@@ -28,7 +28,7 @@ public class ShopService {
 
     public ProductType findProductType(String productTypeTitle) {
         return Stream.of(ProductType.values())
-                .filter(pt -> pt.getValue().toUpperCase().equals(productTypeTitle.replace("-", " ").toUpperCase()))
+                .filter(pt -> pt.getValue().replace(" ", "").toUpperCase().equals(productTypeTitle.toUpperCase()))
                 .findFirst()
                 .orElse(null);
     }

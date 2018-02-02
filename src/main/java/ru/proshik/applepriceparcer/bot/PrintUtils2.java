@@ -34,17 +34,17 @@ public class PrintUtils2 {
             builder.append("*You not have any one subscriptions.*\n\n");
         } else {
             String userShops = userSubscriptions.stream()
-                    .map(shop -> "*" + shop.getTitle() + " - " + shop.getUrl() + "*")
-                    .collect(Collectors.joining(", "));
-            builder.append("Your subscriptions: ").append(userShops);
+                    .map(shop -> "*" + shop.getTitle() + "* - " + shop.getUrl().replace("http://", ""))
+                    .collect(Collectors.joining("\n"));
+            builder.append("Your subscriptions:\n").append(userShops).append("\n\n");
         }
 
         if (!availableShops.isEmpty()) {
             String shopsForSubscribe = availableShops.stream()
-                    .map(Shop::getTitle)
-                    .collect(Collectors.joining(", "));
+                    .map(shop -> "*" + shop.getTitle() + "* - " + shop.getUrl().replace("http://", ""))
+                    .collect(Collectors.joining("\n"));
 
-            builder.append("You could subscribe for get notification for next shops:\n").append(shopsForSubscribe);
+            builder.append("You could subscribe at:\n").append(shopsForSubscribe);
         }
 
         return builder.toString();

@@ -38,12 +38,13 @@ public class CommandService {
             String availableShops = availableShops();
             List<ProductType> productTypes = Arrays.asList(ProductType.values());
 
-            return "Available shops:\n"
+            return "Use next syntax of command: /read <shop> <product type>\n\n"
+                    + "Available shops:\n"
                     + availableShops
                     + "\n\n"
                     + "All product types:\n"
                     + productTypes.stream()
-                    .map(productType -> productType.getValue().replace(" ", "-"))
+                    .map(productType -> "*" + productType.getValue().replace(" ", "") + "*")
                     .collect(Collectors.joining(", "));
         }
 
@@ -61,7 +62,6 @@ public class CommandService {
         try {
             productType = shopService.findProductType(arguments.get(1));
             if (productType == null) {
-
                 return "For shop *" + shop.getTitle() + "* available follow product types:\n" + availableProductTypes(shop);
             }
 
@@ -110,7 +110,7 @@ public class CommandService {
         try {
             Set<Shop> shops = subscriberService.userSubscriptions(userId);
             if (shops.contains(shop)) {
-                return "You've already subscribed on notification from the shop" + shop.getTitle() + "*";
+                return "You've already subscribed on notification from *" + shop.getTitle() + "*";
             }
             subscriberService.addSubscription(userId, shop);
         } catch (DatabaseException e) {
@@ -118,7 +118,7 @@ public class CommandService {
             return "Error on execution operation.";
         }
 
-        return "You have been subscribed on update from shop: *" + shop.getTitle() + "*";
+        return "You have been subscribed on update from *" + shop.getTitle() + "*";
     }
 
     public String unsubscribe(String userId, String shopTitle) {
@@ -129,23 +129,26 @@ public class CommandService {
 
         try {
             Set<Shop> shops = subscriberService.userSubscriptions(userId);
-            if (shops.contains(shop)) {
-                return "You've not yet subscribed on notification from the shop" + shop.getTitle() + "*";
+            if (!shops.contains(shop)) {
+                return "You've not yet subscribed on notification from *" + shop.getTitle() + "*";
             }
 
-            subscriberService.removeSubscription(userId, shop);
+            boolean removeSubscription = subscriberService.removeSubscription(userId, shop);
+            if (!removeSubscription) {
+                return "Error! You haven`t unsubscribed on notification from *" + shop.getTitle() + "*";
+            }
         } catch (DatabaseException e) {
             LOG.error("Error on execute unsubscribe operation", e);
             return "Error on execution operation.";
         }
-        return "You have been unsubscribed on updates from shop: *" + shop.getTitle() + "*";
+        return "You have been unsubscribed on updates from *" + shop.getTitle() + "*";
     }
 
     private String availableShops() {
         Set<Shop> shops = shopService.getShops();
 
         return shops.stream()
-                .map(shop -> "*" + shop.getTitle() + "* - " + shop.getUrl())
+                .map(shop -> "*" + shop.getTitle() + "* - " + shop.getUrl().replace("http://", ""))
                 .collect(Collectors.joining("\n"));
     }
 
@@ -157,7 +160,7 @@ public class CommandService {
         return lastFetch.getProducts().stream()
                 .map(Product::getProductType)
                 .collect(Collectors.toSet()).stream()
-                .map(p -> "*" + p.getValue() + "*")
+                .map(p -> "*" + p.getValue().replace(" ", "") + "*")
                 .collect(Collectors.joining(", "));
     }
 }

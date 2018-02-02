@@ -109,8 +109,12 @@ public class Database2 {
             if (userSubscriptions == null) {
                 return false;
             }
+            //remove subscription on shop from list of user subscripptions
+            boolean result = userSubscriptions.getShops().remove(shop);
+            //save updated user subscriptions
+            map.put(userId, userSubscriptions);
 
-            return userSubscriptions.getShops().remove(shop);
+            return result;
         } catch (Exception e) {
             throw new DatabaseException(e);
         }
