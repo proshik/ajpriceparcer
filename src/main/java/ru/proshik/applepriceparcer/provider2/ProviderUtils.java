@@ -33,7 +33,7 @@ public class ProviderUtils {
 
             for (Map.Entry<ProductType, List<Product>> entry : group.entrySet()) {
                 for (Product p : entry.getValue()) {
-                    System.out.println("productType: " + p.getProductType() + ", presence: " + p.getPresence()
+                    System.out.println("productType: " + p.getProductType() + ", presence: " + p.getAvailable()
                             + ", title:" + p.getTitle() + ", description:" + p.getDescription() + ", price:"
                             + p.getPrice() + ", params:" + p.getParameters());
                 }

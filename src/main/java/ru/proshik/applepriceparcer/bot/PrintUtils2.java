@@ -7,6 +7,7 @@ import ru.proshik.applepriceparcer.model2.Shop;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -70,9 +71,18 @@ public class PrintUtils2 {
 //    }
 
     private static String printProducts(List<Product> products) {
+        products.sort(Comparator.comparing(Product::getPrice));
+
         StringBuilder out = new StringBuilder();
+
         for (Product p : products) {
-            out.append(p.getDescription()).append(" - ").append(p.getPrice()).append(" rub.\n");
+            out.append("*").append(p.getTitle()).append("* - ").append(p.getPrice()).append(" rub.\n");
+            out.append(p.getDescription()).append("\n");
+            if (p.getAvailable() != null) {
+                out.append("Available: ").append("*").append(p.getAvailable().toString()).append("*\n\n");
+            } else {
+                out.append("\n");
+            }
         }
 
         return out.toString();

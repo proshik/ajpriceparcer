@@ -10,7 +10,7 @@ public class Product implements Serializable {
 
     private String title;
     private String description;
-    private Boolean presence;
+    private Boolean available;
     private BigDecimal price;
     private AssortmentType assortmentType;
     private ProductType productType;
@@ -19,21 +19,21 @@ public class Product implements Serializable {
     public Product() {
     }
 
-    public Product(String title, String description, Boolean presence, BigDecimal price, AssortmentType assortmentType,
+    public Product(String title, String description, Boolean available, BigDecimal price, AssortmentType assortmentType,
                    ProductType productType) {
         this.title = title;
         this.description = description;
-        this.presence = presence;
+        this.available = available;
         this.price = price;
         this.assortmentType = assortmentType;
         this.productType = productType;
     }
 
-    public Product(String title, String description, Boolean presence, BigDecimal price, AssortmentType assortmentType,
+    public Product(String title, String description, Boolean available, BigDecimal price, AssortmentType assortmentType,
                    ProductType productType, Map<String, String> parameters) {
         this.title = title;
         this.description = description;
-        this.presence = presence;
+        this.available = available;
         this.price = price;
         this.assortmentType = assortmentType;
         this.productType = productType;
@@ -48,8 +48,8 @@ public class Product implements Serializable {
         return description;
     }
 
-    public Boolean getPresence() {
-        return presence;
+    public Boolean getAvailable() {
+        return available;
     }
 
     public BigDecimal getPrice() {
@@ -75,7 +75,7 @@ public class Product implements Serializable {
         Product product = (Product) o;
         return Objects.equals(title, product.title) &&
                 Objects.equals(description, product.description) &&
-                Objects.equals(presence, product.presence) &&
+                Objects.equals(available, product.available) &&
                 Objects.equals(price, product.price) &&
                 assortmentType == product.assortmentType &&
                 productType == product.productType &&
@@ -85,7 +85,7 @@ public class Product implements Serializable {
     @Override
     public int hashCode() {
 
-        return Objects.hash(title, description, presence, price, assortmentType, productType, parameters);
+        return Objects.hash(title, description, available, price, assortmentType, productType, parameters);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class Product implements Serializable {
         return "Product{" +
                 "title='" + title + '\'' +
                 ", description='" + description + '\'' +
-                ", presence=" + presence +
+                ", available=" + available +
                 ", price=" + price +
                 ", assortmentType=" + assortmentType +
                 ", productType=" + productType +
