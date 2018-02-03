@@ -17,7 +17,7 @@ public class ProviderUtils {
 
         List<String> values = Arrays.asList(value.split(" "));
         for (String v : values) {
-            if (v.toUpperCase().contains("GB")) {
+            if (v.toUpperCase().contains("GB") ) {
                 result.put("GB", v);
             }
         }

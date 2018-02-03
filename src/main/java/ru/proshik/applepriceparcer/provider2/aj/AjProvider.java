@@ -7,7 +7,10 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSpan;
 import org.apache.log4j.Logger;
 import ru.proshik.applepriceparcer.exception.ProviderParseException;
-import ru.proshik.applepriceparcer.model2.*;
+import ru.proshik.applepriceparcer.model2.AssortmentType;
+import ru.proshik.applepriceparcer.model2.Fetch;
+import ru.proshik.applepriceparcer.model2.Product;
+import ru.proshik.applepriceparcer.model2.ProductType;
 import ru.proshik.applepriceparcer.provider2.Provider;
 
 import java.io.IOException;
@@ -65,21 +68,12 @@ public class AjProvider implements Provider {
                         continue;
                     }
 
-                    String title;
-                    if (!h2.getChildNodes().isEmpty()) {
-                        title = ptp.productType.getValue();
-                    } else {
-                        title = "";
-                        LOG.warn("Title not found for assortmentType=" + ptp.assortmentType
-                                + ", productType=" + ptp.productType);
-                    }
-
-
+                    String assortmentDescription = null;
                     for (DomElement ili : ((HtmlElement) article.getFirstByXPath("./ul")).getChildElements()) {
                         List<HtmlSpan> spans = ili.getByXPath("./span");
                         if (spans.isEmpty()) {
                             if (ili.getFirstChild() != null && ili.getFirstChild().getNodeValue() != null) {
-//                                assortmentDescription = ili.getFirstChild().asText();
+                                assortmentDescription = ili.getFirstChild().asText();
                             }
                             // if not a description, then not and info
                             continue;
@@ -111,7 +105,7 @@ public class AjProvider implements Provider {
                                     + ", productType=" + ptp.productType);
                         }
 
-                        products.add(new Product(title, productDescription, null, price, ptp.assortmentType, ptp.productType, params));
+                        products.add(new Product(productDescription, assortmentDescription, null, price, ptp.assortmentType, ptp.productType, params));
                     }
                 }
             }
@@ -135,16 +129,17 @@ public class AjProvider implements Provider {
                 new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_7, "iphone7red", "iPhone 7.*"),
                 new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_6S, "iphone6s", "iPhone 6s.*"),
                 new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_6, "iphone6", "iPhone 6.*"),
-                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_SE, "iphone5se", "iPhone SE.*"),
+                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_SE, "iphone5se", "iPhone SE.*")
                 // MacBook Pro
-                new ProductTypePointer(AssortmentType.MACBOOK_PRO, ProductType.MACBOOK_PRO_2017, "MacBookPro2017", "13\".*"),
-                new ProductTypePointer(AssortmentType.MACBOOK_PRO, ProductType.MACBOOK_PRO_2017, "MacBookPro2017", "15\".*"),
-                new ProductTypePointer(AssortmentType.MACBOOK_PRO, ProductType.MACBOOK_PRO_2016, "MacBookPro2016", "15\".*"),
-                // iMac
-                new ProductTypePointer(AssortmentType.IMAC, ProductType.IMAC_21_5, "new_imac5K-2017", "21\".*"),
-                new ProductTypePointer(AssortmentType.IMAC, ProductType.IMAC_27, "new_imac5K-2017", "27\" Retina 5K(?!.*8-Core).*"),
-                new ProductTypePointer(AssortmentType.IMAC, ProductType.IMAC_21_5, "new_imac5K", "21.5\".*"),
-                new ProductTypePointer(AssortmentType.IMAC, ProductType.IMAC_27, "new_imac5K", "27\" Retina 5K.*"));
+//                new ProductTypePointer(AssortmentType.MACBOOK_PRO, ProductType.MACBOOK_PRO_2017, "MacBookPro2017", "13\".*"),
+//                new ProductTypePointer(AssortmentType.MACBOOK_PRO, ProductType.MACBOOK_PRO_2017, "MacBookPro2017", "15\".*"),
+//                new ProductTypePointer(AssortmentType.MACBOOK_PRO, ProductType.MACBOOK_PRO_2016, "MacBookPro2016", "15\".*"),
+//                // iMac
+//                new ProductTypePointer(AssortmentType.IMAC, ProductType.IMAC_21_5, "new_imac5K-2017", "21\".*"),
+//                new ProductTypePointer(AssortmentType.IMAC, ProductType.IMAC_27, "new_imac5K-2017", "27\" Retina 5K(?!.*8-Core).*"),
+//                new ProductTypePointer(AssortmentType.IMAC, ProductType.IMAC_21_5, "new_imac5K", "21.5\".*"),
+//                new ProductTypePointer(AssortmentType.IMAC, ProductType.IMAC_27, "new_imac5K", "27\" Retina 5K.*")
+        );
     }
 
     private class ProductTypePointer {

@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class IStoreSpbProvider implements Provider {
 
@@ -29,6 +31,8 @@ public class IStoreSpbProvider implements Provider {
 
     public static final String TITLE = "ISTORESPB";
     public static final String URL = "http://istorespb.ru";
+
+    private static List<Pattern> TITLE_PATTERNS = Arrays.asList(Pattern.compile(".*GB"), Pattern.compile(".*Gb"));
 
     private WebClient client = new WebClient();
 
@@ -55,7 +59,7 @@ public class IStoreSpbProvider implements Provider {
             List<HtmlElement> byXPath = page.getByXPath("//div[@class='block_product']");
             for (HtmlElement li : byXPath) {
 
-                String title = ptp.productType.getValue();
+                String title = null;
                 String description = null;
                 BigDecimal price = null;
                 Map<String, String> params = null;
@@ -64,6 +68,22 @@ public class IStoreSpbProvider implements Provider {
                 HtmlElement descriptionElement = li.getFirstByXPath(".//div[@class='name']");
                 if (descriptionElement != null) {
                     description = descriptionElement.asText();
+                    if (description != null) {
+                        for (Pattern p : TITLE_PATTERNS) {
+                            Matcher matcher = p.matcher(description);
+                            if (matcher.find()) {
+                                title = matcher.group();
+                                description = description.replace(title, "").trim();
+                                if (title.contains("Apple")) {
+                                    title = title.replace("Apple", "").trim();
+                                }
+                                break;
+                            }
+                        }
+                        if (title == null) {
+                            title = ptp.productType.getValue();
+                        }
+                    }
                 }
                 // extract price
                 HtmlElement divPriceElem = li.getFirstByXPath(".//div[@class='jshop_price']");
@@ -79,8 +99,8 @@ public class IStoreSpbProvider implements Provider {
                     }
                 }
                 // extract parameters
-                if (description != null) {
-                    params = ProviderUtils.extractParameters(description);
+                if (title != null) {
+                    params = ProviderUtils.extractParameters(title);
                 }
 
                 products.add(new Product(title, description, null, price, AssortmentType.IPHONE, ptp.productType, params));
@@ -141,10 +161,10 @@ public class IStoreSpbProvider implements Provider {
     /**
      * Run
      */
-//    public static void main(String[] args) {
-//        IStoreSpbProvider gsmStoreProvider = new IStoreSpbProvider();
-//        gsmStoreProvider.screening();
-//    }
+    public static void main(String[] args) {
+        IStoreSpbProvider gsmStoreProvider = new IStoreSpbProvider();
+        gsmStoreProvider.screening();
+    }
 
 
 }

@@ -4,19 +4,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import ru.proshik.applepriceparcer.exception.DatabaseException;
-import ru.proshik.applepriceparcer.model.*;
-import ru.proshik.applepriceparcer.storage.Database;
+import ru.proshik.applepriceparcer.model2.*;
+import ru.proshik.applepriceparcer.storage.Database2;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class AjReaderJson {
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    private void read(Database db) throws IOException, DatabaseException {
+    private void read(Database2 db) throws IOException, DatabaseException {
         objectMapper.registerModule(new JSR310Module());
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
@@ -28,43 +33,39 @@ public class AjReaderJson {
 
         Shop s = new Shop("AJ", "http://aj.ru");
 
-        List<Assortment> aj = db.getAssortments(new Shop("AJ", "http://aj.ru"));
+        List<Fetch> aj = db.getFetches(new Shop("AJ", "http://aj.ru"));
 
         System.out.println(aj);
 
-//        for (Aj a : Arrays.asList(ajs)) {
-//
-//            List<Product> products = new ArrayList<>();
-//
-//            for (AjAssortments aja : a.getAssortments()) {
-//                String title = aja.getTitle();
-//                String description = aja.getDescription();
-//
-//                List<Item> items = new ArrayList<>();
-//
-//                for (AjItem aji : aja.getItems()) {
-//                    items.add(new Item(aji.getTitle(), aji.getPrice()));
-//                }
-//
-//                products.add(new Product(title, description, items));
-//
-//            }
-//
-//            Map<ProductType, List<Product>> productTypeListMap = new HashMap<>();
-//            productTypeListMap.put(ProductType.IPHONE, products);
-//
-//            Assortment assortment = new Assortment(a.getCreatedDate(), productTypeListMap);
-//            db.addFetch(s, assortment);
-//        }
-//
+        Map<String, ProductType> collect = Stream.of(ProductType.values())
+                .collect(Collectors.toMap(o -> o.getValue().toUpperCase(), o -> o));
+
+        for (Aj a : Arrays.asList(ajs)) {
+
+            List<Product> products = new ArrayList<>();
+
+            for (AjAssortments aja : a.getAssortments()) {
+                ProductType productType = collect.get(aja.getTitle().toUpperCase());
+                String description = aja.getDescription();
+
+                for (AjItem aji : aja.getItems()) {
+                    products.add(new Product(aji.getTitle(), description, null, aji.getPrice(), AssortmentType.IPHONE,
+                            productType));
+                }
+            }
+
+            Fetch fetch = new Fetch(a.getCreatedDate(), products);
+            db.addFetch(s, fetch);
+        }
+
 //        aj = db.getAssortments(new Shop("AJ", "http://aj.ru"));
-//
-//        System.out.println(aj);
+
+        System.out.println(aj);
     }
 
     public static void main(String[] args) throws IOException, DatabaseException {
 
-        Database db = new Database("database.db");
+        Database2 db = new Database2("database.db");
 
         AjReaderJson ajReaderJson = new AjReaderJson();
         ajReaderJson.read(db);
