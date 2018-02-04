@@ -10,10 +10,13 @@ import java.util.*;
 
 public class ProviderFactory {
 
-    private static final Map<Shop, Provider> PROVIDERS = Map.of(
-            new Shop(AjProvider.TITLE, AjProvider.URL), new AjProvider(),
-            new Shop(GsmStoreProvider.TITLE, GsmStoreProvider.URL), new GsmStoreProvider(),
-            new Shop(IStoreSpbProvider.TITLE, IStoreSpbProvider.URL), new IStoreSpbProvider());
+    private Map<Shop, Provider> PROVIDERS = new HashMap<>();
+
+    public ProviderFactory() {
+        PROVIDERS.put(new Shop(AjProvider.TITLE, AjProvider.URL), new AjProvider());
+        PROVIDERS.put(new Shop(GsmStoreProvider.TITLE, GsmStoreProvider.URL), new GsmStoreProvider());
+        PROVIDERS.put(new Shop(IStoreSpbProvider.TITLE, IStoreSpbProvider.URL), new IStoreSpbProvider());
+    }
 
     public Map<Shop, Provider> providers() {
         return PROVIDERS;

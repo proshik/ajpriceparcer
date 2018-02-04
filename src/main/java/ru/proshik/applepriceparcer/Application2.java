@@ -43,7 +43,7 @@ public class Application2 {
         CommandService operationService = new CommandService(shopService, fetchService, subscriberService);
 
         QuartzDefaultScheduler2 quartzDefaultScheduler =
-                new QuartzDefaultScheduler2(providerFactory, fetchService,subscriberService);
+                new QuartzDefaultScheduler2(providerFactory, fetchService, subscriberService);
         try {
             quartzDefaultScheduler.init();
         } catch (SchedulerException e) {
