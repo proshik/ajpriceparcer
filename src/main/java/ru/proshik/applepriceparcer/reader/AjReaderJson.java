@@ -11,10 +11,7 @@ import ru.proshik.applepriceparcer.storage.Database2;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -26,42 +23,42 @@ public class AjReaderJson {
         objectMapper.registerModule(new JSR310Module());
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
-//        Path path = Paths.get("aj_console.json");
-//
-//        Aj[] ajs = objectMapper.readValue(path.toFile(), Aj[].class);
-//
-//        System.out.println(ajs);
-//
-//        Shop s = new Shop("AJ", "http://aj.ru");
-//
-//        List<Fetch> aj = db.getFetches(new Shop("AJ", "http://aj.ru"));
-//
-//        System.out.println(aj);
-//
-//        Map<String, ProductType> collect = Stream.of(ProductType.values())
-//                .collect(Collectors.toMap(o -> o.getValue().toUpperCase(), o -> o));
-//
-//        for (Aj a : Arrays.asList(ajs)) {
-//
-//            List<Product> products = new ArrayList<>();
-//
-//            for (AjAssortments aja : a.getAssortments()) {
-//                ProductType productType = collect.get(aja.getTitle().toUpperCase());
-//                String description = aja.getDescription();
-//
-//                for (AjItem aji : aja.getItems()) {
-//                    products.add(new Product(aji.getTitle(), description, null, aji.getPrice(), AssortmentType.IPHONE,
-//                            productType));
-//                }
-//            }
-//
-//            Fetch fetch = new Fetch(a.getCreatedDate(), products);
-//            db.addFetch(s, fetch);
-//        }
-//
-////        aj = db.getAssortments(new Shop("AJ", "http://aj.ru"));
-//
-//        System.out.println(aj);
+        Path path = Paths.get("aj_console.json");
+
+        Aj[] ajs = objectMapper.readValue(path.toFile(), Aj[].class);
+
+        System.out.println(ajs);
+
+        Shop s = new Shop("AJ", "http://aj.ru");
+
+        List<Fetch> aj = db.getFetches(new Shop("AJ", "http://aj.ru"));
+
+        System.out.println(aj);
+
+        Map<String, ProductType> collect = Stream.of(ProductType.values())
+                .collect(Collectors.toMap(o -> o.getValue().toUpperCase(), o -> o));
+
+        for (Aj a : Arrays.asList(ajs)) {
+
+            List<Product> products = new ArrayList<>();
+
+            for (AjAssortments aja : a.getAssortments()) {
+                ProductType productType = collect.get(aja.getTitle().toUpperCase());
+                String description = aja.getDescription();
+
+                for (AjItem aji : aja.getItems()) {
+                    products.add(new Product(aji.getTitle(), description, null, aji.getPrice(), AssortmentType.IPHONE,
+                            productType));
+                }
+            }
+
+            Fetch fetch = new Fetch(a.getCreatedDate(), products);
+            db.addFetch(s, fetch);
+        }
+
+//        aj = db.getAssortments(new Shop("AJ", "http://aj.ru"));
+
+        System.out.println(aj);
 
         List<Fetch> fetches = db.getFetches(new Shop(AjProvider.TITLE, AjProvider.URL));
 
@@ -70,7 +67,7 @@ public class AjReaderJson {
 
     public static void main(String[] args) throws IOException, DatabaseException {
 
-        Database2 db = new Database2("data/database1.db");
+        Database2 db = new Database2("database.db");
 
         AjReaderJson ajReaderJson = new AjReaderJson();
         ajReaderJson.read(db);

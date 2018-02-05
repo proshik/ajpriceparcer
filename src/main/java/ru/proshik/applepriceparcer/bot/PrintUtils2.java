@@ -51,6 +51,7 @@ public class PrintUtils2 {
         return builder.toString();
     }
 
+
 //    static String buildHistory(String shopTitle, List<Assortment> assortments, ProductType productType) {
 //        StringBuilder out = new StringBuilder();
 //        out.append("*History* operation\n")

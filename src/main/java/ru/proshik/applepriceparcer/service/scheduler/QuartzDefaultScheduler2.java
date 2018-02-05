@@ -13,7 +13,6 @@ import java.time.ZoneId;
 import java.util.Date;
 
 import static org.quartz.SimpleScheduleBuilder.repeatHourlyForever;
-import static org.quartz.SimpleScheduleBuilder.repeatMinutelyForever;
 
 public class QuartzDefaultScheduler2 {
 
@@ -48,7 +47,7 @@ public class QuartzDefaultScheduler2 {
         Trigger trigger = TriggerBuilder.newTrigger()
                 .withIdentity("ScreeningTrigger", "default")
                 .startAt(Date.from(now.atZone(ZoneId.systemDefault()).toInstant()))
-                .withSchedule(repeatMinutelyForever(HOUR_INTERVAL))
+                .withSchedule(repeatHourlyForever(HOUR_INTERVAL))
                 .build();
 
         // Tell quartz to schedule the job using our trigger

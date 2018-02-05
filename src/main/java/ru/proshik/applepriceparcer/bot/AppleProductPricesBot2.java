@@ -48,11 +48,15 @@ public class AppleProductPricesBot2 extends TelegramLongPollingBot {
         new Thread(() -> {
             while (true) {
                 QueueElement element = notificationQueueService.take();
-
+                if (element == null) {
+                    // error situation
+                    LOG.warn("Notification does not send to user");
+                    continue;
+                }
+                // create message
                 SendMessage message = new SendMessage()
                         .setChatId(element.getUserId())
                         .setText("Success update from shop: " + element.getShop().getTitle());
-
                 try {
                     execute(message);
                 } catch (TelegramApiException e) {
@@ -65,7 +69,6 @@ public class AppleProductPricesBot2 extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         SendMessage message;
-
         try {
             if (update.hasMessage()) {
                 message = processMessageOperation(update);

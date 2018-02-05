@@ -100,4 +100,70 @@ public class Product implements Serializable {
                 ", parameters=" + parameters +
                 '}';
     }
+
+    public static class ProductKey {
+        private String title;
+        private String description;
+        private BigDecimal price;
+        private AssortmentType assortmentType;
+        private ProductType productType;
+
+        public ProductKey(String title, String description, BigDecimal price, AssortmentType assortmentType,
+                          ProductType productType) {
+            this.title = title;
+            this.description = description;
+            this.price = price;
+            this.assortmentType = assortmentType;
+            this.productType = productType;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public AssortmentType getAssortmentType() {
+            return assortmentType;
+        }
+
+        public ProductType getProductType() {
+            return productType;
+        }
+
+        public BigDecimal getPrice() {
+            return price;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ProductKey that = (ProductKey) o;
+            return Objects.equals(title, that.title) &&
+                    Objects.equals(description, that.description) &&
+                    Objects.equals(price, that.price) &&
+                    assortmentType == that.assortmentType &&
+                    productType == that.productType;
+        }
+
+        @Override
+        public int hashCode() {
+
+            return Objects.hash(title, description, price, assortmentType, productType);
+        }
+
+        @Override
+        public String toString() {
+            return "ProductKey{" +
+                    "title='" + title + '\'' +
+                    ", description='" + description + '\'' +
+                    ", price=" + price +
+                    ", assortmentType=" + assortmentType +
+                    ", productType=" + productType +
+                    '}';
+        }
+    }
 }

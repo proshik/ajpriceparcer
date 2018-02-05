@@ -5,6 +5,7 @@ import org.quartz.*;
 import ru.proshik.applepriceparcer.exception.DatabaseException;
 import ru.proshik.applepriceparcer.exception.ProviderParseException;
 import ru.proshik.applepriceparcer.exception.ServiceLayerException;
+import ru.proshik.applepriceparcer.model2.DiffProducts;
 import ru.proshik.applepriceparcer.model2.Fetch;
 import ru.proshik.applepriceparcer.model2.Product;
 import ru.proshik.applepriceparcer.model2.Shop;
@@ -14,8 +15,9 @@ import ru.proshik.applepriceparcer.service.FetchService;
 import ru.proshik.applepriceparcer.service.NotificationQueueService;
 import ru.proshik.applepriceparcer.service.SubscriberService;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static ru.proshik.applepriceparcer.FetchUtils.findLastFetch;
 
@@ -55,13 +57,12 @@ public class ScreeningJob implements Job {
             try {
                 Fetch fetch = p.getValue().screening();
 
-                boolean wasUpdated = tryUpdateFetches(p.getKey(), fetch);
-                // TODO: 16.01.2018 run update an users which has subscribed on a updates of the shop
+                List<DiffProducts> diffProducts = tryUpdateFetches(p.getKey(), fetch);
 //                if (wasUpdated){
                 List<String> users = shopListMap.get(p.getKey());
                 if (users != null) {
                     for (String userId : users) {
-                        notificationQueueService.add(p.getKey(), userId);
+                        notificationQueueService.add(p.getKey(), userId, diffProducts);
                     }
                 }
 //                }
@@ -83,39 +84,54 @@ public class ScreeningJob implements Job {
         notificationQueueService = (NotificationQueueService) schedulerContext.get(NOTIFICATION_SERVICE_LABEL);
     }
 
-    private boolean tryUpdateFetches(Shop shop, Fetch fetch) throws ServiceLayerException {
+    private List<DiffProducts> tryUpdateFetches(Shop shop, Fetch fetch) throws ServiceLayerException {
         List<Fetch> existsFetches = fetchService.getFetch(shop);
 
         if (existsFetches != null && !existsFetches.isEmpty()) {
-            boolean wasChanges = wasChangeInAssortments(fetch, existsFetches);
-            if (wasChanges) {
+            List<DiffProducts> changes = findChanges(fetch, existsFetches);
+            if (!changes.isEmpty()) {
                 fetchService.addFetch(shop, fetch);
                 LOG.info("Success updated assortment for shop with title=" + shop.getTitle());
-                return true;
+                return changes;
             } else {
                 LOG.info("Not found changes in assortment for shop with title=" + shop.getTitle());
             }
         } else {
             fetchService.addFetch(shop, fetch);
             LOG.info("Success added at first time assortment for shop with title=" + shop.getTitle());
+            return Collections.emptyList();
         }
 
-        return false;
+        return Collections.emptyList();
     }
 
-    private boolean wasChangeInAssortments(Fetch newFetch, List<Fetch> existsFetches) {
+    private List<DiffProducts> findChanges(Fetch newFetch, List<Fetch> existsFetches) {
+        List<DiffProducts> diff = new ArrayList<>();
+
         Fetch lastFetch = findLastFetch(existsFetches);
 
         List<Product> newProducts = newFetch.getProducts();
         List<Product> lastFetchProducts = lastFetch.getProducts();
 
-        for (Product p : lastFetchProducts) {
-            boolean notFound = newProducts.contains(p);
-            if (!notFound) {
-                return true;
+        Map<Product.ProductKey, Product> groupByProductKey = newProducts.stream()
+                .collect(Collectors.toMap(p -> new Product.ProductKey(p.getTitle(), p.getDescription(), p.getPrice(),
+                        p.getAssortmentType(), p.getProductType()), Function.identity()));
+
+        for (Product oldProduct : lastFetchProducts) {
+            Product.ProductKey key = new Product.ProductKey(oldProduct.getTitle(), oldProduct.getDescription(),
+                    oldProduct.getPrice(), oldProduct.getAssortmentType(), oldProduct.getProductType());
+
+            Product newProduct = groupByProductKey.get(key);
+            if (newProduct != null) {
+                if (!oldProduct.getPrice().equals(newProduct.getPrice())) {
+                    diff.add(new DiffProducts(oldProduct, newProduct));
+                }
+            } else {
+                LOG.warn("Not found element in NewProductMap for key = " + key);
+                diff.add(new DiffProducts(oldProduct, null));
             }
         }
-        return false;
+        return diff;
     }
 
 }
