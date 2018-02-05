@@ -26,7 +26,7 @@ public class Application2 {
     }
 
     private void Run() {
-        // priceAssortment environment variables
+        // print environment variables
         String telegramUsername = readSystemEnv(TELEGRAM_USERNAME);
         String telegramToken = readSystemEnv(TELEGRAM_TOKEN);
         String dbPath = readSystemEnv(DB_PATH);

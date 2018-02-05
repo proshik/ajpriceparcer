@@ -91,14 +91,14 @@ public class ScreeningJob implements Job {
             List<DiffProducts> changes = findChanges(fetch, existsFetches);
             if (!changes.isEmpty()) {
                 fetchService.addFetch(shop, fetch);
-                LOG.info("Success updated assortment for shop with title=" + shop.getTitle());
+                LOG.info("Success updated fetch for shop with title=" + shop.getTitle());
                 return changes;
             } else {
-                LOG.info("Not found changes in assortment for shop with title=" + shop.getTitle());
+                LOG.info("Not found changes in fetch for shop with title=" + shop.getTitle());
             }
         } else {
             fetchService.addFetch(shop, fetch);
-            LOG.info("Success added at first time assortment for shop with title=" + shop.getTitle());
+            LOG.info("Success added at first time fetch for shop with title=" + shop.getTitle());
             return Collections.emptyList();
         }
 
