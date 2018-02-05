@@ -5,7 +5,9 @@ import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import ru.proshik.applepriceparcer.model2.QueueElement;
 import ru.proshik.applepriceparcer.service.CommandService;
+import ru.proshik.applepriceparcer.service.NotificationQueueService;
 
 import java.util.List;
 
@@ -30,13 +32,34 @@ public class AppleProductPricesBot2 extends TelegramLongPollingBot {
 
     // Injected services
     private CommandService commandService;
+    private NotificationQueueService notificationQueueService;
 
     public AppleProductPricesBot2(String botUsername,
                                   String botToken,
-                                  CommandService commandService) {
+                                  CommandService commandService,
+                                  NotificationQueueService notificationQueueService) {
         this.botUsername = botUsername;
         this.botToken = botToken;
         this.commandService = commandService;
+        this.notificationQueueService = notificationQueueService;
+    }
+
+    public void registerScheduler() {
+        new Thread(() -> {
+            while (true) {
+                QueueElement element = notificationQueueService.take();
+
+                SendMessage message = new SendMessage()
+                        .setChatId(element.getUserId())
+                        .setText("Success update from shop: " + element.getShop().getTitle());
+
+                try {
+                    execute(message);
+                } catch (TelegramApiException e) {
+                    LOG.error("Panic! Messages not sending from notification thread!", e);
+                }
+            }
+        }).start();
     }
 
     @Override
@@ -53,7 +76,6 @@ public class AppleProductPricesBot2 extends TelegramLongPollingBot {
             }
         } catch (Exception e) {
             LOG.error("Error on build message", e);
-
             message = new SendMessage()
                     .setChatId(extractChatId(update))
                     .setText("Error on execute operation! Connect with support!");

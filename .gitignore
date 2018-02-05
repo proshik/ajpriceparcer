@@ -1,7 +1,7 @@
 .idea
 *.iml
 /target
-database.db
+data/database1.db
 database1.db
 logs.log
 

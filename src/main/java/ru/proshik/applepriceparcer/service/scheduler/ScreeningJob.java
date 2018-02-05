@@ -2,6 +2,7 @@ package ru.proshik.applepriceparcer.service.scheduler;
 
 import org.apache.log4j.Logger;
 import org.quartz.*;
+import ru.proshik.applepriceparcer.exception.DatabaseException;
 import ru.proshik.applepriceparcer.exception.ProviderParseException;
 import ru.proshik.applepriceparcer.exception.ServiceLayerException;
 import ru.proshik.applepriceparcer.model2.Fetch;
@@ -10,6 +11,7 @@ import ru.proshik.applepriceparcer.model2.Shop;
 import ru.proshik.applepriceparcer.provider2.Provider;
 import ru.proshik.applepriceparcer.provider2.ProviderFactory;
 import ru.proshik.applepriceparcer.service.FetchService;
+import ru.proshik.applepriceparcer.service.NotificationQueueService;
 import ru.proshik.applepriceparcer.service.SubscriberService;
 
 import java.util.List;
@@ -24,17 +26,28 @@ public class ScreeningJob implements Job {
     public static final String PROVIDER_LABEL = "ProviderFactory";
     public static final String FETCH_SERVICE_LABEL = "FetchService";
     public static final String SUBSCRIBER_SERVICE_LABEL = "SubscriberService";
+    public static final String NOTIFICATION_SERVICE_LABEL = "NotificationQueueService";
 
     private ProviderFactory providerFactory;
     private FetchService fetchService;
     private SubscriberService subscriberService;
+    private NotificationQueueService notificationQueueService;
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         try {
             init(context);
         } catch (SchedulerException e) {
+            LOG.error("Error initialize context for ScreeningJob", e);
             throw new JobExecutionException(e);
+        }
+
+        Map<Shop, List<String>> shopListMap;
+        try {
+            shopListMap = subscriberService.subscriptionsSubscribers();
+        } catch (DatabaseException e) {
+            LOG.error("Error on read subscription subscribers from db", e);
+            throw new RuntimeException("Error on read subscribers", e);
         }
 
         Map<Shop, Provider> providers = providerFactory.providers();
@@ -44,7 +57,14 @@ public class ScreeningJob implements Job {
 
                 boolean wasUpdated = tryUpdateFetches(p.getKey(), fetch);
                 // TODO: 16.01.2018 run update an users which has subscribed on a updates of the shop
-
+//                if (wasUpdated){
+                List<String> users = shopListMap.get(p.getKey());
+                if (users != null) {
+                    for (String userId : users) {
+                        notificationQueueService.add(p.getKey(), userId);
+                    }
+                }
+//                }
             } catch (ProviderParseException e) {
                 LOG.error("Error on screening shop with title=" + p.getKey().getTitle(), e);
             } catch (Exception e) {
@@ -59,9 +79,11 @@ public class ScreeningJob implements Job {
 
         fetchService = (FetchService) schedulerContext.get(FETCH_SERVICE_LABEL);
         providerFactory = (ProviderFactory) schedulerContext.get(PROVIDER_LABEL);
+        subscriberService = (SubscriberService) schedulerContext.get(SUBSCRIBER_SERVICE_LABEL);
+        notificationQueueService = (NotificationQueueService) schedulerContext.get(NOTIFICATION_SERVICE_LABEL);
     }
 
-    public boolean tryUpdateFetches(Shop shop, Fetch fetch) throws ServiceLayerException {
+    private boolean tryUpdateFetches(Shop shop, Fetch fetch) throws ServiceLayerException {
         List<Fetch> existsFetches = fetchService.getFetch(shop);
 
         if (existsFetches != null && !existsFetches.isEmpty()) {

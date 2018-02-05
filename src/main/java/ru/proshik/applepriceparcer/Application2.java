@@ -8,10 +8,7 @@ import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.proshik.applepriceparcer.bot.AppleProductPricesBot2;
 import ru.proshik.applepriceparcer.provider2.ProviderFactory;
-import ru.proshik.applepriceparcer.service.CommandService;
-import ru.proshik.applepriceparcer.service.FetchService;
-import ru.proshik.applepriceparcer.service.ShopService;
-import ru.proshik.applepriceparcer.service.SubscriberService;
+import ru.proshik.applepriceparcer.service.*;
 import ru.proshik.applepriceparcer.service.scheduler.QuartzDefaultScheduler2;
 import ru.proshik.applepriceparcer.storage.Database2;
 
@@ -33,34 +30,36 @@ public class Application2 {
         String telegramUsername = readSystemEnv(TELEGRAM_USERNAME);
         String telegramToken = readSystemEnv(TELEGRAM_TOKEN);
         String dbPath = readSystemEnv(DB_PATH);
-
+        // init data providers
         Database2 db = new Database2(dbPath);
         ProviderFactory providerFactory = new ProviderFactory();
-
+        // init service layer
         ShopService shopService = new ShopService(providerFactory);
         FetchService fetchService = new FetchService(db);
         SubscriberService subscriberService = new SubscriberService(db);
+        NotificationQueueService notificationQueueService = new NotificationQueueService();
         CommandService operationService = new CommandService(shopService, fetchService, subscriberService);
-
-        QuartzDefaultScheduler2 quartzDefaultScheduler =
-                new QuartzDefaultScheduler2(providerFactory, fetchService, subscriberService);
+        // run quartz scheduler
         try {
+            QuartzDefaultScheduler2 quartzDefaultScheduler =
+                    new QuartzDefaultScheduler2(providerFactory, fetchService, subscriberService, notificationQueueService);
             quartzDefaultScheduler.init();
         } catch (SchedulerException e) {
             LOG.error("Error on execute quartz scheduler", e);
             System.exit(0);
         }
-
         // Bot initialization
         ApiContextInitializer.init();
         TelegramBotsApi botsApi = new TelegramBotsApi();
         try {
-            botsApi.registerBot(new AppleProductPricesBot2(telegramUsername, telegramToken, operationService));
+            AppleProductPricesBot2 bot = new AppleProductPricesBot2(telegramUsername, telegramToken, operationService,
+                    notificationQueueService);
+            bot.registerScheduler();
+            botsApi.registerBot(bot);
         } catch (TelegramApiException e) {
             LOG.error("Error on registration bot in Telegram api", e);
             System.exit(0);
         }
-
         LOG.info("Application was started!");
     }
 

@@ -26,7 +26,7 @@ public class AjReaderJson {
         objectMapper.registerModule(new JSR310Module());
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
-//        Path path = Paths.get("aj.json");
+//        Path path = Paths.get("aj_console.json");
 //
 //        Aj[] ajs = objectMapper.readValue(path.toFile(), Aj[].class);
 //
@@ -70,7 +70,7 @@ public class AjReaderJson {
 
     public static void main(String[] args) throws IOException, DatabaseException {
 
-        Database2 db = new Database2("data/database.db");
+        Database2 db = new Database2("data/database1.db");
 
         AjReaderJson ajReaderJson = new AjReaderJson();
         ajReaderJson.read(db);

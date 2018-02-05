@@ -95,7 +95,7 @@ public class GsmStoreProvider implements Provider {
                             price = new BigDecimal(spanPriceElem.asText().replaceAll("\\D+", ""));
                         }
                     } catch (Exception e) {
-                        LOG.warn("Not found price for productType=" + ptp.productType);
+                        LOG.warn("Not found price for productType=" + ptp.productType, e);
                     }
 
                 }

@@ -71,6 +71,10 @@ public class CommandService {
             return "Error on execution operation.";
         }
 
+        if (fetches == null || fetches.isEmpty()) {
+            return "Shop with this title has not any records!";
+        }
+
         Fetch lastFetch = findLastFetch(fetches);
 
         List<Product> selectedProducts = lastFetch.getProducts().stream()
