@@ -5,10 +5,7 @@ import org.quartz.*;
 import ru.proshik.applepriceparcer.exception.DatabaseException;
 import ru.proshik.applepriceparcer.exception.ProviderParseException;
 import ru.proshik.applepriceparcer.exception.ServiceLayerException;
-import ru.proshik.applepriceparcer.model2.DiffProducts;
-import ru.proshik.applepriceparcer.model2.Fetch;
-import ru.proshik.applepriceparcer.model2.Product;
-import ru.proshik.applepriceparcer.model2.Shop;
+import ru.proshik.applepriceparcer.model2.*;
 import ru.proshik.applepriceparcer.provider2.Provider;
 import ru.proshik.applepriceparcer.provider2.ProviderFactory;
 import ru.proshik.applepriceparcer.service.FetchService;
@@ -16,7 +13,6 @@ import ru.proshik.applepriceparcer.service.NotificationQueueService;
 import ru.proshik.applepriceparcer.service.SubscriberService;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static ru.proshik.applepriceparcer.FetchUtils.findLastFetch;
@@ -58,14 +54,14 @@ public class ScreeningJob implements Job {
                 Fetch fetch = p.getValue().screening();
 
                 List<DiffProducts> diffProducts = tryUpdateFetches(p.getKey(), fetch);
-//                if (wasUpdated){
-                List<String> users = shopListMap.get(p.getKey());
-                if (users != null) {
-                    for (String userId : users) {
-                        notificationQueueService.add(p.getKey(), userId, diffProducts);
+                if (!diffProducts.isEmpty()) {
+                    List<String> users = shopListMap.get(p.getKey());
+                    if (users != null) {
+                        for (String userId : users) {
+                            notificationQueueService.add(p.getKey(), userId, diffProducts);
+                        }
                     }
                 }
-//                }
             } catch (ProviderParseException e) {
                 LOG.error("Error on screening shop with title=" + p.getKey().getTitle(), e);
             } catch (Exception e) {
@@ -110,28 +106,91 @@ public class ScreeningJob implements Job {
 
         Fetch lastFetch = findLastFetch(existsFetches);
 
-        List<Product> newProducts = newFetch.getProducts();
+        List<Product> newFetchProducts = newFetch.getProducts();
         List<Product> lastFetchProducts = lastFetch.getProducts();
 
-        Map<Product.ProductKey, Product> groupByProductKey = newProducts.stream()
-                .collect(Collectors.toMap(p -> new Product.ProductKey(p.getTitle(), p.getDescription(), p.getPrice(),
-                        p.getAssortmentType(), p.getProductType()), Function.identity()));
+        Map<ProductKey, List<Product>> groupNewFetch = newFetchProducts.stream()
+                .collect(Collectors.groupingBy(o -> new ProductKey(o.getTitle(), o.getDescription(), o.getProductType())));
+        Map<ProductKey, List<Product>> groupLastFetch = lastFetchProducts.stream()
+                .collect(Collectors.groupingBy(o -> new ProductKey(o.getTitle(), o.getDescription(), o.getProductType())));
 
-        for (Product oldProduct : lastFetchProducts) {
-            Product.ProductKey key = new Product.ProductKey(oldProduct.getTitle(), oldProduct.getDescription(),
-                    oldProduct.getPrice(), oldProduct.getAssortmentType(), oldProduct.getProductType());
+        for (Map.Entry<ProductKey, List<Product>> newEntry : groupNewFetch.entrySet()) {
+            List<Product> oldProducts = groupLastFetch.get(newEntry.getKey());
+            if (oldProducts != null) {
+                List<Product> newProducts = newEntry.getValue();
+                newProducts.sort(Comparator.comparing(Product::getPrice));
+                oldProducts.sort(Comparator.comparing(Product::getPrice));
 
-            Product newProduct = groupByProductKey.get(key);
-            if (newProduct != null) {
-                if (!oldProduct.getPrice().equals(newProduct.getPrice())) {
-                    diff.add(new DiffProducts(oldProduct, newProduct));
+                if (newProducts.size() == oldProducts.size()) {
+                    for (int i = 0; i < newProducts.size(); i++) {
+                        if (!oldProducts.get(i).getPrice().equals(newProducts.get(i).getPrice())
+                                || (oldProducts.get(i).getAvailable() != null && newProducts.get(i).getAvailable() != null
+                                && (!oldProducts.get(i).getAvailable().equals(newProducts.get(i).getAvailable())))) {
+                            diff.add(new DiffProducts(oldProducts.get(i), newProducts.get(i)));
+                        }
+                    }
+                } else {
+                    List<Product> forAdded = new ArrayList<>();
+                    if (newProducts.size() > oldProducts.size()) {
+                        newProducts.retainAll(oldProducts);
+                        forAdded.addAll(newProducts);
+                    } else {
+                        oldProducts.retainAll(newProducts);
+                        forAdded.addAll(oldProducts);
+                    }
+                    for (Product p : forAdded) {
+                        diff.add(new DiffProducts(null, p));
+                    }
                 }
             } else {
-                LOG.warn("Not found element in NewProductMap for key = " + key);
-                diff.add(new DiffProducts(oldProduct, null));
+                for (Product p : newEntry.getValue()) {
+                    diff.add(new DiffProducts(null, p));
+                }
             }
         }
+
         return diff;
+    }
+
+    public static class ProductKey {
+
+        private String title;
+        private String description;
+        private ProductType productType;
+
+        public ProductKey(String title, String description, ProductType productType) {
+            this.title = title;
+            this.description = description;
+            this.productType = productType;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public ProductType getProductType() {
+            return productType;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ProductKey that = (ProductKey) o;
+            return Objects.equals(title, that.title) &&
+                    Objects.equals(description, that.description) &&
+                    productType == that.productType;
+        }
+
+        @Override
+        public int hashCode() {
+
+            return Objects.hash(title, description, productType);
+        }
     }
 
 }

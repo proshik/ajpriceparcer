@@ -1,4 +1,4 @@
-package ru.proshik.applepriceparcer.reader;
+package ru.proshik.applepriceparcer.ajreader;
 
 import java.time.LocalDateTime;
 import java.util.List;

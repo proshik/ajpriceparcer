@@ -42,6 +42,8 @@ public class FetchService {
 
     public void addFetch(Shop shop, Fetch fetch) throws DatabaseException {
         db.addFetch(shop, fetch);
+        //invalidating cache
+        fetchCache.clear();
     }
 
 }

@@ -5,13 +5,14 @@ import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-import ru.proshik.applepriceparcer.model2.QueueElement;
+import ru.proshik.applepriceparcer.model2.ChangeProductNotification;
 import ru.proshik.applepriceparcer.service.CommandService;
 import ru.proshik.applepriceparcer.service.NotificationQueueService;
 
 import java.util.List;
 
 import static ru.proshik.applepriceparcer.bot.BotUtils.extractArgument;
+import static ru.proshik.applepriceparcer.bot.PrintUtils2.notificationInfo;
 
 public class AppleProductPricesBot2 extends TelegramLongPollingBot {
 
@@ -47,7 +48,7 @@ public class AppleProductPricesBot2 extends TelegramLongPollingBot {
     public void registerScheduler() {
         new Thread(() -> {
             while (true) {
-                QueueElement element = notificationQueueService.take();
+                ChangeProductNotification element = notificationQueueService.take();
                 if (element == null) {
                     // error situation
                     LOG.warn("Notification does not send to user");
@@ -56,7 +57,8 @@ public class AppleProductPricesBot2 extends TelegramLongPollingBot {
                 // create message
                 SendMessage message = new SendMessage()
                         .setChatId(element.getUserId())
-                        .setText("Success update from shop: " + element.getShop().getTitle());
+                        .enableMarkdown(true)
+                        .setText(notificationInfo(element));
                 try {
                     execute(message);
                 } catch (TelegramApiException e) {
@@ -68,14 +70,10 @@ public class AppleProductPricesBot2 extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        SendMessage message;
+        SendMessage message = null;
         try {
             if (update.hasMessage()) {
                 message = processMessageOperation(update);
-            } else {
-                message = new SendMessage()
-                        .setChatId(update.getMessage().getChatId())
-                        .setText(commandInfo());
             }
         } catch (Exception e) {
             LOG.error("Error on build message", e);
@@ -84,10 +82,12 @@ public class AppleProductPricesBot2 extends TelegramLongPollingBot {
                     .setText("Error on execute operation! Connect with support!");
         }
 
-        try {
-            execute(message);
-        } catch (TelegramApiException e) {
-            LOG.error("Panic! Messages not sending!", e);
+        if (message != null) {
+            try {
+                execute(message);
+            } catch (TelegramApiException e) {
+                LOG.error("Panic! Messages not sending!", e);
+            }
         }
     }
 
@@ -129,6 +129,9 @@ public class AppleProductPricesBot2 extends TelegramLongPollingBot {
             case COMMAND_READ:
                 message = readCommand(update);
                 break;
+            case COMMAND_HISTORY:
+                message = historyCommand(update);
+                break;
             case COMMAND_SUBSCRIPTION:
                 message = subscriptionCommand(update);
                 break;
@@ -159,6 +162,12 @@ public class AppleProductPricesBot2 extends TelegramLongPollingBot {
         List<String> arguments = BotUtils.extractArguments(update.getMessage().getText());
 
         return commandService.read(arguments);
+    }
+
+    private String historyCommand(Update update) {
+        String argument = BotUtils.extractArgument(update.getMessage().getText())
+                .orElse(null);
+        return commandService.history(argument);
     }
 
     private String subscriptionCommand(Update update) {
@@ -207,7 +216,8 @@ public class AppleProductPricesBot2 extends TelegramLongPollingBot {
         return "Please, used follow commands:\n\n" +
                 "/start - start work with bot\n" +
                 "/read - prices on products\n" +
-                "/subscription - active subscriptions\n" +
+                "/history - history of price changes\n" +
+                "/subscription - subscriptions of user\n" +
                 "/subscribe - subscribe for get update on change assortment and prices\n" +
                 "/unsubscribe - unsubscribe from notifications\n" +
                 "/help - show a help message\n";

@@ -1,9 +1,6 @@
 package ru.proshik.applepriceparcer.bot;
 
-
-import ru.proshik.applepriceparcer.model2.Product;
-import ru.proshik.applepriceparcer.model2.ProductType;
-import ru.proshik.applepriceparcer.model2.Shop;
+import ru.proshik.applepriceparcer.model2.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -51,25 +48,58 @@ public class PrintUtils2 {
         return builder.toString();
     }
 
+    public static String historyInfo(Shop shop, List<HistoryDiff> historyDiff) {
+        StringBuilder out = new StringBuilder();
+        out.append("*History for shop: ").append(shop.getTitle()).append("*\n\n");
 
-//    static String buildHistory(String shopTitle, List<Assortment> assortments, ProductType productType) {
-//        StringBuilder out = new StringBuilder();
-//        out.append("*History* operation\n")
-//                .append("Shop: *").append(shopTitle).append("*\n")
-//                .append("Product type: *").append(productType.getValue()).append("*\n\n");
-//
-//        if (assortments.isEmpty()) {
-//            out.append("There were no changes in the prices");
-//        } else {
-//            for (Assortment a : assortments) {
-//                out.append("*Date last change prices: *")
-//                        .append(DATE_TIME_FORMATTER.format(a.getCreatedDate()))
-//                        .append("\n");
-//                out.append(printProducts(a.byProductType(productType)));
-//            }
-//        }
-//        return out.toString();
-//    }
+        for (HistoryDiff hd : historyDiff) {
+            out.append("*Dates, old/new: ")
+                    .append(DATE_TIME_FORMATTER.format(hd.getOldCreatedDate()))
+                    .append("/")
+                    .append(DATE_TIME_FORMATTER.format(hd.getNewCreatedDAte())).append("*\n");
+
+            diffProducts(hd.getDiff(), out);
+        }
+
+        return out.toString();
+    }
+
+    static String notificationInfo(ChangeProductNotification notification) {
+        StringBuilder out = new StringBuilder();
+        out.append("*Notification for shop: ").append(notification.getShop().getTitle()).append("*\n\n");
+
+        diffProducts(notification.getDiffProducts(), out);
+
+        return out.toString();
+    }
+
+    private static void diffProducts(List<DiffProducts> diffProducts, StringBuilder out) {
+        for (DiffProducts diffP : diffProducts) {
+            Product oldProductDesc = diffP.getOldProductDesc();
+            Product newProductDesc = diffP.getNewProductDesc();
+
+            out.append("*").append(newProductDesc.getTitle()).append("*\n");
+            out.append(newProductDesc.getDescription()).append("\n");
+            if (oldProductDesc != null) {
+                if (!oldProductDesc.getPrice().equals(newProductDesc.getPrice())) {
+                    out.append("Prices old/new: ")
+                            .append(oldProductDesc.getPrice()).append("/").append("*").append(newProductDesc.getPrice()).append("*\n");
+                }
+                if (oldProductDesc.getAvailable() != null && newProductDesc.getAvailable() != null
+                        && (!oldProductDesc.getAvailable().equals(newProductDesc.getAvailable()))) {
+                    out.append("Available before/now: ")
+                            .append(oldProductDesc.getAvailable()).append("/").append("*").append(newProductDesc.getAvailable()).append("*\n");
+                }
+            } else {
+                out.append("*Added product!*\n");
+                out.append("Price: *").append(newProductDesc.getPrice()).append("*\n");
+                if (newProductDesc.getAvailable() != null) {
+                    out.append("Available: *").append(newProductDesc.getAvailable()).append("*\n");
+                }
+            }
+            out.append("\n");
+        }
+    }
 
     private static String printProducts(List<Product> products) {
         products.sort(Comparator.comparing(Product::getPrice));

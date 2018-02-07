@@ -3,11 +3,7 @@ package ru.proshik.applepriceparcer.service;
 import org.apache.log4j.Logger;
 import ru.proshik.applepriceparcer.bot.PrintUtils2;
 import ru.proshik.applepriceparcer.exception.DatabaseException;
-import ru.proshik.applepriceparcer.model2.Fetch;
-import ru.proshik.applepriceparcer.model2.Product;
-import ru.proshik.applepriceparcer.model2.ProductType;
-import ru.proshik.applepriceparcer.model2.Shop;
-import ru.proshik.applepriceparcer.model2.result.HistoryResult;
+import ru.proshik.applepriceparcer.model2.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +20,7 @@ public class CommandService {
     private ShopService shopService;
     private FetchService fetchService;
     private SubscriberService subscriberService;
+    private DiffService diffService = new DiffService();
 
     public CommandService(ShopService shopService,
                           FetchService fetchService,
@@ -84,9 +81,31 @@ public class CommandService {
         return PrintUtils2.fetchInfo(shop.getTitle(), productType, lastFetch.getCreatedDate(), selectedProducts);
     }
 
-    public HistoryResult history(Shop shop, ProductType productType) {
+    public String history(String shopTitle) {
+        if (shopTitle == null) {
+            return "With command must be argument shop.\nAvailable shops:\n" + availableShops();
+        }
 
-        return null;
+        Shop shop = shopService.findShop(shopTitle);
+        if (shop == null) {
+            return "Shop with this title not was found!\n" + "Available shops:\n" + availableShops();
+        }
+
+        List<Fetch> fetches;
+        try {
+            fetches = fetchService.getFetch(shop);
+        } catch (DatabaseException e) {
+            LOG.error("Error on execution read operation", e);
+            return "Error on execution operation.";
+        }
+
+        if (fetches.size() < 2) {
+            return "Changes does not have for shop: *" + shop.getTitle() + "*";
+        }
+
+        List<HistoryDiff> historyDiffs = diffService.historyDiff(fetches);
+
+        return PrintUtils2.historyInfo(shop, historyDiffs);
     }
 
     public String subscriptions(String userId) {

@@ -13,6 +13,7 @@ import java.time.ZoneId;
 import java.util.Date;
 
 import static org.quartz.SimpleScheduleBuilder.repeatHourlyForever;
+import static org.quartz.SimpleScheduleBuilder.repeatMinutelyForever;
 
 public class QuartzDefaultScheduler2 {
 

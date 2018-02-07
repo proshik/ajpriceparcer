@@ -1,4 +1,4 @@
-package ru.proshik.applepriceparcer.writer;
+package ru.proshik.applepriceparcer.exportshop;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -26,6 +26,10 @@ public class AllWriter {
 
         for (Shop s : providerFactory.getShops()) {
             List<Fetch> fetches = db.getFetches(s);
+            if (fetches == null){
+                System.out.println("Data for shop " + s.getTitle() + " is empty!");
+                continue;
+            }
             fetches.sort(Comparator.comparing(Fetch::getCreatedDate));
 
             objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(s.getTitle() + ".json"), fetches);
@@ -34,7 +38,7 @@ public class AllWriter {
     }
 
     public static void main(String[] args) throws IOException, DatabaseException {
-        Database2 db = new Database2("data/database1.db");
+        Database2 db = new Database2("database.db");
 
         AllWriter allWriter = new AllWriter();
 

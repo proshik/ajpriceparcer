@@ -2,12 +2,13 @@ package ru.proshik.applepriceparcer.model2;
 
 import java.util.List;
 
-public class QueueElement {
+public class ChangeProductNotification {
+
     private String userId;
     private Shop shop;
     private List<DiffProducts> diffProducts;
 
-    public QueueElement(String userId, Shop shop, List<DiffProducts> diffProducts) {
+    public ChangeProductNotification(String userId, Shop shop, List<DiffProducts> diffProducts) {
         this.userId = userId;
         this.shop = shop;
         this.diffProducts = diffProducts;

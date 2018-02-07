@@ -1,4 +1,4 @@
-package ru.proshik.applepriceparcer.reader;
+package ru.proshik.applepriceparcer.ajreader;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -29,7 +29,7 @@ public class AjReaderJson {
 
         System.out.println(ajs);
 
-        Shop s = new Shop("AJ", "http://aj.ru");
+        Shop s = new Shop(AjProvider.TITLE, AjProvider.URL);
 
         List<Fetch> aj = db.getFetches(new Shop("AJ", "http://aj.ru"));
 
