@@ -5,4 +5,7 @@ data/database1.db
 database1.db
 logs.log
 
+old
+data
+
 .DS_Store
