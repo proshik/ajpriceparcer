@@ -1,10 +1,10 @@
 package ru.proshik.applepriceparcer.service;
 
+import ru.proshik.applepriceparcer.model.ProductKey;
 import ru.proshik.applepriceparcer.model2.DiffProducts;
 import ru.proshik.applepriceparcer.model2.Fetch;
 import ru.proshik.applepriceparcer.model2.HistoryDiff;
 import ru.proshik.applepriceparcer.model2.Product;
-import ru.proshik.applepriceparcer.service.scheduler.ScreeningJob;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -28,15 +28,17 @@ public class DiffService {
         return result;
     }
 
-    private List<DiffProducts> findDiff(Fetch oldFetch, Fetch newFetch) {
+    public List<DiffProducts> findDiff(Fetch oldFetch, Fetch newFetch) {
         List<DiffProducts> diff = new ArrayList<>();
 
-        Map<ScreeningJob.ProductKey, List<Product>> groupNewFetch = newFetch.getProducts().stream()
-                .collect(Collectors.groupingBy(o -> new ScreeningJob.ProductKey(o.getTitle(), o.getDescription(), o.getProductType())));
-        Map<ScreeningJob.ProductKey, List<Product>> groupLastFetch = oldFetch.getProducts().stream()
-                .collect(Collectors.groupingBy(o -> new ScreeningJob.ProductKey(o.getTitle(), o.getDescription(), o.getProductType())));
+        Map<ProductKey, List<Product>> groupNewFetch = newFetch.getProducts().stream()
+                .collect(Collectors.groupingBy(o -> new ProductKey(o.getTitle(), o.getDescription(), o.getProductType())));
+        Map<ProductKey, List<Product>> groupLastFetch = oldFetch.getProducts().stream()
+                .collect(Collectors.groupingBy(o -> new ProductKey(o.getTitle(), o.getDescription(), o.getProductType())));
 
-        for (Map.Entry<ScreeningJob.ProductKey, List<Product>> newEntry : groupNewFetch.entrySet()) {
+        List<Product> withoutDiff = new ArrayList<>();
+
+        for (Map.Entry<ProductKey, List<Product>> newEntry : groupNewFetch.entrySet()) {
             List<Product> oldProducts = groupLastFetch.get(newEntry.getKey());
             if (oldProducts != null) {
                 List<Product> newProducts = newEntry.getValue();
@@ -49,6 +51,8 @@ public class DiffService {
                                 || (oldProducts.get(i).getAvailable() != null && newProducts.get(i).getAvailable() != null
                                 && (!oldProducts.get(i).getAvailable().equals(newProducts.get(i).getAvailable())))) {
                             diff.add(new DiffProducts(oldProducts.get(i), newProducts.get(i)));
+                        } else {
+                            withoutDiff.add(oldProducts.get(i));
                         }
                     }
                 } else {
@@ -71,6 +75,24 @@ public class DiffService {
             }
         }
 
+        if (diff.size() > 0) {
+            List<Product> old = oldFetch.getProducts();
+
+            List<Product> olders = diff.stream()
+                    .filter(diffProducts -> diffProducts.getOldProductDesc() != null)
+                    .map(DiffProducts::getOldProductDesc)
+                    .collect(Collectors.toList());
+            for (Product p : olders) {
+                old.remove(p);
+            }
+            old.removeAll(withoutDiff);
+
+            if (old.size() > 0) {
+                for (Product p : old) {
+                    diff.add(new DiffProducts(p, null));
+                }
+            }
+        }
         return diff;
     }
 

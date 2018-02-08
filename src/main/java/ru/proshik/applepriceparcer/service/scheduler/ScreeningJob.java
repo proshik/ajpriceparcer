@@ -8,6 +8,7 @@ import ru.proshik.applepriceparcer.exception.ServiceLayerException;
 import ru.proshik.applepriceparcer.model2.*;
 import ru.proshik.applepriceparcer.provider2.Provider;
 import ru.proshik.applepriceparcer.provider2.ProviderFactory;
+import ru.proshik.applepriceparcer.service.DiffService;
 import ru.proshik.applepriceparcer.service.FetchService;
 import ru.proshik.applepriceparcer.service.NotificationQueueService;
 import ru.proshik.applepriceparcer.service.SubscriberService;
@@ -31,6 +32,8 @@ public class ScreeningJob implements Job {
     private SubscriberService subscriberService;
     private NotificationQueueService notificationQueueService;
 
+    private DiffService diffService = new DiffService();
+
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         try {
@@ -51,9 +54,11 @@ public class ScreeningJob implements Job {
         Map<Shop, Provider> providers = providerFactory.providers();
         for (Map.Entry<Shop, Provider> p : providers.entrySet()) {
             try {
+                // screening operation
                 Fetch fetch = p.getValue().screening();
-
+                // find change in prices and available goods
                 List<DiffProducts> diffProducts = tryUpdateFetches(p.getKey(), fetch);
+                // if changes was found then send notification to subscribe users
                 if (!diffProducts.isEmpty()) {
                     List<String> users = shopListMap.get(p.getKey());
                     if (users != null) {
@@ -81,10 +86,13 @@ public class ScreeningJob implements Job {
     }
 
     private List<DiffProducts> tryUpdateFetches(Shop shop, Fetch fetch) throws ServiceLayerException {
+        // get fetches for shop from storage
         List<Fetch> existsFetches = fetchService.getFetch(shop);
-
+        //
         if (existsFetches != null && !existsFetches.isEmpty()) {
-            List<DiffProducts> changes = findChanges(fetch, existsFetches);
+            Fetch lastFetch = findLastFetch(existsFetches);
+
+            List<DiffProducts> changes = diffService.findDiff(lastFetch, fetch);
             if (!changes.isEmpty()) {
                 fetchService.addFetch(shop, fetch);
                 LOG.info("Success updated fetch for shop with title=" + shop.getTitle());
@@ -99,98 +107,6 @@ public class ScreeningJob implements Job {
         }
 
         return Collections.emptyList();
-    }
-
-    private List<DiffProducts> findChanges(Fetch newFetch, List<Fetch> existsFetches) {
-        List<DiffProducts> diff = new ArrayList<>();
-
-        Fetch lastFetch = findLastFetch(existsFetches);
-
-        List<Product> newFetchProducts = newFetch.getProducts();
-        List<Product> lastFetchProducts = lastFetch.getProducts();
-
-        Map<ProductKey, List<Product>> groupNewFetch = newFetchProducts.stream()
-                .collect(Collectors.groupingBy(o -> new ProductKey(o.getTitle(), o.getDescription(), o.getProductType())));
-        Map<ProductKey, List<Product>> groupLastFetch = lastFetchProducts.stream()
-                .collect(Collectors.groupingBy(o -> new ProductKey(o.getTitle(), o.getDescription(), o.getProductType())));
-
-        for (Map.Entry<ProductKey, List<Product>> newEntry : groupNewFetch.entrySet()) {
-            List<Product> oldProducts = groupLastFetch.get(newEntry.getKey());
-            if (oldProducts != null) {
-                List<Product> newProducts = newEntry.getValue();
-                newProducts.sort(Comparator.comparing(Product::getPrice));
-                oldProducts.sort(Comparator.comparing(Product::getPrice));
-
-                if (newProducts.size() == oldProducts.size()) {
-                    for (int i = 0; i < newProducts.size(); i++) {
-                        if (!oldProducts.get(i).getPrice().equals(newProducts.get(i).getPrice())
-                                || (oldProducts.get(i).getAvailable() != null && newProducts.get(i).getAvailable() != null
-                                && (!oldProducts.get(i).getAvailable().equals(newProducts.get(i).getAvailable())))) {
-                            diff.add(new DiffProducts(oldProducts.get(i), newProducts.get(i)));
-                        }
-                    }
-                } else {
-                    List<Product> forAdded = new ArrayList<>();
-                    if (newProducts.size() > oldProducts.size()) {
-                        newProducts.retainAll(oldProducts);
-                        forAdded.addAll(newProducts);
-                    } else {
-                        oldProducts.retainAll(newProducts);
-                        forAdded.addAll(oldProducts);
-                    }
-                    for (Product p : forAdded) {
-                        diff.add(new DiffProducts(null, p));
-                    }
-                }
-            } else {
-                for (Product p : newEntry.getValue()) {
-                    diff.add(new DiffProducts(null, p));
-                }
-            }
-        }
-
-        return diff;
-    }
-
-    public static class ProductKey {
-
-        private String title;
-        private String description;
-        private ProductType productType;
-
-        public ProductKey(String title, String description, ProductType productType) {
-            this.title = title;
-            this.description = description;
-            this.productType = productType;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public ProductType getProductType() {
-            return productType;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            ProductKey that = (ProductKey) o;
-            return Objects.equals(title, that.title) &&
-                    Objects.equals(description, that.description) &&
-                    productType == that.productType;
-        }
-
-        @Override
-        public int hashCode() {
-
-            return Objects.hash(title, description, productType);
-        }
     }
 
 }
