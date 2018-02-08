@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ru.proshik.apple-price-parcer</groupId>
-    <artifactId>apple-price-parcer</artifactId>
+    <groupId>ru.proshik.applepricebot</groupId>
+    <artifactId>applepricebot</artifactId>
     <version>1.0-SNAPSHOT</version>
     <build>
         <plugins>
@@ -30,7 +30,7 @@
                             <finalName>applepriceparcer</finalName>
                             <archive>
                                 <manifest>
-                                    <mainClass>ru.proshik.applepriceparcer.Application2</mainClass>
+                                    <mainClass>ru.proshik.applepricebot.Application</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>
