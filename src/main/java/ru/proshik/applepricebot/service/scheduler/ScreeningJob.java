@@ -95,7 +95,7 @@ public class ScreeningJob implements Job {
         if (existsFetches != null && !existsFetches.isEmpty()) {
             Fetch lastFetch = findLastFetch(existsFetches);
 
-            List<DiffProducts> changes = diffService.findDiff(lastFetch, fetch);
+            List<DiffProducts> changes = diffService.findDiff(lastFetch, fetch, null);
             if (!changes.isEmpty()) {
                 fetchService.addFetch(shop, fetch);
                 LOG.info("Success updated fetch for shop with title=" + shop.getTitle());

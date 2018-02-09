@@ -5,6 +5,7 @@ import ru.proshik.applepricebot.dto.DiffProducts;
 import ru.proshik.applepricebot.storage.model.Fetch;
 import ru.proshik.applepricebot.dto.HistoryDiff;
 import ru.proshik.applepricebot.storage.model.Product;
+import ru.proshik.applepricebot.storage.model.ProductType;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -14,26 +15,29 @@ import java.util.stream.Collectors;
 
 public class DiffService {
 
-    public List<HistoryDiff> historyDiff(List<Fetch> fetches) {
+    public List<HistoryDiff> historyDiff(List<Fetch> fetches, ProductType productType) {
         List<HistoryDiff> result = new ArrayList<>();
 
-        List<Fetch> limitedFetches = fetches.stream().sorted((o1, o2) -> o2.getCreatedDate().compareTo(o1.getCreatedDate()))
+        List<Fetch> limitedFetches = fetches.stream()
+                .sorted((o1, o2) -> o2.getCreatedDate().compareTo(o1.getCreatedDate()))
                 .limit(5)
                 .collect(Collectors.toList());
         for (int i = 0; i < limitedFetches.size() - 1; i++) {
-            List<DiffProducts> diff = findDiff(limitedFetches.get(i + 1), limitedFetches.get(i));
+            List<DiffProducts> diff = findDiff(limitedFetches.get(i + 1), limitedFetches.get(i), productType);
             result.add(new HistoryDiff(limitedFetches.get(i).getCreatedDate(), limitedFetches.get(i + 1).getCreatedDate(), diff));
         }
 
         return result;
     }
 
-    public List<DiffProducts> findDiff(Fetch oldFetch, Fetch newFetch) {
+    public List<DiffProducts> findDiff(Fetch oldFetch, Fetch newFetch, ProductType productType) {
         List<DiffProducts> diff = new ArrayList<>();
 
         Map<ProductKey, List<Product>> groupNewFetch = newFetch.getProducts().stream()
+                .filter(product -> productType == null || product.getProductType() == productType)
                 .collect(Collectors.groupingBy(o -> new ProductKey(o.getTitle(), o.getDescription(), o.getProductType())));
         Map<ProductKey, List<Product>> groupLastFetch = oldFetch.getProducts().stream()
+                .filter(product -> productType == null || product.getProductType() == productType)
                 .collect(Collectors.groupingBy(o -> new ProductKey(o.getTitle(), o.getDescription(), o.getProductType())));
 
         List<Product> withoutDiff = new ArrayList<>();

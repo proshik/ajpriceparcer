@@ -1,13 +1,13 @@
 package ru.proshik.applepricebot.service;
 
 import org.apache.log4j.Logger;
-import ru.proshik.applepricebot.utils.PrintUtils;
 import ru.proshik.applepricebot.dto.HistoryDiff;
 import ru.proshik.applepricebot.exception.DatabaseException;
 import ru.proshik.applepricebot.storage.model.Fetch;
 import ru.proshik.applepricebot.storage.model.Product;
 import ru.proshik.applepricebot.storage.model.ProductType;
 import ru.proshik.applepricebot.storage.model.Shop;
+import ru.proshik.applepricebot.utils.PrintUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,11 +35,63 @@ public class CommandService {
     }
 
     public String read(List<String> arguments) {
+        ShopProductTypeAgrCommand params = parseArguments(arguments);
+        if (params.message != null) {
+            return params.message;
+        }
+
+        List<Fetch> fetches;
+        try {
+            fetches = fetchService.getFetch(params.shop);
+        } catch (DatabaseException e) {
+            LOG.error("Error on execution read operation", e);
+            return "Error on execution operation";
+        }
+
+        if (fetches == null || fetches.isEmpty()) {
+            return "Shop with this title has not any records!";
+        }
+
+        Fetch lastFetch = findLastFetch(fetches);
+
+        List<Product> selectedProducts = lastFetch.getProducts().stream()
+                .filter(p -> p.getProductType() == params.productType)
+                .collect(Collectors.toList());
+
+        return PrintUtils.fetchInfo(params.shop.getTitle(), params.productType, lastFetch.getCreatedDate(),
+                selectedProducts);
+    }
+
+    public String history(List<String> arguments) {
+        ShopProductTypeAgrCommand params = parseArguments(arguments);
+        if (params.message != null) {
+            return params.message;
+        }
+
+        List<Fetch> fetches;
+        try {
+            fetches = fetchService.getFetch(params.shop);
+        } catch (DatabaseException e) {
+            LOG.error("Error on execution read operation", e);
+            return "Error on execution operation.";
+        }
+
+        if (fetches.size() < 2) {
+            return "Changes does not have for shop: *" + params.shop.getTitle() + "*";
+        }
+
+        List<HistoryDiff> historyDiffs = diffService.historyDiff(fetches, params.productType);
+
+        return PrintUtils.historyInfo(params.shop, historyDiffs);
+    }
+
+    private ShopProductTypeAgrCommand parseArguments(List<String> arguments) {
+        String message = null;
         if (arguments.isEmpty()) {
             String availableShops = availableShops();
             List<ProductType> productTypes = Arrays.asList(ProductType.values());
 
-            return "Use next syntax of command: /read <shop> <product type>\n\n"
+            message = "Use next syntax of arguments command <shop> <product type>\n\n"
                     + "Available shops:\n"
                     + availableShops
                     + "\n\n"
@@ -50,66 +102,32 @@ public class CommandService {
         }
 
         if (arguments.size() != 2) {
-            return "Needed 2 arguments for the entered command, write /read for more information.";
+            message = "Needed 2 arguments for the entered command, write command without arguments for take more information.";
+        }
+
+        if (message != null) {
+            return new ShopProductTypeAgrCommand(message);
         }
 
         Shop shop = shopService.findShop(arguments.get(0));
         if (shop == null) {
-            return "Shop with this title not was found!\n" + "Available shops:\n" + availableShops();
+            return new ShopProductTypeAgrCommand("Shop with this title not was found!\n"
+                    + "Available shops:\n" + availableShops());
         }
 
-        List<Fetch> fetches;
         ProductType productType;
         try {
             productType = shopService.findProductType(arguments.get(1));
             if (productType == null) {
-                return "For shop *" + shop.getTitle() + "* available follow product types:\n" + availableProductTypes(shop);
+                return new ShopProductTypeAgrCommand("For shop *" + shop.getTitle()
+                        + "* available follow product types:\n" + availableProductTypes(shop));
             }
-
-            fetches = fetchService.getFetch(shop);
         } catch (DatabaseException e) {
             LOG.error("Error on execution read operation", e);
-            return "Error on execution operation.";
+            return new ShopProductTypeAgrCommand("Error on execution operation.");
         }
 
-        if (fetches == null || fetches.isEmpty()) {
-            return "Shop with this title has not any records!";
-        }
-
-        Fetch lastFetch = findLastFetch(fetches);
-
-        List<Product> selectedProducts = lastFetch.getProducts().stream()
-                .filter(p -> p.getProductType() == productType)
-                .collect(Collectors.toList());
-
-        return PrintUtils.fetchInfo(shop.getTitle(), productType, lastFetch.getCreatedDate(), selectedProducts);
-    }
-
-    public String history(String shopTitle) {
-        if (shopTitle == null) {
-            return "With command must be argument shop.\nAvailable shops:\n" + availableShops();
-        }
-
-        Shop shop = shopService.findShop(shopTitle);
-        if (shop == null) {
-            return "Shop with this title not was found!\n" + "Available shops:\n" + availableShops();
-        }
-
-        List<Fetch> fetches;
-        try {
-            fetches = fetchService.getFetch(shop);
-        } catch (DatabaseException e) {
-            LOG.error("Error on execution read operation", e);
-            return "Error on execution operation.";
-        }
-
-        if (fetches.size() < 2) {
-            return "Changes does not have for shop: *" + shop.getTitle() + "*";
-        }
-
-        List<HistoryDiff> historyDiffs = diffService.historyDiff(fetches);
-
-        return PrintUtils.historyInfo(shop, historyDiffs);
+        return new ShopProductTypeAgrCommand(shop, productType);
     }
 
     public String subscriptions(String userId) {
@@ -189,5 +207,21 @@ public class CommandService {
                 .collect(Collectors.toSet()).stream()
                 .map(p -> "*" + p.getValue().replace(" ", "") + "*")
                 .collect(Collectors.joining(", "));
+    }
+
+    private class ShopProductTypeAgrCommand {
+        String message;
+        Shop shop;
+        ProductType productType;
+
+        ShopProductTypeAgrCommand(String message) {
+            this.message = message;
+        }
+
+        ShopProductTypeAgrCommand(Shop shop, ProductType productType) {
+            this.shop = shop;
+            this.productType = productType;
+        }
+
     }
 }

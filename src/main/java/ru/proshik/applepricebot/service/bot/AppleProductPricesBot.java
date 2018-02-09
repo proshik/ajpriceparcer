@@ -163,9 +163,9 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
     }
 
     private String historyCommand(Update update) {
-        String argument = BotUtils.extractArgument(update.getMessage().getText())
-                .orElse(null);
-        return commandService.history(argument);
+        List<String> arguments = BotUtils.extractArguments(update.getMessage().getText());
+
+        return commandService.history(arguments);
     }
 
     private String subscriptionCommand(Update update) {
