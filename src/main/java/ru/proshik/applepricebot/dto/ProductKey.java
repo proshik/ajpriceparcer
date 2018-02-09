@@ -8,7 +8,7 @@ public class ProductKey {
 
     private String title;
     private String description;
-    private ru.proshik.applepricebot.storage.model.ProductType productType;
+    private ProductType productType;
 
     public ProductKey(String title, String description, ProductType productType) {
         this.title = title;

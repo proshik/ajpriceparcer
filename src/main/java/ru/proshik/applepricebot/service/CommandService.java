@@ -86,27 +86,23 @@ public class CommandService {
     }
 
     private ShopProductTypeAgrCommand parseArguments(List<String> arguments) {
-        String message = null;
         if (arguments.isEmpty()) {
             String availableShops = availableShops();
             List<ProductType> productTypes = Arrays.asList(ProductType.values());
 
-            message = "Use next syntax of arguments command <shop> <product type>\n\n"
+            return new ShopProductTypeAgrCommand("Use next syntax of arguments command <shop> <product type>\n\n"
                     + "Available shops:\n"
                     + availableShops
                     + "\n\n"
                     + "All product types:\n"
                     + productTypes.stream()
                     .map(productType -> "*" + productType.getValue().replace(" ", "") + "*")
-                    .collect(Collectors.joining(", "));
+                    .collect(Collectors.joining(", ")));
         }
 
         if (arguments.size() != 2) {
-            message = "Needed 2 arguments for the entered command, write command without arguments for take more information.";
-        }
-
-        if (message != null) {
-            return new ShopProductTypeAgrCommand(message);
+            return new ShopProductTypeAgrCommand("Needed 2 arguments for the entered command, " +
+                    "write command without arguments for take more information.");
         }
 
         Shop shop = shopService.findShop(arguments.get(0));

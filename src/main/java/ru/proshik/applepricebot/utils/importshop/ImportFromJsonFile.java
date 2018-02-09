@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Set;
 
-public class ReadFromJsonFile {
+public class ImportFromJsonFile {
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -37,14 +37,14 @@ public class ReadFromJsonFile {
                 db.addFetch(shop, f);
             }
 
-            System.out.println("Read: " + shop.getTitle());
+            System.out.println("Success import: " + shop.getTitle());
         }
     }
 
     public static void main(String[] args) throws IOException, DatabaseException {
         Database db = new Database("database.db");
 
-        ReadFromJsonFile readFromJsonFile = new ReadFromJsonFile();
-        readFromJsonFile.read(db);
+        ImportFromJsonFile importFromJsonFile = new ImportFromJsonFile();
+        importFromJsonFile.read(db);
     }
 }

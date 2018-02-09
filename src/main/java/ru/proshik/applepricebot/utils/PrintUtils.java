@@ -55,15 +55,23 @@ public class PrintUtils {
 
     public static String historyInfo(Shop shop, List<HistoryDiff> historyDiff) {
         StringBuilder out = new StringBuilder();
-        out.append("*History for shop: ").append(shop.getTitle()).append("*\n\n");
 
-        for (HistoryDiff hd : historyDiff) {
-            out.append("*Dates, old/new: ")
-                    .append(DATE_TIME_FORMATTER.format(hd.getOldCreatedDate()))
-                    .append("/")
-                    .append(DATE_TIME_FORMATTER.format(hd.getNewCreatedDAte())).append("*\n");
+        if (historyDiff.isEmpty()) {
+            out.append("*Changes was not found for shop: ").append(shop.getTitle()).append("*\n\n");
+        } else {
+            out.append("*History for shop: ").append(shop.getTitle()).append("*\n\n");
 
-            diffProducts(hd.getDiff(), out);
+            for (HistoryDiff hd : historyDiff) {
+                if (hd.getDiff().isEmpty()) {
+                    continue;
+                }
+                out.append("*Dates, old/new: ")
+                        .append(DATE_TIME_FORMATTER.format(hd.getOldCreatedDate()))
+                        .append("/")
+                        .append(DATE_TIME_FORMATTER.format(hd.getNewCreatedDAte())).append("*\n");
+
+                diffProducts(hd.getDiff(), out);
+            }
         }
 
         return out.toString();
@@ -80,7 +88,16 @@ public class PrintUtils {
 
     private static void diffProducts(List<DiffProducts> diffProducts, StringBuilder out) {
 
+        diffProducts.sort((o1, o2) -> {
+            if (o1.getNewProductDesc() != null && o2.getNewProductDesc() != null) {
+                return o1.getNewProductDesc().getPrice().compareTo(o2.getNewProductDesc().getPrice());
+            } else {
+                return o1.getOldProductDesc().getPrice().compareTo(o2.getOldProductDesc().getPrice());
+            }
+        });
+
         for (DiffProducts diffP : diffProducts) {
+
             Product oldProductDesc = diffP.getOldProductDesc();
             Product newProductDesc = diffP.getNewProductDesc();
 
@@ -97,7 +114,8 @@ public class PrintUtils {
                                 .append(oldProductDesc.getPrice()).append("/").append("*").append(newProductDesc.getPrice()).append("*\n");
                     }
                     if (oldProductDesc.getAvailable() != null && newProductDesc.getAvailable() != null
-                            && (!oldProductDesc.getAvailable().equals(newProductDesc.getAvailable()))) {
+//                            && (!oldProductDesc.getAvailable().equals(newProductDesc.getAvailable()))
+                            ) {
                         out.append("Available before/now: ")
                                 .append(oldProductDesc.getAvailable()).append("/").append("*").append(newProductDesc.getAvailable()).append("*\n");
                     }
