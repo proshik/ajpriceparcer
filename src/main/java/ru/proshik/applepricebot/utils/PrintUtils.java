@@ -77,8 +77,8 @@ public class PrintUtils {
 
     public static String notificationInfo(ChangeProductNotification notification) {
         StringBuilder out = new StringBuilder();
-        out.append("*Notification for shop: ").append(notification.getShop().getTitle()).append("*\n\n");
-
+        out.append("*Notification for shop: ").append(notification.getShop().getTitle()).append("*\n");
+        out.append("Date: *").append(DATE_TIME_FORMATTER.format(LocalDateTime.now())).append("*\n\n");
         diffProducts(notification.getDiffProducts(), out);
 
         return out.toString();
