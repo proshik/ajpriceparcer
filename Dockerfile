@@ -6,8 +6,8 @@ ADD ./src src/
 
 #RUN apt-get install --reinstall ca-certificates-java
 
-RUN mvn clean
-RUN cp target/applepriceparcer-jar-with-dependencies.jar target/app.jar
+RUN mvn clean install
+RUN cp target/applepricesbot-jar-with-dependencies.jar target/app.jar
 
 # Final stage to define our minimal runtime
 FROM openjdk:8-jre
