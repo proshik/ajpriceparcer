@@ -1,6 +1,6 @@
 # ApplePricesBot #
 
-[![Build Status](https://travis-ci.org/proshik/applepricesbot.svg?branch=master)](https://travis-ci.org/proshik/applepricesbot)
+[![Travis](https://travis-ci.org/proshik/applepricesbot.svg?branch=master)](https://travis-ci.org/proshik/applepricesbot)
 [![codecov](https://codecov.io/gh/proshik/applepricesbot/branch/master/graph/badge.svg)](https://codecov.io/gh/proshik/applepricesbot)
 [![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/proshik/applepricesbot/issues)
 
