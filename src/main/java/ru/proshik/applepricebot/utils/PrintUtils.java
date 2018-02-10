@@ -23,10 +23,8 @@ public class PrintUtils {
                                    LocalDateTime createdDate,
                                    List<Product> products) {
         return "Shop: *" + shopTitle + "*\n" +
-                "Product type: *" + productType.getValue() + "*\n\n" +
-                "*Date last change prices: *" +
-                DATE_TIME_FORMATTER.format(createdDate) +
-                "\n" +
+                "Product type: *" + productType.getValue() + "*\n" +
+                "Date last change prices: *" + DATE_TIME_FORMATTER.format(createdDate) + "*\n\n" +
                 printProducts(products);
     }
 
@@ -132,13 +130,13 @@ public class PrintUtils {
     }
 
     private static String printProducts(List<Product> products) {
-        products.sort(Comparator.comparing(Product::getPrice));
-
         StringBuilder out = new StringBuilder();
 
+        products.sort(Comparator.comparing(Product::getPrice));
         for (Product p : products) {
-            out.append("*").append(p.getTitle()).append("* - ").append(p.getPrice()).append(" rub.\n");
+            out.append("*").append(p.getTitle()).append("*\n");
             out.append(p.getDescription()).append("\n");
+            out.append("Price: ").append("*").append(p.getPrice()).append("*\n");
             if (p.getAvailable() != null) {
                 out.append("Available: ").append("*").append(p.getAvailable().toString()).append("*\n\n");
             } else {

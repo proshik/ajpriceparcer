@@ -1,6 +1,6 @@
-# AppleProductPricesBot #
+# ApplePricesBot #
 
-[Telegram bot](https://t.me/ApplePriceParcerBot) for check prices on apple types in several shops SpB and Moscow
+[Telegram bot](https://t.me/ApplePriceParcerBot) for check prices on apple products in several shops SpB and Moscow
 
 ## Build ##
 

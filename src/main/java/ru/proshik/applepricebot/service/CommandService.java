@@ -90,7 +90,7 @@ public class CommandService {
             String availableShops = availableShops();
             List<ProductType> productTypes = Arrays.asList(ProductType.values());
 
-            return new ShopProductTypeAgrCommand("Use next syntax of arguments command <shop> <product type>\n\n"
+            return new ShopProductTypeAgrCommand("Use next syntax of arguments command /command :shop :product-type\n\n"
                     + "Available shops:\n"
                     + availableShops
                     + "\n\n"
