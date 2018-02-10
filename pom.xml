@@ -30,7 +30,7 @@
                             <finalName>applepricesbot</finalName>
                             <archive>
                                 <manifest>
-                                    <mainClass>ru.proshik.applepricesbot.Application</mainClass>
+                                    <mainClass>ru.proshik.applepricebot.Application</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>
