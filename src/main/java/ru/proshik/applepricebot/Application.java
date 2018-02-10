@@ -16,9 +16,9 @@ public class Application {
 
     private static final Logger LOG = Logger.getLogger(Application.class);
 
-    private static final String TELEGRAM_USERNAME = "APPLEPRICEPARCER_TELEGRAMUSERNAME";
-    private static final String TELEGRAM_TOKEN = "APPLEPRICEPARCER_TELEGRAMTOKEN";
-    private static final String DB_PATH = "APPLEPRICEPARCER_DBPATH";
+    private static final String TELEGRAM_USERNAME = "APPLEPRICESBOT_TELEGRAMUSERNAME";
+    private static final String TELEGRAM_TOKEN = "APPLEPRICESBOT_TELEGRAMTOKEN";
+    private static final String DB_PATH = "APPLEPRICESBOT_DBPATH";
 
     public static void main(String[] args) {
         Application application = new Application();
