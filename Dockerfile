@@ -14,4 +14,4 @@ FROM openjdk:8-jre
 
 COPY --from=build-env target/app.jar /app/app.jar
 
-CMD ["java","-jar","/app/app.jar"]
+CMD ["java","-jar","/app/app.jar","-Xms64m","-Xmx128m"]
