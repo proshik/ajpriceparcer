@@ -27,10 +27,10 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <finalName>applepriceparcer</finalName>
+                            <finalName>applepricesbot</finalName>
                             <archive>
                                 <manifest>
-                                    <mainClass>ru.proshik.applepricebot.Application</mainClass>
+                                    <mainClass>ru.proshik.applepricesbot.Application</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>
