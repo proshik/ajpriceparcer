@@ -4,7 +4,7 @@
 [![codecov](https://codecov.io/gh/proshik/applepricesbot/branch/master/graph/badge.svg)](https://codecov.io/gh/proshik/applepricesbot)
 [![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/proshik/applepricesbot/issues)
 
-[Telegram bot](https://t.me/ApplePriceParcerBot) for check prices on apple products in several shops SpB and Moscow
+[Telegram bot](https://t.me/ApplePrices_bot) for check prices on apple products in several shops SpB and Moscow
 
 ## Build and Run ##
 
