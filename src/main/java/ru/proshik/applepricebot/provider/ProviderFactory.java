@@ -1,6 +1,7 @@
 package ru.proshik.applepricebot.provider;
 
 
+import ru.proshik.applepricebot.provider.citilink.CitilinkSpbProvider;
 import ru.proshik.applepricebot.storage.model.Shop;
 import ru.proshik.applepricebot.provider.aj.AjProvider;
 import ru.proshik.applepricebot.provider.gsmstore.GsmStoreProvider;
@@ -16,6 +17,7 @@ public class ProviderFactory {
         PROVIDERS.put(new Shop(AjProvider.TITLE, AjProvider.URL), new AjProvider());
         PROVIDERS.put(new Shop(GsmStoreProvider.TITLE, GsmStoreProvider.URL), new GsmStoreProvider());
         PROVIDERS.put(new Shop(IStoreSpbProvider.TITLE, IStoreSpbProvider.URL), new IStoreSpbProvider());
+        PROVIDERS.put(new Shop(CitilinkSpbProvider.TITLE, CitilinkSpbProvider.URL), new CitilinkSpbProvider());
     }
 
     public Map<Shop, Provider> providers() {
