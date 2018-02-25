@@ -2,10 +2,8 @@ package ru.proshik.applepricebot.provider.citilink;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.DomElement;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.html.HtmlSpan;
 import org.apache.log4j.Logger;
 import ru.proshik.applepricebot.exception.ProviderParseException;
 import ru.proshik.applepricebot.provider.Provider;
@@ -13,11 +11,9 @@ import ru.proshik.applepricebot.storage.model.AssortmentType;
 import ru.proshik.applepricebot.storage.model.Fetch;
 import ru.proshik.applepricebot.storage.model.Product;
 import ru.proshik.applepricebot.storage.model.ProductType;
-import ru.proshik.applepricebot.utils.ajreader.Aj;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,8 +58,17 @@ public class CitilinkSpbProvider implements Provider {
                 try {
                     CitilinkProductObject object = objectMapper.readValue(info, CitilinkProductObject.class);
                     ArrayList<String> productData = groupExtractor(object.getShortName(),productTypePointer.liTitleRegexp);
-                    Map<String, String> params = extractGBSolid(object.getShortName());
-                    products.add(new Product("", "", Boolean.TRUE, new BigDecimal(0), productTypePointer.assortmentType, productTypePointer.productType, params));
+                    if (productData.size()==4 || !object.getPrice().equals(null))
+                    {
+                        String title = String.format("%s %s", productData.get(3), productData.get(2) );
+                        String description = productData.get(0);
+                        String paramsData = productData.get(2);
+                        Map<String, String> params = extractGBSolid(paramsData);
+                        products.add(new Product(title, description, Boolean.TRUE, new BigDecimal(object.getPrice()), productTypePointer.assortmentType, productTypePointer.productType, params));
+                    }
+                    else {
+                        LOG.error("wrong extract data for " + object.getShortName());
+                    }
                 } catch (IOException e) {
                     LOG.error(String.format(this.URL+queryPath,productTypePointer.queryText));
                     e.printStackTrace();
@@ -92,15 +97,15 @@ public class CitilinkSpbProvider implements Provider {
     private List<ProductTypePointer> productTypeClassHolder() {
         return Arrays.asList(
                 // iPhone
-/*                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_X, "iphoneX", "iPhone X.*"),
-                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_8, "iphone8", "iPhone 8(?!.*Plus).*"),
-                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_8_PLUS, "iphone8", "iPhone 8 Plus.*"),
-                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_7, "iphone7", "iPhone 7(?!.*Plus).*"),
-                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_7_PLUS, "iphone7", "iPhone 7 Plus.*"),
-                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_7, "iphone7red", "iPhone 7.*"),
-                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_6S, "iphone6s", "iPhone 6s.*"),
-                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_6, "iphone6", "iPhone 6.*"),*/
-                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_SE, "iphone%20SE", "iPhone SE (\\d+Gb),(.*),(.*)")
+//              new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_X, "iphoneX", "iPhone X.*"),
+//                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_8, "iphone8", "iPhone 8(?!.*Plus).*"),
+//                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_8_PLUS, "iphone8", "iPhone 8 Plus.*"),
+//                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_7, "iphone7", "iPhone 7(?!.*Plus).*"),
+//                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_7_PLUS, "iphone7", "iPhone 7 Plus.*"),
+//                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_7, "iphone7red", "iPhone 7.*"),
+//                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_6S, "iphone6s", "iPhone 6s.*"),
+//                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_6, "iphone6", "iPhone 6.*"),
+                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_SE, "iphone%20SE", "(iPhone SE).(\\d+Gb),(.*),(.*)")
         );
     }
 
@@ -122,33 +127,9 @@ public class CitilinkSpbProvider implements Provider {
     /**
      * Fun
      */
-/*
     public static void main(String[] args) throws ProviderParseException {
-        CitilinkSpbProvider apP = new CitilinkSpbProvider();
-        Fetch screening = apP.screening();
+        CitilinkSpbProvider citilinkSpbProvider = new CitilinkSpbProvider();
+        Fetch screening = citilinkSpbProvider.screening();
     }
-*/
 
-/**
- * Run from file
- */
-    public static void main(String[] args) throws IOException, ProviderParseException {
-        WebClient client = new WebClient();
-        client.getOptions().setCssEnabled(false);
-        client.getOptions().setJavaScriptEnabled(false);
-        client.getOptions().setThrowExceptionOnFailingStatusCode(false);
-
-        HtmlPage page = client.getPage(Paths.get("citilinkspb.html").toUri().toURL());
-
-
-       try {
-            page = client.getPage(URL);
-        } catch (IOException e) {
-            throw new ProviderParseException("Error on priceAssortment page from citilinkspb.ru", e);
-        }
-        CitilinkSpbProvider apP = new CitilinkSpbProvider();
-       Fetch screening = apP.screening();
-
-        System.out.println(screening);
-    }
 }

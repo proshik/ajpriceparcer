@@ -25,8 +25,8 @@ public class ProviderUtils {
         Pattern p = Pattern.compile("(\\d+)(Gb|GB|gb)");
         Matcher matcher = p.matcher(text);
         if (matcher.find()) {
-            String value = matcher.group();
-            result.put("GB",value );
+            String value = matcher.group(1);
+            result.put("GB",String.format("%sGB",value));
         }
         return result;
     }
