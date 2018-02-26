@@ -43,7 +43,7 @@ public class CitilinkSpbProvider implements Provider {
     public Fetch screening() throws ProviderParseException {
         LOG.info("Screening has started for " + this.TITLE);
 
-        String queryPath = "/search/?menu_id=100008&text=%s&available=1";
+        String queryPath = "/catalog/mobile/cell_phones/APPLE/?available=1&f=%s";
         List<Product> products = new ArrayList<>();
 
         for (ProductTypePointer productTypePointer : productTypeClassHolder()) {
@@ -58,7 +58,7 @@ public class CitilinkSpbProvider implements Provider {
                 try {
                     CitilinkProductObject object = objectMapper.readValue(info, CitilinkProductObject.class);
                     ArrayList<String> productData = groupExtractor(object.getShortName(),productTypePointer.liTitleRegexp);
-                    if (productData.size()==4 || !object.getPrice().equals(null))
+                    if (productData.size()==4 && !object.getPrice().equals(null))
                     {
                         String title = String.format("%s %s", productData.get(3), productData.get(2) );
                         String description = productData.get(0);
@@ -67,11 +67,10 @@ public class CitilinkSpbProvider implements Provider {
                         products.add(new Product(title, description, Boolean.TRUE, new BigDecimal(object.getPrice()), productTypePointer.assortmentType, productTypePointer.productType, params));
                     }
                     else {
-                        LOG.error("wrong extract data for " + object.getShortName());
+                        LOG.debug("wrong extract data from" + object.getShortName() + " for: " + productTypePointer.liTitleRegexp);
                     }
                 } catch (IOException e) {
                     LOG.error(String.format(this.URL+queryPath,productTypePointer.queryText));
-                    e.printStackTrace();
                 }
 
             }
@@ -88,7 +87,6 @@ public class CitilinkSpbProvider implements Provider {
         }
         catch (IOException e) {
             LOG.error(this.URL);
-            e.printStackTrace();
             return null;
         }
         return page;
@@ -97,15 +95,14 @@ public class CitilinkSpbProvider implements Provider {
     private List<ProductTypePointer> productTypeClassHolder() {
         return Arrays.asList(
                 // iPhone
-//              new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_X, "iphoneX", "iPhone X.*"),
-//                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_8, "iphone8", "iPhone 8(?!.*Plus).*"),
-//                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_8_PLUS, "iphone8", "iPhone 8 Plus.*"),
-//                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_7, "iphone7", "iPhone 7(?!.*Plus).*"),
-//                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_7_PLUS, "iphone7", "iPhone 7 Plus.*"),
-//                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_7, "iphone7red", "iPhone 7.*"),
-//                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_6S, "iphone6s", "iPhone 6s.*"),
-//                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_6, "iphone6", "iPhone 6.*"),
-                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_SE, "iphone%20SE", "(iPhone SE).(\\d+Gb),(.*),(.*)")
+                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_X, "11116_214", "(iPhone X).(\\d+Gb),(.*),(.*)"),
+                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_8, "11114_214", "(iPhone 8).(\\d+Gb),(.*),(.*)"),
+                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_8_PLUS, "11115_214", "(iPhone 8 Plus).(\\d+Gb),(.*),(.*)"),
+                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_7_PLUS, "10927_214", "(iPhone 7 Plus).(\\d+Gb),(.*),(.*)"),
+                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_7, "10926_214", "(iPhone 7).(\\d+Gb),(.*),(.*)"),
+                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_6S, "10924_214", "(iPhone 6S).(\\d+Gb),(.*),(.*)"),
+                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_6, "10922_214", "(iPhone 6).(\\d+Gb),(.*),(.*)"),
+                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_SE, "10928_214", "(iPhone SE).(\\d+Gb),(.*),(.*)")
         );
     }
 
