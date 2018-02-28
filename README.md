@@ -41,6 +41,7 @@ Print /start command after running bot service.
 
 - tests;
 - internalization;
+- more providers;
 - concurrent screening.
 
 ## Patch 
