@@ -39,7 +39,6 @@ Print /start command after running bot service.
 
 ## TODO
 
-- tests;
 - internalization;
 - more providers;
 - concurrent screening.
