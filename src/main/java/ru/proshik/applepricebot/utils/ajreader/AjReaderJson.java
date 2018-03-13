@@ -68,12 +68,12 @@ public class AjReaderJson {
         System.out.println(fetches);
     }
 
-    public static void main(String[] args) throws IOException, DatabaseException {
-
-        Database db = new Database("database.db");
-
-        AjReaderJson ajReaderJson = new AjReaderJson();
-        ajReaderJson.read(db);
-    }
+//    public static void main(String[] args) throws IOException, DatabaseException {
+//
+//        Database db = new Database("database.db");
+//
+//        AjReaderJson ajReaderJson = new AjReaderJson();
+//        ajReaderJson.read(db);
+//    }
 
 }

@@ -4,6 +4,8 @@ import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
 import org.mapdb.Serializer;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import ru.proshik.applepricebot.exception.DatabaseException;
 import ru.proshik.applepricebot.storage.model.Fetch;
 import ru.proshik.applepricebot.storage.model.Shop;
@@ -17,16 +19,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class Database {
 
     private static final String SHOP_BUCKET = "shop";
     private static final String USER_SUBSCRIPTIONS_BUCKET = "userSubscriptions";
 
-    private final String dbPath;
+    @Value("${db.path}")
+    private String dbPath;
 
-    public Database(String dbPath) {
-        this.dbPath = dbPath;
-    }
+//    public Database(String dbPath) {
+//        this.dbPath = dbPath;
+//    }
 
     public List<Fetch> getFetches(Shop shop) throws DatabaseException {
         try (DB db = open()) {

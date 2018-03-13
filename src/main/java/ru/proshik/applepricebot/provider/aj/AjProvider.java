@@ -128,14 +128,14 @@ public class AjProvider implements Provider {
                 new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_6, "iphone6", "iPhone 6.*"),
                 new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_SE, "iphone5se", "iPhone SE.*")
                 // MacBook Pro
-//                new ProductTypePointer(AssortmentType.MACBOOK_PRO, ProductType.MACBOOK_PRO_2017, "MacBookPro2017", "13\".*"),
-//                new ProductTypePointer(AssortmentType.MACBOOK_PRO, ProductType.MACBOOK_PRO_2017, "MacBookPro2017", "15\".*"),
-//                new ProductTypePointer(AssortmentType.MACBOOK_PRO, ProductType.MACBOOK_PRO_2016, "MacBookPro2016", "15\".*"),
+//                new ProductTypePointer(AssortmentType.MACBOOK_PRO, ProductTypes.MACBOOK_PRO_2017, "MacBookPro2017", "13\".*"),
+//                new ProductTypePointer(AssortmentType.MACBOOK_PRO, ProductTypes.MACBOOK_PRO_2017, "MacBookPro2017", "15\".*"),
+//                new ProductTypePointer(AssortmentType.MACBOOK_PRO, ProductTypes.MACBOOK_PRO_2016, "MacBookPro2016", "15\".*"),
 //                // iMac
-//                new ProductTypePointer(AssortmentType.IMAC, ProductType.IMAC_21_5, "new_imac5K-2017", "21\".*"),
-//                new ProductTypePointer(AssortmentType.IMAC, ProductType.IMAC_27, "new_imac5K-2017", "27\" Retina 5K(?!.*8-Core).*"),
-//                new ProductTypePointer(AssortmentType.IMAC, ProductType.IMAC_21_5, "new_imac5K", "21.5\".*"),
-//                new ProductTypePointer(AssortmentType.IMAC, ProductType.IMAC_27, "new_imac5K", "27\" Retina 5K.*")
+//                new ProductTypePointer(AssortmentType.IMAC, ProductTypes.IMAC_21_5, "new_imac5K-2017", "21\".*"),
+//                new ProductTypePointer(AssortmentType.IMAC, ProductTypes.IMAC_27, "new_imac5K-2017", "27\" Retina 5K(?!.*8-Core).*"),
+//                new ProductTypePointer(AssortmentType.IMAC, ProductTypes.IMAC_21_5, "new_imac5K", "21.5\".*"),
+//                new ProductTypePointer(AssortmentType.IMAC, ProductTypes.IMAC_27, "new_imac5K", "27\" Retina 5K.*")
         );
     }
 

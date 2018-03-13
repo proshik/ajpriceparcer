@@ -8,6 +8,7 @@ import ru.proshik.applepricebot.storage.model.ProductType;
 import ru.proshik.applepricebot.storage.model.Shop;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
@@ -77,8 +78,9 @@ public class PrintUtils {
 
     public static String notificationInfo(ChangeProductNotification notification) {
         StringBuilder out = new StringBuilder();
-        out.append("*Notification for shop: ").append(notification.getShop().getTitle()).append("*\n");
-        out.append("Date: *").append(DATE_TIME_FORMATTER.format(LocalDateTime.now())).append("*\n\n");
+        out.append("*Notification for shop: ").append(notification.getShop().getTitle()).append("*" +
+                "\n");
+        out.append("Date: *").append(DATE_TIME_FORMATTER.format(ZonedDateTime.now())).append("*\n\n");
         diffProducts(notification.getDiffProducts(), out);
 
         return out.toString();

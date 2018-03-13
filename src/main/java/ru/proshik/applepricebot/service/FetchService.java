@@ -1,6 +1,7 @@
 package ru.proshik.applepricebot.service;
 
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 import ru.proshik.applepricebot.exception.DatabaseException;
 import ru.proshik.applepricebot.storage.model.Fetch;
 import ru.proshik.applepricebot.storage.model.Shop;
@@ -11,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class FetchService {
 
     private static final Logger LOG = Logger.getLogger(FetchService.class);

@@ -1,6 +1,8 @@
 package ru.proshik.applepricebot.service;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import ru.proshik.applepricebot.dto.HistoryDiff;
 import ru.proshik.applepricebot.exception.DatabaseException;
 import ru.proshik.applepricebot.storage.model.Fetch;
@@ -17,22 +19,33 @@ import java.util.stream.Collectors;
 
 import static ru.proshik.applepricebot.utils.FetchUtils.findLastFetch;
 
+@Component
 public class CommandService {
 
     private static final Logger LOG = Logger.getLogger(CommandService.class);
 
-    private ShopService shopService;
-    private FetchService fetchService;
-    private SubscriberService subscriberService;
+//    private ShopService shopService;
+//    private FetchService fetchService;
+//    private SubscriberService subscriberService;
+
     private DiffService diffService = new DiffService();
 
-    public CommandService(ShopService shopService,
-                          FetchService fetchService,
-                          SubscriberService subscriberService) {
-        this.shopService = shopService;
-        this.fetchService = fetchService;
-        this.subscriberService = subscriberService;
-    }
+    @Autowired
+    private ShopService shopService;
+
+    @Autowired
+    private FetchService fetchService;
+
+    @Autowired
+    private SubscriberService subscriberService;
+
+//    public CommandService(ShopService shopService,
+//                          FetchService fetchService,
+//                          SubscriberService subscriberService) {
+//        this.shopService = shopService;
+//        this.fetchService = fetchService;
+//        this.subscriberService = subscriberService;
+//    }
 
     public String read(List<String> arguments) {
         ShopProductTypeAgrCommand params = parseArguments(arguments);

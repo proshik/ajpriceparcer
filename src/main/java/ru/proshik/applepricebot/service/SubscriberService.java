@@ -1,5 +1,7 @@
 package ru.proshik.applepricebot.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import ru.proshik.applepricebot.exception.DatabaseException;
 import ru.proshik.applepricebot.storage.model.Shop;
 import ru.proshik.applepricebot.storage.model.UserSubscriptions;
@@ -7,8 +9,10 @@ import ru.proshik.applepricebot.storage.Database;
 
 import java.util.*;
 
+@Component
 public class SubscriberService {
 
+    @Autowired
     private Database db;
 
     public SubscriberService(Database db) {

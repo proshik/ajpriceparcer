@@ -1,6 +1,11 @@
 package ru.proshik.applepricebot.service.bot;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.ApiContextInitializer;
+import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -10,11 +15,13 @@ import ru.proshik.applepricebot.service.CommandService;
 import ru.proshik.applepricebot.service.NotificationQueueService;
 import ru.proshik.applepricebot.utils.BotUtils;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 
 import static ru.proshik.applepricebot.utils.BotUtils.extractArgument;
 import static ru.proshik.applepricebot.utils.PrintUtils.notificationInfo;
 
+@Component
 public class AppleProductPricesBot extends TelegramLongPollingBot {
 
     private static final Logger LOG = Logger.getLogger(AppleProductPricesBot.class);
@@ -27,21 +34,31 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
     private static final String COMMAND_SUBSCRIBE = "/subscribe";
     private static final String COMMAND_UNSUBSCRIBE = "/unsubscribe";
     // Telegram bot settings
-    private final String botUsername;
-    private final String botToken;
+//    private final String botUsername;
+//    private final String botToken;
     // Injected services
-    private CommandService commandService;
+//    private CommandService commandService;
+    @Autowired
     private NotificationQueueService notificationQueueService;
 
-    public AppleProductPricesBot(String botUsername,
-                                 String botToken,
-                                 CommandService commandService,
-                                 NotificationQueueService notificationQueueService) {
-        this.botUsername = botUsername;
-        this.botToken = botToken;
-        this.commandService = commandService;
-        this.notificationQueueService = notificationQueueService;
-    }
+    @Value("${telegram.username}")
+    private String botUsername;
+
+    @Value("${telegram.token}")
+    private String botToken;
+
+    @Autowired
+    private CommandService commandService;
+
+//    public AppleProductPricesBot(String botUsername,
+//                                 String botToken,
+//                                 CommandService commandService,
+//                                 NotificationQueueService notificationQueueService) {
+//        this.botUsername = botUsername;
+//        this.botToken = botToken;
+//        this.commandService = commandService;
+//        this.notificationQueueService = notificationQueueService;
+//    }
 
     public void registerScheduler() {
         new Thread(() -> {

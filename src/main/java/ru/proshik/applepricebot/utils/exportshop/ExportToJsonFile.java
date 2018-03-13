@@ -37,10 +37,10 @@ public class ExportToJsonFile {
         }
     }
 
-    public static void main(String[] args) throws IOException, DatabaseException {
-        Database db = new Database("database.db");
-
-        ExportToJsonFile exportToJsonFile = new ExportToJsonFile();
-        exportToJsonFile.write(db);
-    }
+//    public static void main(String[] args) throws IOException, DatabaseException {
+//        Database db = new Database("database.db");
+//
+//        ExportToJsonFile exportToJsonFile = new ExportToJsonFile();
+//        exportToJsonFile.write(db);
+//    }
 }

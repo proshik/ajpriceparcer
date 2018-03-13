@@ -41,10 +41,10 @@ public class ImportFromJsonFile {
         }
     }
 
-    public static void main(String[] args) throws IOException, DatabaseException {
-        Database db = new Database("database.db");
-
-        ImportFromJsonFile importFromJsonFile = new ImportFromJsonFile();
-        importFromJsonFile.read(db);
-    }
+//    public static void main(String[] args) throws IOException, DatabaseException {
+//        Database db = new Database("database.db");
+//
+//        ImportFromJsonFile importFromJsonFile = new ImportFromJsonFile();
+//        importFromJsonFile.read(db);
+//    }
 }

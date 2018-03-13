@@ -3,39 +3,49 @@ package ru.proshik.applepricebot.service.scheduler;
 import org.apache.log4j.Logger;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import ru.proshik.applepricebot.provider.ProviderFactory;
 import ru.proshik.applepricebot.service.FetchService;
 import ru.proshik.applepricebot.service.NotificationQueueService;
 import ru.proshik.applepricebot.service.SubscriberService;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
 import static org.quartz.SimpleScheduleBuilder.repeatHourlyForever;
-import static org.quartz.SimpleScheduleBuilder.repeatMinutelyForever;
 
+@Component
 public class QuartzDefaultScheduler {
 
     private static final Logger LOG = Logger.getLogger(QuartzDefaultScheduler.class);
 
     private static final int HOUR_INTERVAL = 1;
 
+    @Autowired
     private FetchService fetchService;
-    private ProviderFactory providerFactory;
-    private final SubscriberService subscriberService;
-    private final NotificationQueueService notificationQueueService;
 
-    public QuartzDefaultScheduler(ProviderFactory providerFactory,
-                                  FetchService fetchService,
-                                  SubscriberService subscriberService,
-                                  NotificationQueueService notificationQueueService) {
-        this.providerFactory = providerFactory;
-        this.fetchService = fetchService;
-        this.subscriberService = subscriberService;
-        this.notificationQueueService = notificationQueueService;
-    }
+    @Autowired
+    private SubscriberService subscriberService;
 
+    @Autowired
+    private NotificationQueueService notificationQueueService;
+
+    private ProviderFactory providerFactory = new ProviderFactory();
+
+//    public QuartzDefaultScheduler(ProviderFactory providerFactory,
+//                                  FetchService fetchService,
+//                                  SubscriberService subscriberService,
+//                                  NotificationQueueService notificationQueueService) {
+//        this.providerFactory = providerFactory;
+//        this.fetchService = fetchService;
+//        this.subscriberService = subscriberService;
+//        this.notificationQueueService = notificationQueueService;
+//    }
+
+    @PostConstruct
     public void init() throws SchedulerException {
         Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
 

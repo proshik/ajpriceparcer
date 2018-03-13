@@ -1,5 +1,6 @@
 package ru.proshik.applepricebot.service;
 
+import org.springframework.stereotype.Component;
 import ru.proshik.applepricebot.storage.model.ProductType;
 import ru.proshik.applepricebot.storage.model.Shop;
 import ru.proshik.applepricebot.provider.ProviderFactory;
@@ -7,13 +8,14 @@ import ru.proshik.applepricebot.provider.ProviderFactory;
 import java.util.Set;
 import java.util.stream.Stream;
 
+@Component
 public class ShopService {
 
-    private ProviderFactory providerFactory;
+    private ProviderFactory providerFactory = new ProviderFactory();
 
-    public ShopService(ProviderFactory providerFactory) {
-        this.providerFactory = providerFactory;
-    }
+//    public ShopService(ProviderFactory providerFactory) {
+//        this.providerFactory = providerFactory;
+//    }
 
     public Set<Shop> getShops() {
         return providerFactory.getShops();

@@ -1,6 +1,7 @@
 package ru.proshik.applepricebot.service;
 
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 import ru.proshik.applepricebot.dto.DiffProducts;
 import ru.proshik.applepricebot.dto.ChangeProductNotification;
 import ru.proshik.applepricebot.storage.model.Shop;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
+@Component
 public class NotificationQueueService {
 
     private static final Logger LOG = Logger.getLogger(NotificationQueueService.class);

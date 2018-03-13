@@ -43,6 +43,6 @@ public enum ProductType implements Serializable {
         return Arrays.stream(values())
                 .filter(pro -> pro.getValue().toUpperCase().equals(value.toUpperCase()))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Unexpected ProductType value=" + value));
+                .orElseThrow(() -> new IllegalArgumentException("Unexpected ProductTypes value=" + value));
     }
 }

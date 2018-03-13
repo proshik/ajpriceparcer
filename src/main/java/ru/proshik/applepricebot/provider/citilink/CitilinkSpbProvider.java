@@ -97,14 +97,14 @@ public class CitilinkSpbProvider implements Provider {
     private List<ProductTypePointer> productTypeClassHolder() {
         return Arrays.asList(
                 // iPhone
-//              new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_X, "iphoneX", "iPhone X.*"),
-//                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_8, "iphone8", "iPhone 8(?!.*Plus).*"),
-//                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_8_PLUS, "iphone8", "iPhone 8 Plus.*"),
-//                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_7, "iphone7", "iPhone 7(?!.*Plus).*"),
-//                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_7_PLUS, "iphone7", "iPhone 7 Plus.*"),
-//                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_7, "iphone7red", "iPhone 7.*"),
-//                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_6S, "iphone6s", "iPhone 6s.*"),
-//                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_6, "iphone6", "iPhone 6.*"),
+//              new ProductTypePointer(AssortmentType.IPHONE, ProductTypes.IPHONE_X, "iphoneX", "iPhone X.*"),
+//                new ProductTypePointer(AssortmentType.IPHONE, ProductTypes.IPHONE_8, "iphone8", "iPhone 8(?!.*Plus).*"),
+//                new ProductTypePointer(AssortmentType.IPHONE, ProductTypes.IPHONE_8_PLUS, "iphone8", "iPhone 8 Plus.*"),
+//                new ProductTypePointer(AssortmentType.IPHONE, ProductTypes.IPHONE_7, "iphone7", "iPhone 7(?!.*Plus).*"),
+//                new ProductTypePointer(AssortmentType.IPHONE, ProductTypes.IPHONE_7_PLUS, "iphone7", "iPhone 7 Plus.*"),
+//                new ProductTypePointer(AssortmentType.IPHONE, ProductTypes.IPHONE_7, "iphone7red", "iPhone 7.*"),
+//                new ProductTypePointer(AssortmentType.IPHONE, ProductTypes.IPHONE_6S, "iphone6s", "iPhone 6s.*"),
+//                new ProductTypePointer(AssortmentType.IPHONE, ProductTypes.IPHONE_6, "iphone6", "iPhone 6.*"),
                 new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_SE, "iphone%20SE", "(iPhone SE).(\\d+Gb),(.*),(.*)")
         );
     }
