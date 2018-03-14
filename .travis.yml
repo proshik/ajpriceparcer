@@ -21,4 +21,5 @@ after_success:
   - docker build -t $APPLEPRICESBOT:$COMMIT .
   - docker tag $APPLEPRICESBOT:$COMMIT $APPLEPRICESBOT:$TAG
   - docker login -u $DOCKER_USER -p $DOCKER_PASS
+  - echo $APPLEPRICESBOT:$TAG
   - docker push $APPLEPRICESBOT:$TAG
