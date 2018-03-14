@@ -15,7 +15,7 @@ after_success:
 
   # TAG
   - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
-  - export APPLEPRICESBOT=proshik/apple-prices-bot
+  - export APPLEPRICESBOT=proshik/applepricesbot
   - export COMMIT=${TRAVIS_COMMIT::7}
   
   - docker build -t $APPLEPRICESBOT:$COMMIT .
