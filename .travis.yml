@@ -8,15 +8,15 @@ jdk: oraclejdk8
 
 script: mvn clean test -B
 
-#after_success:
+after_success:
   - bash <(curl -s https://codecov.io/bash)
   - docker login -u $DOCKER_USER -p $DOCKER_PASS
 
-# TAG
+  # TAG
   - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
-  - COMMIT=${TRAVIS_COMMIT::7}
-
   - export APPLEPRICESBOT=proshik/apple-prices-bot
+  - export COMMIT=${TRAVIS_COMMIT::7}
+  
   - docker build -t $APPLEPRICESBOT:$COMMIT .
   - docker tag $APPLEPRICESBOT:$COMMIT $APPLEPRICESBOT:$TAG
   - docker push $APPLEPRICESBOT:$TAG
