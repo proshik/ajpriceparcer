@@ -8,7 +8,9 @@ addons:
     packages:
       - docker-ce
 
-script: mvn clean test -B
+script:
+  - mvn clean test -B
+  - echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
@@ -20,5 +22,4 @@ after_success:
   
   - docker build -t $APPLEPRICESBOT:$COMMIT .
   - docker tag $APPLEPRICESBOT:$COMMIT $APPLEPRICESBOT:$TAG
-  - docker login -u $DOCKER_USER -p $DOCKER_PASS
   - docker push $APPLEPRICESBOT:$TAG
