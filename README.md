@@ -30,7 +30,7 @@ $ docker run --rm \
 -e APPLEPRICEPARCER_TELEGRAMTOKEN='' \
 -e APPLEPRICEPARCER_DBPATH='/app/data/database.db' \
 --mount=type=bind,source="$(pwd)"/data,target=/app/data \
---name applepricesbot applepricesbot:latest
+--name applepricesbot applepricesbot:latest 
 ```
 
 ## Usage
@@ -39,8 +39,8 @@ Print /start command after running bot service.
 
 ## TODO
 
-- tests;
 - internalization;
+- more providers;
 - concurrent screening.
 
 ## Patch 
