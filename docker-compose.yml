@@ -1,0 +1,32 @@
+version: "3.3"
+services:
+  app:
+    image: proshik/applepricesbot:latest
+    ports:
+      - "7117:7117"
+    networks:
+      - traefik-net
+    environment:
+      - APPLEPRICESBOT_TELEGRAMUSERNAME=<name>
+      - APPLEPRICESBOT_TELEGRAMTOKEN=<token>
+      - APPLEPRICESBOT_DBPATH=/app/data/database.db
+    volumes:
+      - applepricesbot:/app/data
+    deploy:
+      placement:
+        constraints: [node.role==worker]
+      restart_policy:
+        condition: on-failure
+      labels:
+        - traefik.port=7007
+        - traefik.enable=true
+        - traefik.backend=applepricesbot
+        - traefik.docker.network=traefik-net
+        - traefik.frontend.rule=Host:apb.project.proshik.ru
+
+volumes:
+  applepricesbot:
+
+networks:
+  traefik-net:
+    driver: overlay
