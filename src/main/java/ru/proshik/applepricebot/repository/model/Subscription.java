@@ -1,5 +1,7 @@
 package ru.proshik.applepricebot.repository.model;
 
+import ru.proshik.applepricebot.storage.model.ProductType;
+
 import javax.persistence.*;
 
 @Entity
@@ -11,35 +13,41 @@ public class Subscription {
     @SequenceGenerator(name = "subscription_seq_gen", sequenceName = "subscription_seq")
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name="shop_id")
-    private Shop shop;
+    @Column(name = "shopType")
+    private ShopType shopType;
+
+    @Column(name = "productType")
+    private ProductType productType;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false, updatable = false)
     private User user;
 
-    @OneToOne
-    @JoinColumn(name = "product_type_id")
-    private ProductTypes productTypes;
-
     public Subscription() {
     }
 
-    public Subscription(Shop shop, ProductTypes productTypes) {
-        this.shop = shop;
-        this.productTypes = productTypes;
+    public Subscription(ShopType shopType, ProductType productType) {
+        this.shopType = shopType;
+        this.productType = productType;
     }
 
     public Long getId() {
         return id;
     }
 
-    public Shop getShop() {
-        return shop;
+    public ShopType getShopType() {
+        return shopType;
     }
 
-    public ProductTypes getProductTypes() {
-        return productTypes;
+    public ProductType getProductType() {
+        return productType;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

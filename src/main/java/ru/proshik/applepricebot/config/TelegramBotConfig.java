@@ -16,9 +16,9 @@ public class TelegramBotConfig {
 
     private static final Logger LOG = Logger.getLogger(Application.class);
 
-//    static {
-//        ApiContextInitializer.init();
-//    }
+    static {
+        ApiContextInitializer.init();
+    }
 
     @Autowired
     private AppleProductPricesBot appleProductPricesBot;

@@ -1,5 +1,7 @@
 package ru.proshik.applepricebot.repository.model;
 
+import ru.proshik.applepricebot.storage.model.ProductType;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -17,6 +19,12 @@ public class Product {
             columnDefinition = "timestamp default CURRENT_TIMESTAMP")
     private ZonedDateTime createdDate;
 
+    @Column(name = "fetch_date", updatable = false)
+    private ZonedDateTime fetchDate;
+
+    @Column(name = "shopType")
+    private ShopType shopType;
+
     @Column(name = "title")
     private String title;
 
@@ -29,13 +37,8 @@ public class Product {
     @Column(name = "price")
     private BigDecimal price;
 
-    @OneToOne
-    @JoinColumn(name = "product_type_id")
-    private ProductTypes productTypes;
-
-    @ManyToOne
-    @JoinColumn(name = "fetch_id", nullable = false, updatable = false)
-    private Fetch fetch;
+    @Column(name = "productType")
+    private ProductType productType;
 
     @Column(name = "parameters")
     private String parameters;
@@ -44,20 +47,33 @@ public class Product {
     public Product() {
     }
 
-    public Product(ZonedDateTime createdDate, String title, String description, Boolean available, BigDecimal price,
-                   ProductTypes productTypes, Fetch fetch, String parameters) {
+    public Product(ZonedDateTime fetchDate, ShopType shopType, String title,
+                   String description, Boolean available, BigDecimal price, ProductType productType, String parameters) {
         this.createdDate = createdDate;
+        this.fetchDate = fetchDate;
+        this.shopType = shopType;
         this.title = title;
         this.description = description;
         this.available = available;
         this.price = price;
-        this.productTypes = productTypes;
-        this.fetch = fetch;
+        this.productType = productType;
         this.parameters = parameters;
     }
 
     public Long getId() {
         return id;
+    }
+
+    public ZonedDateTime getCreatedDate() {
+        return createdDate;
+    }
+
+    public ZonedDateTime getFetchDate() {
+        return fetchDate;
+    }
+
+    public ShopType getShopType() {
+        return shopType;
     }
 
     public String getTitle() {
@@ -76,16 +92,8 @@ public class Product {
         return price;
     }
 
-    public ProductTypes getProductTypes() {
-        return productTypes;
-    }
-
-    public ZonedDateTime getCreatedDate() {
-        return createdDate;
-    }
-
-    public Fetch getFetch() {
-        return fetch;
+    public ProductType getProductType() {
+        return productType;
     }
 
     public String getParameters() {
