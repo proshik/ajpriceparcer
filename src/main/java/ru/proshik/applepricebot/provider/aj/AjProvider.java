@@ -7,16 +7,22 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSpan;
 import org.apache.log4j.Logger;
 import ru.proshik.applepricebot.exception.ProviderParseException;
+import ru.proshik.applepricebot.provider.Provider;
+import ru.proshik.applepricebot.repository.model.ShopType;
 import ru.proshik.applepricebot.storage.model.AssortmentType;
 import ru.proshik.applepricebot.storage.model.Fetch;
 import ru.proshik.applepricebot.storage.model.Product;
 import ru.proshik.applepricebot.storage.model.ProductType;
-import ru.proshik.applepricebot.provider.Provider;
+import ru.proshik.applepricebot.utils.ProviderUtils;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -24,21 +30,18 @@ import static ru.proshik.applepricebot.utils.ProviderUtils.extractParameters;
 
 public class AjProvider implements Provider {
 
-    private static final Logger LOG = Logger.getLogger(ru.proshik.applepricebot.provider.aj.AjProvider.class);
+    private static final Logger LOG = Logger.getLogger(AjProvider.class);
 
     public static final String URL = "http://aj.ru";
     public static final String TITLE = "AJ";
 
-    private WebClient client = new WebClient();
+    @Override
+    public List<ru.proshik.applepricebot.repository.model.Product> screening() throws ProviderParseException {
+        LOG.info("Screening has started for " + TITLE);
 
-    public AjProvider() {
+        WebClient client = new WebClient();
         client.getOptions().setCssEnabled(false);
         client.getOptions().setJavaScriptEnabled(false);
-    }
-
-    @Override
-    public Fetch screening() throws ProviderParseException {
-        LOG.info("Screening has started for " + TITLE);
 
         HtmlPage page;
         try {
@@ -46,6 +49,10 @@ public class AjProvider implements Provider {
         } catch (IOException e) {
             throw new ProviderParseException("Error on priceAssortment page from aj.ru", e);
         }
+
+        LocalDateTime fetchTime = LocalDateTime.now();
+
+        List<ru.proshik.applepricebot.repository.model.Product> newProducts = new ArrayList<>();
         List<Product> products = new ArrayList<>();
 
         Map<AssortmentType, List<ProductTypePointer>> groupByAssortmentType = productTypeClassHolder().stream()
@@ -65,12 +72,12 @@ public class AjProvider implements Provider {
                         continue;
                     }
 
-                    String assortmentDescription = null;
+                    String description = null;
                     for (DomElement ili : ((HtmlElement) article.getFirstByXPath("./ul")).getChildElements()) {
                         List<HtmlSpan> spans = ili.getByXPath("./span");
                         if (spans.isEmpty()) {
                             if (ili.getFirstChild() != null && ili.getFirstChild().getNodeValue() != null) {
-                                assortmentDescription = ili.getFirstChild().asText();
+                                description = ili.getFirstChild().asText();
                             }
                             // if not a description, then not and info
                             continue;
@@ -88,21 +95,22 @@ public class AjProvider implements Provider {
                             continue;
                         }
 
-                        String productDescription = ili.getFirstChild()
+                        String title = ili.getFirstChild()
                                 .getNodeValue().substring(0, ili.getFirstChild().getNodeValue().length() - 3);
-                        if (!p.matcher(productDescription).matches()) {
+                        if (!p.matcher(title).matches()) {
                             // if this element not equals title from holder
                             continue;
                         }
 
-                        Map<String, String> params = extractParameters(productDescription);
+                        Map<String, String> params = extractParameters(title);
 
                         if (price == null) {
                             LOG.warn("Not found price for assortmentType=" + ptp.assortmentType
                                     + ", productType=" + ptp.productType);
                         }
-
-                        products.add(new Product(productDescription, assortmentDescription, null, price, ptp.assortmentType, ptp.productType, params));
+                        newProducts.add(new ru.proshik.applepricebot.repository.model.Product(ZonedDateTime.now(), fetchTime, ShopType.AJ,
+                                title, description, null, price, ptp.productType, ProviderUtils.paramsToString(params)));
+                        products.add(new Product(title, description, null, price, ptp.assortmentType, ptp.productType, params));
                     }
                 }
             }
@@ -112,7 +120,8 @@ public class AjProvider implements Provider {
 
         LOG.info("Screening has ended for " + TITLE);
 
-        return new Fetch(LocalDateTime.now(), products);
+        return newProducts;
+//        return new Fetch(LocalDateTime.now(), products);
     }
 
     private List<ProductTypePointer> productTypeClassHolder() {
@@ -159,7 +168,7 @@ public class AjProvider implements Provider {
      */
     public static void main(String[] args) throws ProviderParseException {
         AjProvider apP = new AjProvider();
-        Fetch screening = apP.screening();
+        apP.screening();
     }
 
 /**

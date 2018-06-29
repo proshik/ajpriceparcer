@@ -7,6 +7,7 @@ import ru.proshik.applepricebot.storage.model.Shop;
 import ru.proshik.applepricebot.storage.model.UserSubscriptions;
 import ru.proshik.applepricebot.storage.Database;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 
 @Component

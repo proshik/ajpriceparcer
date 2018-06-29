@@ -1,16 +1,18 @@
 package ru.proshik.applepricebot.repository.model;
 
+import org.hibernate.annotations.GenericGenerator;
 import ru.proshik.applepricebot.storage.model.ProductType;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "subscriptions")
+@GenericGenerator(name = "subscriptions_id_generator", strategy = "sequence", parameters = {
+        @org.hibernate.annotations.Parameter(name = "sequence", value = "subscriptions_id_seq")})
 public class Subscription {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "subscription_seq_gen")
-    @SequenceGenerator(name = "subscription_seq_gen", sequenceName = "subscription_seq")
+    @GeneratedValue(generator = "subscriptions_id_generator")
     private Long id;
 
     @Column(name = "shopType")

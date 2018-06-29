@@ -1,0 +1,18 @@
+{
+  "properties": [
+    {
+      "name": "telegram.username",
+      "type": "java.lang.String",
+      "description": "Description for telegram.username."
+    },
+    {
+      "name": "telegram.token",
+      "type": "java.lang.String",
+      "description": "Description for telegram.token."
+    },
+    {
+      "name": "db.path",
+      "type": "java.lang.String",
+      "description": "Description for db.path."
+    }
+  ] }

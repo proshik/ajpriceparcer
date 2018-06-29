@@ -11,10 +11,7 @@ import ru.proshik.applepricebot.storage.model.ProductType;
 import ru.proshik.applepricebot.storage.model.Shop;
 import ru.proshik.applepricebot.utils.PrintUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static ru.proshik.applepricebot.utils.FetchUtils.findLastFetch;
@@ -93,7 +90,9 @@ public class CommandService {
             return "Changes does not have for shop: *" + params.shop.getTitle() + "*";
         }
 
-        List<HistoryDiff> historyDiffs = diffService.historyDiff(fetches, params.productType);
+        // TODO: 27.06.2018
+//        List<HistoryDiff> historyDiffs = diffService.historyDiff(fetches, params.productType);
+        List<HistoryDiff> historyDiffs = Collections.emptyList();
 
         return PrintUtils.historyInfo(params.shop, historyDiffs);
     }

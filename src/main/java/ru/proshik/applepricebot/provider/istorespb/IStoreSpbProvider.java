@@ -8,16 +8,17 @@ import org.apache.log4j.Logger;
 import org.w3c.css.sac.CSSException;
 import org.w3c.css.sac.CSSParseException;
 import org.w3c.css.sac.ErrorHandler;
+import ru.proshik.applepricebot.provider.Provider;
+import ru.proshik.applepricebot.repository.model.ShopType;
 import ru.proshik.applepricebot.storage.model.AssortmentType;
-import ru.proshik.applepricebot.storage.model.Fetch;
 import ru.proshik.applepricebot.storage.model.Product;
 import ru.proshik.applepricebot.storage.model.ProductType;
-import ru.proshik.applepricebot.provider.Provider;
 import ru.proshik.applepricebot.utils.ProviderUtils;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,9 +44,12 @@ public class IStoreSpbProvider implements Provider {
     }
 
     @Override
-    public Fetch screening() {
+    public List<ru.proshik.applepricebot.repository.model.Product> screening() {
         LOG.info("Screening has started for " + TITLE);
 
+        LocalDateTime fetchTime = LocalDateTime.now();
+
+        List<ru.proshik.applepricebot.repository.model.Product> newProducts = new ArrayList<>();
         List<Product> products = new ArrayList<>();
         for (ProductTypePointer ptp : productTypeClassHolder()) {
             HtmlPage page;
@@ -102,7 +106,8 @@ public class IStoreSpbProvider implements Provider {
                 if (title != null) {
                     params = ProviderUtils.extractParameters(title);
                 }
-
+                newProducts.add(new ru.proshik.applepricebot.repository.model.Product(ZonedDateTime.now(), fetchTime, ShopType.ISTORE_SBP,
+                        title, description, null, price, ptp.productType, ProviderUtils.paramsToString(params)));
                 products.add(new Product(title, description, null, price, AssortmentType.IPHONE, ptp.productType, params));
             }
         }
@@ -111,7 +116,8 @@ public class IStoreSpbProvider implements Provider {
 
         LOG.info("Screening has ended for " + TITLE);
 
-        return new Fetch(LocalDateTime.now(), products);
+        return newProducts;
+//        return new Fetch(LocalDateTime.now(), products);
     }
 
 

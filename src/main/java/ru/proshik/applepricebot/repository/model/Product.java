@@ -1,18 +1,27 @@
 package ru.proshik.applepricebot.repository.model;
 
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.id.enhanced.SequenceStyleGenerator;
 import ru.proshik.applepricebot.storage.model.ProductType;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "products")
+@Table(name = "products",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"fetch_date", "shop_type", "product_type", "title"}))
 public class Product {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_seq_gen")
-    @SequenceGenerator(name = "product_seq_gen", sequenceName = "product_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "products_id_seq")
+    @GenericGenerator(
+            name = "products_id_seq",
+            strategy = "enhanced-sequence",
+            parameters = @org.hibernate.annotations.Parameter(
+                    name = SequenceStyleGenerator.SEQUENCE_PARAM,
+                    value = "products_id_seq"))
     private Long id;
 
     @Column(name = "created_date", updatable = false, insertable = false,
@@ -20,9 +29,9 @@ public class Product {
     private ZonedDateTime createdDate;
 
     @Column(name = "fetch_date", updatable = false)
-    private ZonedDateTime fetchDate;
+    private LocalDateTime fetchDate;
 
-    @Column(name = "shopType")
+    @Column(name = "shop_type")
     private ShopType shopType;
 
     @Column(name = "title")
@@ -37,17 +46,16 @@ public class Product {
     @Column(name = "price")
     private BigDecimal price;
 
-    @Column(name = "productType")
+    @Column(name = "product_type")
     private ProductType productType;
 
     @Column(name = "parameters")
     private String parameters;
 
-
     public Product() {
     }
 
-    public Product(ZonedDateTime fetchDate, ShopType shopType, String title,
+    public Product(ZonedDateTime createdDate, LocalDateTime fetchDate, ShopType shopType, String title,
                    String description, Boolean available, BigDecimal price, ProductType productType, String parameters) {
         this.createdDate = createdDate;
         this.fetchDate = fetchDate;
@@ -68,7 +76,7 @@ public class Product {
         return createdDate;
     }
 
-    public ZonedDateTime getFetchDate() {
+    public LocalDateTime getFetchDate() {
         return fetchDate;
     }
 
@@ -99,4 +107,6 @@ public class Product {
     public String getParameters() {
         return parameters;
     }
+
+
 }

@@ -11,7 +11,8 @@ import ru.proshik.applepricebot.service.bot.AppleProductPricesBot;
 
 import javax.annotation.PostConstruct;
 
-@Configuration
+// TODO: 27.06.2018 fix it
+//@Configuration
 public class TelegramBotConfig {
 
     private static final Logger LOG = Logger.getLogger(Application.class);

@@ -7,14 +7,17 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import org.apache.log4j.Logger;
 import ru.proshik.applepricebot.exception.ProviderParseException;
 import ru.proshik.applepricebot.provider.Provider;
+import ru.proshik.applepricebot.repository.model.ShopType;
 import ru.proshik.applepricebot.storage.model.AssortmentType;
 import ru.proshik.applepricebot.storage.model.Fetch;
 import ru.proshik.applepricebot.storage.model.Product;
 import ru.proshik.applepricebot.storage.model.ProductType;
+import ru.proshik.applepricebot.utils.ProviderUtils;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,6 +32,7 @@ public class CitilinkSpbProvider implements Provider {
 
     public static final String URL = "http://citilink.ru";
     public static final String TITLE = "CitilinkSpb";
+
     private ObjectMapper objectMapper = new ObjectMapper();
 
     private WebClient client = new WebClient();
@@ -40,10 +44,14 @@ public class CitilinkSpbProvider implements Provider {
     }
 
     @Override
-    public Fetch screening() throws ProviderParseException {
+    public List<ru.proshik.applepricebot.repository.model.Product> screening() {
         LOG.info("Screening has started for " + this.TITLE);
 
         String queryPath = "/search/?menu_id=100008&text=%s&available=1";
+
+        LocalDateTime fetchTime = LocalDateTime.now();
+
+        List<ru.proshik.applepricebot.repository.model.Product> newProducts = new ArrayList<>();
         List<Product> products = new ArrayList<>();
 
         for (ProductTypePointer productTypePointer : productTypeClassHolder()) {
@@ -57,36 +65,36 @@ public class CitilinkSpbProvider implements Provider {
                 }
                 try {
                     CitilinkProductObject object = objectMapper.readValue(info, CitilinkProductObject.class);
-                    ArrayList<String> productData = groupExtractor(object.getShortName(),productTypePointer.liTitleRegexp);
-                    if (productData.size()==4 || !object.getPrice().equals(null))
-                    {
-                        String title = String.format("%s %s", productData.get(3), productData.get(2) );
+                    ArrayList<String> productData = groupExtractor(object.getShortName(), productTypePointer.liTitleRegexp);
+                    if (productData.size() == 4 || !object.getPrice().equals(null)) {
+                        String title = String.format("%s %s", productData.get(3), productData.get(2));
                         String description = productData.get(0);
                         String paramsData = productData.get(2);
                         Map<String, String> params = extractGBSolid(paramsData);
                         products.add(new Product(title, description, Boolean.TRUE, new BigDecimal(object.getPrice()), productTypePointer.assortmentType, productTypePointer.productType, params));
-                    }
-                    else {
+                        newProducts.add(new ru.proshik.applepricebot.repository.model.Product(ZonedDateTime.now(), fetchTime, ShopType.CITI_LINK,
+                                title, description, null, new BigDecimal(object.getPrice()), productTypePointer.productType, ProviderUtils.paramsToString(params)));
+                    } else {
                         LOG.error("wrong extract data for " + object.getShortName());
                     }
                 } catch (IOException e) {
-                    LOG.error(String.format(this.URL+queryPath,productTypePointer.queryText));
+                    LOG.error(String.format(this.URL + queryPath, productTypePointer.queryText));
                     e.printStackTrace();
                 }
 
             }
         }
-       LOG.info("Screening has ended for " + TITLE);
-       return new Fetch(LocalDateTime.now(), products);
+        LOG.info("Screening has ended for " + TITLE);
+
+        return newProducts;
+//       return new Fetch(LocalDateTime.now(), products);
     }
 
-    private HtmlPage openPageByQueryText(String queryPath, String queryText)
-    {
+    private HtmlPage openPageByQueryText(String queryPath, String queryText) {
         HtmlPage page;
         try {
-            page = client.getPage( String.format(this.URL+queryPath,queryText));
-        }
-        catch (IOException e) {
+            page = client.getPage(String.format(this.URL + queryPath, queryText));
+        } catch (IOException e) {
             LOG.error(this.URL);
             e.printStackTrace();
             return null;
@@ -129,7 +137,7 @@ public class CitilinkSpbProvider implements Provider {
      */
     public static void main(String[] args) throws ProviderParseException {
         CitilinkSpbProvider citilinkSpbProvider = new CitilinkSpbProvider();
-        Fetch screening = citilinkSpbProvider.screening();
+        citilinkSpbProvider.screening();
     }
 
 }

@@ -4,59 +4,44 @@ DROP TABLE IF EXISTS products CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS subscriptions CASCADE;
 
-DROP SEQUENCE IF EXISTS "shops_seq" CASCADE;
-DROP SEQUENCE IF EXISTS "product_types_seq" CASCADE;
-DROP SEQUENCE IF EXISTS "fetchs_seq" CASCADE;
-DROP SEQUENCE IF EXISTS "products_seq" CASCADE;
-DROP SEQUENCE IF EXISTS "users_seq" CASCADE;
-DROP SEQUENCE IF EXISTS "subscriptions_seq" CASCADE;
+DROP SEQUENCE IF EXISTS "products_id_seq" CASCADE;
+DROP SEQUENCE IF EXISTS "users_id_seq" CASCADE;
+DROP SEQUENCE IF EXISTS "subscriptions_id_seq" CASCADE;
 
 /* ------------------------------------------- */
 
-CREATE SEQUENCE "products_seq";
-CREATE TABLE products
+CREATE SEQUENCE "products_id_seq";
+create table if not exists products
 (
-  id              BIGINT PRIMARY KEY          DEFAULT "nextval"('"products_seq"'),
-  available       BOOLEAN,
-  created_date    TIMESTAMP WITHOUT TIME ZONE DEFAULT now(),
-  description     TEXT,
-  price           NUMERIC(19, 2),
-  title           TEXT,
-  fetch_id        BIGINT NOT NULL,
-  product_type_id BIGINT,
-  parameters      JSONB,
-  CONSTRAINT fk_fetch_id FOREIGN KEY (fetch_id)
-  REFERENCES fetchs (id) MATCH SIMPLE
-  ON UPDATE NO ACTION,
-  CONSTRAINT fk_product_type_id FOREIGN KEY (product_type_id)
-  REFERENCES product_types (id) MATCH SIMPLE
-  ON UPDATE NO ACTION ON DELETE NO ACTION
+  id           bigint primary key  DEFAULT "nextval"('products_id_seq'),
+  available    boolean,
+  created_date timestamp           default now(),
+  description  varchar(255),
+  fetch_date   timestamp,
+  parameters   varchar(255),
+  price        numeric(19, 2),
+  product_type integer,
+  shop_type    integer,
+  title        varchar(255)
 );
 
-CREATE SEQUENCE "users_seq";
-CREATE TABLE users
+CREATE SEQUENCE "users_id_seq";
+create table if not exists users
 (
-  id           BIGINT PRIMARY KEY          DEFAULT "nextval"('"users_seq"'),
-  chat_id      TEXT,
-  created_date TIMESTAMP WITHOUT TIME ZONE DEFAULT now()
+  id           bigint primary key  DEFAULT "nextval"('users_id_seq'),
+  chat_id      varchar(255),
+  created_date timestamp           default now()
 );
 
-CREATE SEQUENCE "subscriptions_seq";
-CREATE TABLE subscriptions
+CREATE SEQUENCE "subscriptions_id_seq";
+create table if not exists subscriptions
 (
-  id              BIGINT PRIMARY KEY          DEFAULT "nextval"('"subscriptions_seq"'),
-  product_type_id BIGINT,
-  shop_id         BIGINT,
-  user_id         BIGINT NOT NULL,
-  CONSTRAINT fk_shop_id FOREIGN KEY (shop_id)
-  REFERENCES shops (id) MATCH SIMPLE
-  ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_product_type_id FOREIGN KEY (product_type_id)
-  REFERENCES product_types (id) MATCH SIMPLE
-  ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_user_id FOREIGN KEY (user_id)
-  REFERENCES users (id) MATCH SIMPLE
-  ON UPDATE NO ACTION ON DELETE CASCADE
+  id           bigint primary key  DEFAULT "nextval"('subscriptions_id_seq'),
+  product_type integer,
+  shop_type    integer,
+  user_id      bigint not null
+    constraint fkhro52ohfqfbay9774bev0qinr
+    references users
 );
 
 END TRANSACTION;

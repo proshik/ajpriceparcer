@@ -1,16 +1,19 @@
 package ru.proshik.applepricebot.repository.model;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
 import java.time.ZonedDateTime;
 import java.util.List;
 
 @Entity
 @Table(name = "users")
+@GenericGenerator(name = "users_id_generator", strategy = "sequence", parameters = {
+        @org.hibernate.annotations.Parameter(name = "sequence", value = "users_id_seq")})
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq_gen")
-    @SequenceGenerator(name = "user_seq_gen", sequenceName = "user_seq")
+    @GeneratedValue(generator = "users_id_generator")
     private Long id;
 
     @Column(name = "created_date", updatable = false, insertable = false,
