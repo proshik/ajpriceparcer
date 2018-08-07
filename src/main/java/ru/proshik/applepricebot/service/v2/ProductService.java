@@ -35,6 +35,8 @@ public class ProductService {
         for (Map.Entry<ShopType, Provider> entry : providers.entrySet()) {
             try {
                 if (entry.getKey().isEnabled()) {
+
+
                     List<Product> products = entry.getValue().screening();
                     result.put(entry.getKey(), products);
                 }

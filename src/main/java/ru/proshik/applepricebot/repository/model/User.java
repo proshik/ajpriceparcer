@@ -1,19 +1,22 @@
 package ru.proshik.applepricebot.repository.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+@Getter
+@NoArgsConstructor
 @Entity
 @Table(name = "users")
-@GenericGenerator(name = "users_id_generator", strategy = "sequence", parameters = {
-        @org.hibernate.annotations.Parameter(name = "sequence", value = "users_id_seq")})
 public class User {
 
     @Id
-    @GeneratedValue(generator = "users_id_generator")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_seq_gen")
+    @SequenceGenerator(name = "users_seq_gen", sequenceName = "users_seq")
     private Long id;
 
     @Column(name = "created_date", updatable = false, insertable = false,
@@ -26,27 +29,4 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Subscription> subscriptions;
 
-    public User() {
-    }
-
-    public User(String chatId, List<Subscription> subscriptions) {
-        this.chatId = chatId;
-        this.subscriptions = subscriptions;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public ZonedDateTime getCreatedDate() {
-        return createdDate;
-    }
-
-    public String getChatId() {
-        return chatId;
-    }
-
-    public List<Subscription> getSubscriptions() {
-        return subscriptions;
-    }
 }

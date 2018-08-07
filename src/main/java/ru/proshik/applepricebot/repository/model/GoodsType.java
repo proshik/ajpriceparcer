@@ -1,9 +1,9 @@
-package ru.proshik.applepricebot.storage.model;
+package ru.proshik.applepricebot.repository.model;
 
 import java.io.Serializable;
 import java.util.Arrays;
 
-public enum ProductType implements Serializable {
+public enum GoodsType implements Serializable {
     /*
     iPhone
      */
@@ -15,8 +15,7 @@ public enum ProductType implements Serializable {
     IPHONE_7("iPhone 7"),
     IPHONE_7_PLUS("iPhone 7 Plus"),
     IPHONE_8("iPhone 8"),
-    IPHONE_8_PLUS("iPhone " +
-            "8 Plus"),
+    IPHONE_8_PLUS("iPhone 8 Plus"),
     IPHONE_X("iPhone X"),
     /*
     iMac
@@ -32,7 +31,7 @@ public enum ProductType implements Serializable {
 
     private String value;
 
-    ProductType(String value) {
+    GoodsType(String value) {
         this.value = value;
     }
 
@@ -40,7 +39,7 @@ public enum ProductType implements Serializable {
         return value;
     }
 
-    public static ProductType fromValue(String value) {
+    public static GoodsType fromValue(String value) {
         return Arrays.stream(values())
                 .filter(pro -> pro.getValue().toUpperCase().equals(value.toUpperCase()))
                 .findFirst()

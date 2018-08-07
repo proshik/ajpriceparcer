@@ -31,7 +31,7 @@ public class ScreeningJob implements Job {
     private NotificationService notificationService;
 
     // Provide products.
-    // Find different from previous day grouped by Shop and then ProductType
+    // Find different from previous day grouped by Shop and then Goods
     // If different is exists to notify users by their subscription
 
     @Override

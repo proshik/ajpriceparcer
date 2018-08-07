@@ -68,7 +68,7 @@ public class DiffService {
         return result;
     }
 
-//    public List<HistoryDiff> historyDiff(List<Fetch> fetches, ProductType productType) {
+//    public List<HistoryDiff> historyDiff(List<Fetch> fetches, Goods productType) {
 //        List<HistoryDiff> result = new ArrayList<>();
 //
 //        List<Fetch> limitedFetches = fetches.stream()
@@ -86,7 +86,7 @@ public class DiffService {
 //        return result;
 //    }
 //
-//    public List<DiffProducts> findDiff(Fetch oldFetch, Fetch newFetch, ProductType productType) {
+//    public List<DiffProducts> findDiff(Fetch oldFetch, Fetch newFetch, Goods productType) {
 //        List<DiffProducts> diff = new ArrayList<>();
 //
 //        Map<ProductKey, List<Product>> groupNewFetch = newFetch.getProducts().stream()
