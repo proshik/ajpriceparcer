@@ -1,5 +1,6 @@
 package ru.proshik.applepricebot.repository.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -7,6 +8,7 @@ import javax.persistence.*;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "subscription")
 public class Subscription {
@@ -28,8 +30,7 @@ public class Subscription {
     @JoinColumn(name = "user_id", nullable = false, updatable = false)
     private User user;
 
-    public Subscription() {
+    public void setUser(User user) {
+        this.user = user;
     }
-
-
 }

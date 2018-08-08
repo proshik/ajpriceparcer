@@ -23,7 +23,6 @@ public class ProviderUtils {
         }
     }
 
-    @Deprecated
     public static Map<String, String> extractParameters(String value) {
         Map<String, String> result = new HashMap<>();
 

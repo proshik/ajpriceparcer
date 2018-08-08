@@ -3,26 +3,17 @@ package ru.proshik.applepricebot.service.scheduler;
 import org.apache.log4j.Logger;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
-import ru.proshik.applepricebot.model.PriceProductDifferent;
-import ru.proshik.applepricebot.repository.model.Product;
-import ru.proshik.applepricebot.repository.model.ShopType;
 import ru.proshik.applepricebot.service.DiffService;
 import ru.proshik.applepricebot.service.v2.NotificationService;
-import ru.proshik.applepricebot.service.v2.ProductService;
-import ru.proshik.applepricebot.storage.model.ProductType;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
+import ru.proshik.applepricebot.service.v2.ScreeningService;
 
 public class ScreeningJob implements Job {
 
     private static final Logger LOG = Logger.getLogger(ScreeningJob.class);
 
     @Autowired
-    private ProductService productService;
+    private ScreeningService screeningService;
 
     @Autowired
     private DiffService diffService;
@@ -35,12 +26,15 @@ public class ScreeningJob implements Job {
     // If different is exists to notify users by their subscription
 
     @Override
-    public void execute(JobExecutionContext context) throws JobExecutionException {
-        Map<ShopType, List<Product>> products = productService.provideProducts();
-
+    public void execute(JobExecutionContext context) {
+        try {
+            screeningService.provideProducts(true);
+        } catch (Exception e) {
+            LOG.error("Unexpected error on screening job", e);
+        }
 //        LocalDateTime previousDay = LocalDateTime.now().minusDays(1);
 //
-//        Map<ShopType, Map<ProductType, List<PriceProductDifferent>>> different = diffService.buildPriceDifferent(products, previousDay);
+//        Map<ShopType, Map<ProductT ype, List<PriceProductDifferent>>> different = diffService.buildPriceDifferent(assortment, previousDay);
 //        if (!different.isEmpty()) {
 //            notificationService.buildEventNotification(different);
 //        }

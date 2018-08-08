@@ -24,8 +24,10 @@ public class DiffService {
     public Map<ShopType, Map<ProductType, List<PriceProductDifferent>>> buildPriceDifferent(Map<ShopType, List<Product>> products, LocalDateTime date) {
         Map<ShopType, Map<ProductType, List<PriceProductDifferent>>> result = new HashMap<>();
 
-        Map<ShopType, List<Product>> prevGroupByShop = productRepository.findByFetchDate(date).stream()
-                .collect(Collectors.groupingBy(Product::getShopType));
+        Map<ShopType, List<Product>> prevGroupByShop =
+                new HashMap<>();
+//                productRepository.findByFetchDate(date).stream()
+//                .collect(Collectors.groupingBy(Product::getShopType));
 
         for (Map.Entry<ShopType, List<Product>> entry : products.entrySet()) {
 

@@ -106,8 +106,8 @@ public class IStoreSpbProvider implements Provider {
                 if (title != null) {
                     params = ProviderUtils.extractParameters(title);
                 }
-                newProducts.add(new ru.proshik.applepricebot.repository.model.Product(ZonedDateTime.now(), fetchTime, ShopType.ISTORE_SBP,
-                        title, description, null, price, ptp.productType, ProviderUtils.paramsToString(params)));
+//                newProducts.add(new ru.proshik.applepricebot.repository.model.Product(ZonedDateTime.now(), fetchTime, ShopType.ISTORE_SBP,
+//                        title, description, null, price, ptp.productType, ProviderUtils.paramsToString(params)));
                 products.add(new Product(title, description, null, price, AssortmentType.IPHONE, ptp.productType, params));
             }
         }
@@ -117,7 +117,7 @@ public class IStoreSpbProvider implements Provider {
         LOG.info("Screening has ended for " + TITLE);
 
         return newProducts;
-//        return new Fetch(LocalDateTime.now(), products);
+//        return new Fetch(LocalDateTime.now(), assortment);
     }
 
 

@@ -1,20 +1,40 @@
 package ru.proshik.applepricebot.repository.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.vladmihalcea.hibernate.type.array.IntArrayType;
+import com.vladmihalcea.hibernate.type.array.StringArrayType;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import com.vladmihalcea.hibernate.type.json.JsonNodeBinaryType;
+import com.vladmihalcea.hibernate.type.json.JsonNodeStringType;
+import com.vladmihalcea.hibernate.type.json.JsonStringType;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.TypeDefs;
 import org.hibernate.id.enhanced.SequenceStyleGenerator;
 import ru.proshik.applepricebot.storage.model.ProductType;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 
 @Getter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "product")
+@TypeDefs({
+        @TypeDef(name = "string-array", typeClass = StringArrayType.class),
+        @TypeDef(name = "int-array", typeClass = IntArrayType.class),
+        @TypeDef(name = "json", typeClass = JsonStringType.class),
+        @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class),
+        @TypeDef(name = "jsonb-node", typeClass = JsonNodeBinaryType.class),
+        @TypeDef(name = "json-node", typeClass = JsonNodeStringType.class),
+})
 public class Product {
 
     @Id
@@ -27,10 +47,6 @@ public class Product {
                     value = "product_id_seq"))
     private Long id;
 
-    @Column(name = "created_date", updatable = false, insertable = false,
-            columnDefinition = "timestamp default CURRENT_TIMESTAMP")
-    private ZonedDateTime createdDate;
-
     @Column(name = "data")
     private String data;
 
@@ -38,4 +54,7 @@ public class Product {
     @JoinColumn(name = "assortment_id", nullable = false, updatable = false)
     private Assortment assortment;
 
+    public void setAssortment(Assortment assortment) {
+        this.assortment = assortment;
+    }
 }

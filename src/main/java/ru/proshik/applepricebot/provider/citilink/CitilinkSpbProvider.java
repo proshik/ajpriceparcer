@@ -72,8 +72,8 @@ public class CitilinkSpbProvider implements Provider {
                         String paramsData = productData.get(2);
                         Map<String, String> params = extractGBSolid(paramsData);
                         products.add(new Product(title, description, Boolean.TRUE, new BigDecimal(object.getPrice()), productTypePointer.assortmentType, productTypePointer.productType, params));
-                        newProducts.add(new ru.proshik.applepricebot.repository.model.Product(ZonedDateTime.now(), fetchTime, ShopType.CITI_LINK,
-                                title, description, null, new BigDecimal(object.getPrice()), productTypePointer.productType, ProviderUtils.paramsToString(params)));
+//                        newProducts.add(new ru.proshik.applepricebot.repository.model.Product(ZonedDateTime.now(), fetchTime, ShopType.CITI_LINK,
+//                                title, description, null, new BigDecimal(object.getPrice()), productTypePointer.productType, ProviderUtils.paramsToString(params)));
                     } else {
                         LOG.error("wrong extract data for " + object.getShortName());
                     }
@@ -87,7 +87,7 @@ public class CitilinkSpbProvider implements Provider {
         LOG.info("Screening has ended for " + TITLE);
 
         return newProducts;
-//       return new Fetch(LocalDateTime.now(), products);
+//       return new Fetch(LocalDateTime.now(), assortment);
     }
 
     private HtmlPage openPageByQueryText(String queryPath, String queryText) {

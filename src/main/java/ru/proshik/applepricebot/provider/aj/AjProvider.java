@@ -8,9 +8,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlSpan;
 import org.apache.log4j.Logger;
 import ru.proshik.applepricebot.exception.ProviderParseException;
 import ru.proshik.applepricebot.provider.Provider;
-import ru.proshik.applepricebot.repository.model.ShopType;
 import ru.proshik.applepricebot.storage.model.AssortmentType;
-import ru.proshik.applepricebot.storage.model.Fetch;
 import ru.proshik.applepricebot.storage.model.Product;
 import ru.proshik.applepricebot.storage.model.ProductType;
 import ru.proshik.applepricebot.utils.ProviderUtils;
@@ -18,7 +16,6 @@ import ru.proshik.applepricebot.utils.ProviderUtils;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -49,8 +46,6 @@ public class AjProvider implements Provider {
         } catch (IOException e) {
             throw new ProviderParseException("Error on priceAssortment page from aj.ru", e);
         }
-
-        LocalDateTime fetchTime = LocalDateTime.now();
 
         List<ru.proshik.applepricebot.repository.model.Product> newProducts = new ArrayList<>();
         List<Product> products = new ArrayList<>();
@@ -108,8 +103,17 @@ public class AjProvider implements Provider {
                             LOG.warn("Not found price for assortmentType=" + ptp.assortmentType
                                     + ", productType=" + ptp.productType);
                         }
-                        newProducts.add(new ru.proshik.applepricebot.repository.model.Product(ZonedDateTime.now(), fetchTime, ShopType.AJ,
-                                title, description, null, price, ptp.productType, ProviderUtils.paramsToString(params)));
+
+                        ru.proshik.applepricebot.repository.model.Product product =
+                                ru.proshik.applepricebot.repository.model.Product.builder()
+                                        .title(title)
+                                        .description(description)
+                                        .price(price)
+                                        .productType(ptp.productType)
+                                        .parameters(ProviderUtils.paramsToString(params))
+                                        .build();
+
+                        newProducts.add(product);
                         products.add(new Product(title, description, null, price, ptp.assortmentType, ptp.productType, params));
                     }
                 }
@@ -121,7 +125,7 @@ public class AjProvider implements Provider {
         LOG.info("Screening has ended for " + TITLE);
 
         return newProducts;
-//        return new Fetch(LocalDateTime.now(), products);
+//        return new Fetch(LocalDateTime.now(), assortment);
     }
 
     private List<ProductTypePointer> productTypeClassHolder() {

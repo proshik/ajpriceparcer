@@ -4,9 +4,7 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
 import org.apache.log4j.Logger;
 import ru.proshik.applepricebot.provider.Provider;
-import ru.proshik.applepricebot.repository.model.ShopType;
 import ru.proshik.applepricebot.storage.model.AssortmentType;
-import ru.proshik.applepricebot.storage.model.Fetch;
 import ru.proshik.applepricebot.storage.model.Product;
 import ru.proshik.applepricebot.storage.model.ProductType;
 import ru.proshik.applepricebot.utils.ProviderUtils;
@@ -14,7 +12,6 @@ import ru.proshik.applepricebot.utils.ProviderUtils;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -64,7 +61,7 @@ public class GsmStoreProvider implements Provider {
 
                 String title = null;
                 String description = null;
-                Boolean presence = null;
+                Boolean available = null;
                 BigDecimal price = null;
                 Map<String, String> params = null;
 
@@ -73,9 +70,9 @@ public class GsmStoreProvider implements Provider {
                 HtmlSpan presenceElem = statusDiv.getFirstByXPath(".//span");
                 if (presenceElem != null) {
                     if (presenceElem.asText().equals(IN_STOCK)) {
-                        presence = true;
+                        available = true;
                     } else if (presenceElem.asText().equals(OUT_STOCK))
-                        presence = false;
+                        available = false;
                 }
                 // extract description
                 HtmlStrong strongDescriptionPreElem = li.getFirstByXPath(".//strong[@class='title']");
@@ -109,9 +106,19 @@ public class GsmStoreProvider implements Provider {
                 if (title != null) {
                     params = ProviderUtils.extractParameters(title);
                 }
-                newProducts.add(new ru.proshik.applepricebot.repository.model.Product(ZonedDateTime.now(), fetchTime, ShopType.GSM_STORE,
-                        title, description, null, price, ptp.productType, ProviderUtils.paramsToString(params)));
-                products.add(new Product(title, description, presence, price, AssortmentType.IPHONE, ptp.productType, params));
+
+                ru.proshik.applepricebot.repository.model.Product product =
+                        ru.proshik.applepricebot.repository.model.Product.builder()
+                                .title(title)
+                                .description(description)
+                                .price(price)
+                                .available(available)
+                                .productType(ptp.productType)
+                                .parameters(ProviderUtils.paramsToString(params))
+                                .build();
+
+                newProducts.add(product);
+                products.add(new Product(title, description, available, price, AssortmentType.IPHONE, ptp.productType, params));
             }
         }
 
@@ -120,7 +127,7 @@ public class GsmStoreProvider implements Provider {
         LOG.info("Screening has ended for " + TITLE);
 
         return newProducts;
-//        return new Fetch(LocalDateTime.now(), products);
+//        return new Fetch(LocalDateTime.now(), assortment);
     }
 
     private List<ProductTypePointer> productTypeClassHolder() {

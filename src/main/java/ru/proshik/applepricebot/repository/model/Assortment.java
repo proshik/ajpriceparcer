@@ -1,7 +1,11 @@
 package ru.proshik.applepricebot.repository.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.id.enhanced.SequenceStyleGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -9,14 +13,21 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "assortment")
 public class Assortment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "assortment_seq_gen")
-    @SequenceGenerator(name = "assortment_seq_gen", sequenceName = "assortment_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "assortment_id_seq")
+    @GenericGenerator(
+            name = "assortment_id_seq",
+            strategy = "enhanced-sequence",
+            parameters = @org.hibernate.annotations.Parameter(
+                    name = SequenceStyleGenerator.SEQUENCE_PARAM,
+                    value = "assortment_id_seq"))
     private Long id;
 
     @Column(name = "created_date", updatable = false, insertable = false,
@@ -26,15 +37,11 @@ public class Assortment {
     @Column(name = "fetch_date")
     private LocalDateTime fetchDate;
 
-    @OneToOne
-    @JoinColumn(name = "shop_id")
-    private Shop shop;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "shop_type")
+    private ShopType shopType;
 
-    @OneToOne
-    @JoinColumn(name = "goods_id")
-    private Goods goods;
-
-    @OneToMany(mappedBy = "assortment")
+    @OneToMany(mappedBy = "assortment", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Product> products;
 
 }

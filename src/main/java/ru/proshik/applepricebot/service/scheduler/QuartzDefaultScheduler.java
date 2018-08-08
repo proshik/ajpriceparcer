@@ -6,25 +6,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.TimeZone;
 
 @Component
 public class QuartzDefaultScheduler {
 
     private static final Logger LOG = Logger.getLogger(QuartzDefaultScheduler.class);
 
+    private final Scheduler scheduler;
+
     @Autowired
-    private Scheduler scheduler;
+    public QuartzDefaultScheduler(Scheduler scheduler) {
+        this.scheduler = scheduler;
+    }
 
     @PostConstruct
     public void init() throws SchedulerException {
         TriggerKey triggerKey = TriggerKey.triggerKey("ScreeningTrigger", "default");
         if (scheduler.getTrigger(triggerKey) != null) {
-            LOG.debug("Trigger with key "+ triggerKey + " al");
+            LOG.debug("Trigger with key " + triggerKey + " al");
             return;
         }
 
@@ -36,7 +38,8 @@ public class QuartzDefaultScheduler {
         Trigger trigger = TriggerBuilder.newTrigger()
                 .withIdentity(triggerKey)
                 .startAt(Date.from(LocalDateTime.now().plusSeconds(5).atZone(ZoneId.systemDefault()).toInstant()))
-                .withSchedule(CronScheduleBuilder.cronSchedule("0 0 10 1/1 * ? *"))
+                .withSchedule(CronScheduleBuilder.cronSchedule("0 0 10 1/1 * ? *")
+                        .withMisfireHandlingInstructionFireAndProceed())
                 .build();
 
         scheduler.scheduleJob(job, trigger);

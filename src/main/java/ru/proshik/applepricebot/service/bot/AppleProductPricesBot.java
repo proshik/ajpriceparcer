@@ -21,7 +21,7 @@ import java.util.List;
 import static ru.proshik.applepricebot.utils.BotUtils.extractArgument;
 import static ru.proshik.applepricebot.utils.PrintUtils.notificationInfo;
 
-@Component
+//@Component
 public class AppleProductPricesBot extends TelegramLongPollingBot {
 
     private static final Logger LOG = Logger.getLogger(AppleProductPricesBot.class);
@@ -170,7 +170,7 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
     }
 
     private String startCommand() {
-        return "Hello, this is Bot for follow prices on apple products in several shops.\n\n" + commandInfo();
+        return "Hello, this is Bot for follow prices on apple assortment in several shops.\n\n" + commandInfo();
     }
 
     private String readCommand(Update update) {
@@ -230,7 +230,7 @@ public class AppleProductPricesBot extends TelegramLongPollingBot {
     private String commandInfo() {
         return "Please, used follow commands:\n\n" +
                 "/start - start work with bot\n" +
-                "/read - show prices on products\n" +
+                "/read - show prices on assortment\n" +
                 "/history - history of price changes\n" +
                 "/subscription - subscriptions of user\n" +
                 "/subscribe - subscribe to notifications\n" +
