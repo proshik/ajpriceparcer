@@ -41,7 +41,7 @@ public class ProductService {
                     result.put(entry.getKey(), products);
                 }
             } catch (ProviderParseException e) {
-                LOG.error("On screening the shop: " + entry.getKey());
+                LOG.error("Screening the shop: " + entry.getKey());
             }
         }
 
