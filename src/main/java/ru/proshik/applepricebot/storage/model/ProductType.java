@@ -15,8 +15,7 @@ public enum ProductType implements Serializable {
     IPHONE_7("iPhone 7"),
     IPHONE_7_PLUS("iPhone 7 Plus"),
     IPHONE_8("iPhone 8"),
-    IPHONE_8_PLUS("iPhone " +
-            "8 Plus"),
+    IPHONE_8_PLUS("iPhone 8 Plus"),
     IPHONE_X("iPhone X"),
     /*
     iMac

@@ -3,6 +3,8 @@ package ru.proshik.applepricebot.repository.model;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
+import ru.proshik.applepricebot.storage.model.ProductType;
 
 import javax.persistence.*;
 
@@ -10,21 +12,20 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "subscription")
+@Table(name = "subscriptions")
+@GenericGenerator(name = "subscriptions_id_generator", strategy = "sequence", parameters = {
+        @org.hibernate.annotations.Parameter(name = "sequence", value = "subscriptions_id_seq")})
 public class Subscription {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "subscription_seq_gen")
-    @SequenceGenerator(name = "subscription_seq_gen", sequenceName = "subscription_seq")
+    @GeneratedValue(generator = "subscriptions_id_generator")
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "shop_id")
-    private Shop shop;
+    @Column(name = "shopType")
+    private ShopType shopType;
 
-    @OneToOne
-    @JoinColumn(name = "goods_id")
-    private Goods goods;
+    @Column(name = "productType")
+    private ProductType productType;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false, updatable = false)

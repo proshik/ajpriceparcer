@@ -12,11 +12,12 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "users")
+@GenericGenerator(name = "users_id_generator", strategy = "sequence", parameters = {
+        @org.hibernate.annotations.Parameter(name = "sequence", value = "users_id_seq")})
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_seq_gen")
-    @SequenceGenerator(name = "users_seq_gen", sequenceName = "users_seq")
+    @GeneratedValue(generator = "users_id_generator")
     private Long id;
 
     @Column(name = "created_date", updatable = false, insertable = false,

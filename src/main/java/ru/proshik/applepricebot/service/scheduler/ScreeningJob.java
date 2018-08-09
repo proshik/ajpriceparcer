@@ -21,10 +21,6 @@ public class ScreeningJob implements Job {
     @Autowired
     private NotificationService notificationService;
 
-    // Provide products.
-    // Find different from previous day grouped by Shop and then Goods
-    // If different is exists to notify users by their subscription
-
     @Override
     public void execute(JobExecutionContext context) {
         try {

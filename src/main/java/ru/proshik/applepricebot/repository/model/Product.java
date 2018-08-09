@@ -47,9 +47,27 @@ public class Product {
                     value = "product_id_seq"))
     private Long id;
 
-    @Column(name = "data")
-    private String data;
+    @Column(name = "title")
+    private String title;
 
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "available")
+    private Boolean available;
+
+    @Column(name = "price")
+    private BigDecimal price;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "product_type")
+    private ProductType productType;
+
+    @Type(type = "jsonb")
+    @Column(columnDefinition = "json")
+    private String parameters;
+
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "assortment_id", nullable = false, updatable = false)
     private Assortment assortment;
