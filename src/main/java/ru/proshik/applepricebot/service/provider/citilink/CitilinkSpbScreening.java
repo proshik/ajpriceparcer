@@ -1,14 +1,14 @@
-package ru.proshik.applepricebot.provider.citilink;
+package ru.proshik.applepricebot.service.provider.citilink;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import org.apache.log4j.Logger;
-import ru.proshik.applepricebot.model.ProviderInfo;
-import ru.proshik.applepricebot.provider.Provider;
 import ru.proshik.applepricebot.repository.model.Product;
 import ru.proshik.applepricebot.repository.model.ProductType;
+import ru.proshik.applepricebot.repository.model.Provider;
+import ru.proshik.applepricebot.service.provider.Screening;
 import ru.proshik.applepricebot.utils.ProviderUtils;
 
 import java.io.IOException;
@@ -23,26 +23,23 @@ import static ru.proshik.applepricebot.utils.ProviderUtils.extractGBSolid;
 import static ru.proshik.applepricebot.utils.ProviderUtils.groupExtractor;
 
 
-public class CitilinkSpbProvider implements Provider {
+public class CitilinkSpbScreening implements Screening {
 
-    private static final Logger LOG = Logger.getLogger(CitilinkSpbProvider.class);
-
-    public static final String URL = "http://citilink.ru";
-    public static final String TITLE = "CitilinkSpb";
-
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private static final Logger LOG = Logger.getLogger(CitilinkSpbScreening.class);
 
     private WebClient client = new WebClient();
 
-    public CitilinkSpbProvider() {
+    private ObjectMapper objectMapper = new ObjectMapper();
+
+    public CitilinkSpbScreening() {
         client.getOptions().setCssEnabled(false);
         client.getOptions().setJavaScriptEnabled(false);
         client.addRequestHeader("_space", "spb_cl%3A");
     }
 
     @Override
-    public List<Product> screening(ProviderInfo providerInfo) {
-        LOG.info("Screening has started for " + this.TITLE);
+    public List<Product> screening(Provider provider) {
+        LOG.info("Screening has started for " + provider.getTitle());
 
         String queryPath = "/search/?menu_id=100008&text=%s&available=1";
 
@@ -51,8 +48,8 @@ public class CitilinkSpbProvider implements Provider {
         List<Product> products = new ArrayList<>();
 
         for (ProductTypePointer productTypePointer : productTypeClassHolder()) {
+            HtmlPage page = openPageByQueryText(provider.getUrl(), queryPath, productTypePointer.queryText);
 
-            HtmlPage page = openPageByQueryText(queryPath, productTypePointer.queryText);
             List<HtmlElement> data = page.getByXPath("//*[@id=\"subcategoryList\"]/div/div/div[*]");
             for (HtmlElement item : data) {
                 String info = item.getAttribute("data-params");
@@ -78,23 +75,23 @@ public class CitilinkSpbProvider implements Provider {
 
                     products.add(product);
                 } catch (IOException e) {
-                    LOG.error(String.format(this.URL + queryPath, productTypePointer.queryText));
+                    LOG.error(String.format(provider.getUrl() + queryPath, productTypePointer.queryText));
                     e.printStackTrace();
                 }
 
             }
         }
-        LOG.info("Screening has ended for " + TITLE);
+        LOG.info("Screening has ended for " + provider.getTitle());
 
         return products;
     }
 
-    private HtmlPage openPageByQueryText(String queryPath, String queryText) {
+    private HtmlPage openPageByQueryText(String url, String queryPath, String queryText) {
         HtmlPage page;
         try {
-            page = client.getPage(String.format(this.URL + queryPath, queryText));
+            page = client.getPage(String.format(url + queryPath, queryText));
         } catch (IOException e) {
-            LOG.error(this.URL);
+            LOG.error(url);
             e.printStackTrace();
             return null;
         }
@@ -133,7 +130,7 @@ public class CitilinkSpbProvider implements Provider {
      * Fun
      */
 //    public static void main(String[] args) {
-//        CitilinkSpbProvider citilinkSpbProvider = new CitilinkSpbProvider();
+//        CitilinkSpbScreening citilinkSpbProvider = new CitilinkSpbScreening();
 //        citilinkSpbProvider.screening();
 //    }
 

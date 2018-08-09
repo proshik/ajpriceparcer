@@ -22,7 +22,7 @@ public class ScreeningJob implements Job {
         }
 //        LocalDateTime previousDay = LocalDateTime.now().minusDays(1);
 //
-//        Map<ShopType, Map<ProductT ype, List<PriceProductDifferent>>> different = diffService.buildPriceDifferent(assortment, previousDay);
+//        Map<ProviderType, Map<ProductT ype, List<PriceProductDifferent>>> different = diffService.buildPriceDifferent(assortment, previousDay);
 //        if (!different.isEmpty()) {
 //            notificationService.buildEventNotification(different);
 //        }

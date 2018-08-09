@@ -8,40 +8,37 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.id.enhanced.SequenceStyleGenerator;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.util.List;
 
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "assortment")
-public class Assortment {
+@Table(name = "provider")
+public class Provider {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "assortment_id_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "provider_id_seq")
     @GenericGenerator(
-            name = "assortment_id_seq",
+            name = "provider_id_seq",
             strategy = "enhanced-sequence",
             parameters = @org.hibernate.annotations.Parameter(
                     name = SequenceStyleGenerator.SEQUENCE_PARAM,
-                    value = "assortment_id_seq"))
+                    value = "provider_id_seq"))
     private Long id;
 
     @Column(name = "created_date", updatable = false, insertable = false,
             columnDefinition = "timestamp default CURRENT_TIMESTAMP")
     private ZonedDateTime createdDate;
 
-    @Column(name = "fetch_date")
-    private LocalDateTime fetchDate;
+    private String title;
 
-    @OneToOne
-    @JoinColumn(name="provider_id")
-    private Provider provider;
+    private String url;
 
-    @OneToMany(mappedBy = "assortment", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<Product> products;
+    private boolean enabled;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type")
+    private ProviderType type;
 }

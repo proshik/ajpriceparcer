@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.id.enhanced.SequenceStyleGenerator;
 
 import javax.persistence.*;
 
@@ -11,19 +12,24 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "subscriptions")
-@GenericGenerator(name = "subscriptions_id_generator", strategy = "sequence", parameters = {
-        @org.hibernate.annotations.Parameter(name = "sequence", value = "subscriptions_id_seq")})
+@Table(name = "subscription")
 public class Subscription {
 
     @Id
-    @GeneratedValue(generator = "subscriptions_id_generator")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "subscription_id_seq")
+    @GenericGenerator(
+            name = "subscription_id_seq",
+            strategy = "enhanced-sequence",
+            parameters = @org.hibernate.annotations.Parameter(
+                    name = SequenceStyleGenerator.SEQUENCE_PARAM,
+                    value = "subscription_id_seq"))
     private Long id;
 
-    @Column(name = "shopType")
-    private ShopType shopType;
+    @OneToOne
+    @JoinColumn(name = "provider_id")
+    private Provider provider;
 
-    @Column(name = "productType")
+    @Column(name = "product_type")
     private ProductType productType;
 
     @ManyToOne

@@ -1,4 +1,4 @@
-package ru.proshik.applepricebot.provider.aj;
+package ru.proshik.applepricebot.service.provider.aj;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.DomElement;
@@ -7,10 +7,10 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSpan;
 import org.apache.log4j.Logger;
 import ru.proshik.applepricebot.exception.ProviderParseException;
-import ru.proshik.applepricebot.model.ProviderInfo;
-import ru.proshik.applepricebot.provider.Provider;
 import ru.proshik.applepricebot.repository.model.Product;
 import ru.proshik.applepricebot.repository.model.ProductType;
+import ru.proshik.applepricebot.repository.model.Provider;
+import ru.proshik.applepricebot.service.provider.Screening;
 import ru.proshik.applepricebot.utils.ProviderUtils;
 
 import java.io.IOException;
@@ -23,16 +23,13 @@ import java.util.regex.Pattern;
 
 import static ru.proshik.applepricebot.utils.ProviderUtils.extractParameters;
 
-public class AjProvider implements Provider {
+public class AjScreening implements Screening {
 
-    private static final Logger LOG = Logger.getLogger(AjProvider.class);
-
-    public static final String URL = "http://aj.ru";
-    public static final String TITLE = "AJ";
+    private static final Logger LOG = Logger.getLogger(AjScreening.class);
 
     @Override
-    public List<Product> screening(ProviderInfo providerInfo) throws ProviderParseException {
-        LOG.info("Screening has started for " + TITLE);
+    public List<Product> screening(Provider provider) throws ProviderParseException {
+        LOG.info("Screening has started for " + provider.getTitle());
 
         WebClient client = new WebClient();
         client.getOptions().setCssEnabled(false);
@@ -40,7 +37,7 @@ public class AjProvider implements Provider {
 
         HtmlPage page;
         try {
-            page = client.getPage(URL);
+            page = client.getPage(provider.getUrl());
         } catch (IOException e) {
             throw new ProviderParseException("Error on priceAssortment page from aj.ru", e);
         }
@@ -110,7 +107,7 @@ public class AjProvider implements Provider {
             }
         }
 
-        LOG.info("Screening has ended for " + TITLE);
+        LOG.info("Screening has ended for " + provider.getTitle());
 
         return products;
     }
@@ -156,7 +153,7 @@ public class AjProvider implements Provider {
      * Fun
      */
 //    public static void main(String[] args) throws ProviderParseException {
-//        AjProvider apP = new AjProvider();
+//        AjScreening apP = new AjScreening();
 //        apP.screening();
 //    }
 

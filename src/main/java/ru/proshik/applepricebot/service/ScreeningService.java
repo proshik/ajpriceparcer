@@ -5,13 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.proshik.applepricebot.exception.ProviderParseException;
-import ru.proshik.applepricebot.model.ProviderInfo;
-import ru.proshik.applepricebot.provider.Provider;
-import ru.proshik.applepricebot.provider.ProviderFactory;
 import ru.proshik.applepricebot.repository.AssortmentRepository;
+import ru.proshik.applepricebot.repository.ProviderRepository;
 import ru.proshik.applepricebot.repository.model.Assortment;
 import ru.proshik.applepricebot.repository.model.Product;
-import ru.proshik.applepricebot.repository.model.ShopType;
+import ru.proshik.applepricebot.repository.model.Provider;
+import ru.proshik.applepricebot.service.provider.ProviderResolver;
+import ru.proshik.applepricebot.service.provider.Screening;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -20,44 +20,55 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ScreeningService {
 
     private static final Logger LOG = Logger.getLogger(ScreeningService.class);
 
-    private final ProviderFactory providerFactory;
+    private final ProviderResolver providerResolver;
 
     private final AssortmentRepository assortmentRepository;
 
+    private final ProviderRepository providerRepository;
+
     @Autowired
-    public ScreeningService(ProviderFactory providerFactory, AssortmentRepository assortmentRepository) {
-        this.providerFactory = providerFactory;
+    public ScreeningService(ProviderResolver providerResolver, AssortmentRepository assortmentRepository, ProviderRepository providerRepository) {
+        this.providerResolver = providerResolver;
         this.assortmentRepository = assortmentRepository;
+        this.providerRepository = providerRepository;
     }
 
     @Transactional
     public List<Assortment> provideProducts(boolean store) {
-        Map<ProviderInfo, Provider> providers = providerFactory.providers();
 
-        Map<ProviderInfo, List<Product>> productByShopType = new HashMap<>();
-        for (Map.Entry<ProviderInfo, Provider> entry : providers.entrySet()) {
+        List<Provider> providers = providerRepository.findAll();
+
+        Map<Long, Provider> byProviderId = providers.stream()
+                .collect(Collectors.toMap(Provider::getId, o -> o));
+
+        Map<Long, List<Product>> productByShopType = new HashMap<>();
+        for (Provider provider : providers) {
             try {
-                if (entry.getKey().isEnabled()) {
-                    List<Product> products = entry.getValue().screening(entry.getKey());
-                    productByShopType.put(entry.getKey(), products);
+                if (provider.isEnabled()) {
+                    Screening screening = providerResolver.resolve(provider);
+
+                    List<Product> screeningResult = screening.screening(provider);
+
+                    productByShopType.put(provider.getId(), screeningResult);
                 }
             } catch (ProviderParseException e) {
-                LOG.error("Screening the shop: " + entry.getKey());
+                LOG.error("Screening the provider with id: " + provider.getId());
             }
         }
 
         List<Assortment> result = new ArrayList<>();
-        for (Map.Entry<ProviderInfo, List<Product>> entry : productByShopType.entrySet()) {
+        for (Map.Entry<Long, List<Product>> entry : productByShopType.entrySet()) {
             Assortment assortment = Assortment.builder()
                     .createdDate(ZonedDateTime.now())
                     .fetchDate(LocalDateTime.now().atZone(ZoneId.of("Europe/Moscow")).toLocalDateTime())
-                    .shopType(ShopType.fromTitle(entry.getKey().getTitle()))
+                    .provider(byProviderId.get(entry.getKey()))
                     .products(entry.getValue())
                     .build();
 

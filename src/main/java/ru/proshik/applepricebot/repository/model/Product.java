@@ -32,8 +32,7 @@ import java.math.BigDecimal;
         @TypeDef(name = "json", typeClass = JsonStringType.class),
         @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class),
         @TypeDef(name = "jsonb-node", typeClass = JsonNodeBinaryType.class),
-        @TypeDef(name = "json-node", typeClass = JsonNodeStringType.class),
-})
+        @TypeDef(name = "json-node", typeClass = JsonNodeStringType.class)})
 public class Product {
 
     @Id

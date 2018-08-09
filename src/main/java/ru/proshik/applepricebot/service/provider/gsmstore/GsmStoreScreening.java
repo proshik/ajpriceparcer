@@ -1,12 +1,12 @@
-package ru.proshik.applepricebot.provider.gsmstore;
+package ru.proshik.applepricebot.service.provider.gsmstore;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
 import org.apache.log4j.Logger;
-import ru.proshik.applepricebot.model.ProviderInfo;
-import ru.proshik.applepricebot.provider.Provider;
 import ru.proshik.applepricebot.repository.model.Product;
 import ru.proshik.applepricebot.repository.model.ProductType;
+import ru.proshik.applepricebot.repository.model.Provider;
+import ru.proshik.applepricebot.service.provider.Screening;
 import ru.proshik.applepricebot.utils.ProviderUtils;
 
 import java.io.IOException;
@@ -19,12 +19,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class GsmStoreProvider implements Provider {
+public class GsmStoreScreening implements Screening {
 
-    private static final Logger LOG = Logger.getLogger(ru.proshik.applepricebot.provider.gsmstore.GsmStoreProvider.class);
-
-    public static final String TITLE = "GSM-STORE";
-    public static final String URL = "http://gsm-store.ru";
+    private static final Logger LOG = Logger.getLogger(GsmStoreScreening.class);
 
     private static final String IN_STOCK = "В наличии";
     private static final String OUT_STOCK = "Товар закончился";
@@ -33,14 +30,14 @@ public class GsmStoreProvider implements Provider {
 
     private WebClient client = new WebClient();
 
-    public GsmStoreProvider() {
+    public GsmStoreScreening() {
         client.getOptions().setCssEnabled(false);
         client.getOptions().setJavaScriptEnabled(false);
     }
 
     @Override
-    public List<Product> screening(ProviderInfo providerInfo) {
-        LOG.info("Screening has started for " + TITLE);
+    public List<Product> screening(Provider provider) {
+        LOG.info("Screening has started for " + provider.getTitle());
 
         LocalDateTime fetchTime = LocalDateTime.now();
 
@@ -49,9 +46,9 @@ public class GsmStoreProvider implements Provider {
         for (ProductTypePointer ptp : productTypeClassHolder()) {
             HtmlPage page;
             try {
-                page = client.getPage(URL + ptp.urlPath);
+                page = client.getPage(provider.getUrl() + ptp.urlPath);
             } catch (IOException e) {
-                LOG.error("Error on get page from gsm-store.ru for url" + URL + ptp.urlPath);
+                LOG.error("Error on get page from gsm-store.ru for url" + provider.getUrl() + ptp.urlPath);
                 continue;
             }
 
@@ -120,7 +117,7 @@ public class GsmStoreProvider implements Provider {
             }
         }
 
-        LOG.info("Screening has ended for " + TITLE);
+        LOG.info("Screening has ended for " + provider.getTitle());
 
         return products;
     }
@@ -155,7 +152,7 @@ public class GsmStoreProvider implements Provider {
      * Run
      */
 //    public static void main(String[] args) {
-//        GsmStoreProvider gsmStoreProvider = new GsmStoreProvider();
+//        GsmStoreScreening gsmStoreProvider = new GsmStoreScreening();
 //        gsmStoreProvider.screening();
 //    }
 

@@ -1,4 +1,4 @@
-package ru.proshik.applepricebot.provider.istorespb;
+package ru.proshik.applepricebot.service.provider.istorespb;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
@@ -8,10 +8,11 @@ import org.apache.log4j.Logger;
 import org.w3c.css.sac.CSSException;
 import org.w3c.css.sac.CSSParseException;
 import org.w3c.css.sac.ErrorHandler;
-import ru.proshik.applepricebot.model.ProviderInfo;
-import ru.proshik.applepricebot.provider.Provider;
 import ru.proshik.applepricebot.repository.model.Product;
 import ru.proshik.applepricebot.repository.model.ProductType;
+import ru.proshik.applepricebot.repository.model.Provider;
+import ru.proshik.applepricebot.service.provider.Screening;
+import ru.proshik.applepricebot.service.provider.gsmstore.GsmStoreScreening;
 import ru.proshik.applepricebot.utils.ProviderUtils;
 
 import java.io.IOException;
@@ -23,35 +24,32 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class IStoreSpbProvider implements Provider {
+public class IStoreSpbScreening implements Screening {
 
-    private static final Logger LOG = Logger.getLogger(ru.proshik.applepricebot.provider.gsmstore.GsmStoreProvider.class);
-
-    private static final String TITLE = "ISTORESPB";
-    private static final String URL = "http://istorespb.ru";
+    private static final Logger LOG = Logger.getLogger(GsmStoreScreening.class);
 
     private static List<Pattern> TITLE_PATTERNS = Arrays.asList(Pattern.compile(".*GB"), Pattern.compile(".*Gb"));
 
     private WebClient client = new WebClient();
 
-    public IStoreSpbProvider() {
+    public IStoreSpbScreening() {
         client.getOptions().setCssEnabled(false);
         client.getOptions().setJavaScriptEnabled(false);
         client.setCssErrorHandler(new CustomErrorHandler());
     }
 
     @Override
-    public List<Product> screening(ProviderInfo providerInfo) {
-        LOG.info("Screening has started for " + TITLE);
+    public List<Product> screening(Provider provider) {
+        LOG.info("Screening has started for " + provider.getTitle());
 
         List<Product> products = new ArrayList<>();
 
         for (ProductTypePointer ptp : productTypeClassHolder()) {
             HtmlPage page;
             try {
-                page = client.getPage(URL + ptp.urlPath);
+                page = client.getPage(provider.getUrl() + ptp.urlPath);
             } catch (IOException e) {
-                LOG.error("Error on get page from istorespb.ru for url" + URL + ptp.urlPath);
+                LOG.error("Error on get page from istorespb.ru for url" + provider.getUrl() + ptp.urlPath);
                 continue;
             }
 
@@ -114,7 +112,7 @@ public class IStoreSpbProvider implements Provider {
             }
         }
 
-        LOG.info("Screening ended for " + TITLE);
+        LOG.info("Screening ended for " + provider.getTitle());
 
         return products;
     }
@@ -167,7 +165,7 @@ public class IStoreSpbProvider implements Provider {
      * Run
      */
 //    public static void main(String[] args) {
-//        IStoreSpbProvider gsmStoreProvider = new IStoreSpbProvider();
+//        IStoreSpbScreening gsmStoreProvider = new IStoreSpbScreening();
 //        gsmStoreProvider.screening();
 //    }
 
