@@ -3,10 +3,10 @@ package ru.proshik.applepricebot.provider.gsmstore;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
 import org.apache.log4j.Logger;
+import ru.proshik.applepricebot.model.ProviderInfo;
 import ru.proshik.applepricebot.provider.Provider;
-import ru.proshik.applepricebot.storage.model.AssortmentType;
-import ru.proshik.applepricebot.storage.model.Product;
-import ru.proshik.applepricebot.storage.model.ProductType;
+import ru.proshik.applepricebot.repository.model.Product;
+import ru.proshik.applepricebot.repository.model.ProductType;
 import ru.proshik.applepricebot.utils.ProviderUtils;
 
 import java.io.IOException;
@@ -39,12 +39,11 @@ public class GsmStoreProvider implements Provider {
     }
 
     @Override
-    public List<ru.proshik.applepricebot.repository.model.Product> screening() {
+    public List<Product> screening(ProviderInfo providerInfo) {
         LOG.info("Screening has started for " + TITLE);
 
         LocalDateTime fetchTime = LocalDateTime.now();
 
-        List<ru.proshik.applepricebot.repository.model.Product> newProducts = new ArrayList<>();
         List<Product> products = new ArrayList<>();
 
         for (ProductTypePointer ptp : productTypeClassHolder()) {
@@ -107,8 +106,8 @@ public class GsmStoreProvider implements Provider {
                     params = ProviderUtils.extractParameters(title);
                 }
 
-                ru.proshik.applepricebot.repository.model.Product product =
-                        ru.proshik.applepricebot.repository.model.Product.builder()
+                Product product =
+                        Product.builder()
                                 .title(title)
                                 .description(description)
                                 .price(price)
@@ -117,17 +116,13 @@ public class GsmStoreProvider implements Provider {
                                 .parameters(ProviderUtils.paramsToString(params))
                                 .build();
 
-                newProducts.add(product);
-                products.add(new Product(title, description, available, price, AssortmentType.IPHONE, ptp.productType, params));
+                products.add(product);
             }
         }
 
-//        printAssortments(assortments);
-
         LOG.info("Screening has ended for " + TITLE);
 
-        return newProducts;
-//        return new Fetch(LocalDateTime.now(), assortment);
+        return products;
     }
 
     private List<ProductTypePointer> productTypeClassHolder() {
@@ -145,6 +140,7 @@ public class GsmStoreProvider implements Provider {
     }
 
     private class ProductTypePointer {
+
         ProductType productType;
         String urlPath;
 
@@ -158,9 +154,9 @@ public class GsmStoreProvider implements Provider {
     /**
      * Run
      */
-    public static void main(String[] args) {
-        GsmStoreProvider gsmStoreProvider = new GsmStoreProvider();
-        gsmStoreProvider.screening();
-    }
+//    public static void main(String[] args) {
+//        GsmStoreProvider gsmStoreProvider = new GsmStoreProvider();
+//        gsmStoreProvider.screening();
+//    }
 
 }

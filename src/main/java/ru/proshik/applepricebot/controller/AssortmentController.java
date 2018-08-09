@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.proshik.applepricebot.repository.model.Assortment;
-import ru.proshik.applepricebot.service.v2.ScreeningService;
+import ru.proshik.applepricebot.service.ScreeningService;
 
 import java.util.List;
 
@@ -14,14 +14,16 @@ import java.util.List;
 @RequestMapping(value = "api/v1")
 public class AssortmentController {
 
+    private final ScreeningService screeningService;
+
     @Autowired
-    private ScreeningService screeningService;
+    public AssortmentController(ScreeningService screeningService) {
+        this.screeningService = screeningService;
+    }
 
     @PostMapping("assortment")
     public List<Assortment> assortment(@RequestParam(required = false, defaultValue = "false") boolean store) {
-        List<Assortment> assortments = screeningService.provideProducts(store);
-
-        return assortments;
+        return screeningService.provideProducts(store);
     }
 
 }

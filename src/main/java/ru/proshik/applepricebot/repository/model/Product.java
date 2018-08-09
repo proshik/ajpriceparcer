@@ -16,7 +16,6 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
 import org.hibernate.id.enhanced.SequenceStyleGenerator;
-import ru.proshik.applepricebot.storage.model.ProductType;
 
 import javax.persistence.*;
 import java.math.BigDecimal;

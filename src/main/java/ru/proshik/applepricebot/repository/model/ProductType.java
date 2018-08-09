@@ -1,4 +1,4 @@
-package ru.proshik.applepricebot.storage.model;
+package ru.proshik.applepricebot.repository.model;
 
 import java.io.Serializable;
 import java.util.Arrays;

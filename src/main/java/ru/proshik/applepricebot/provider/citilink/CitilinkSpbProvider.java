@@ -5,19 +5,15 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import org.apache.log4j.Logger;
-import ru.proshik.applepricebot.exception.ProviderParseException;
+import ru.proshik.applepricebot.model.ProviderInfo;
 import ru.proshik.applepricebot.provider.Provider;
-import ru.proshik.applepricebot.repository.model.ShopType;
-import ru.proshik.applepricebot.storage.model.AssortmentType;
-import ru.proshik.applepricebot.storage.model.Fetch;
-import ru.proshik.applepricebot.storage.model.Product;
-import ru.proshik.applepricebot.storage.model.ProductType;
+import ru.proshik.applepricebot.repository.model.Product;
+import ru.proshik.applepricebot.repository.model.ProductType;
 import ru.proshik.applepricebot.utils.ProviderUtils;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,6 +21,7 @@ import java.util.Map;
 
 import static ru.proshik.applepricebot.utils.ProviderUtils.extractGBSolid;
 import static ru.proshik.applepricebot.utils.ProviderUtils.groupExtractor;
+
 
 public class CitilinkSpbProvider implements Provider {
 
@@ -44,14 +41,13 @@ public class CitilinkSpbProvider implements Provider {
     }
 
     @Override
-    public List<ru.proshik.applepricebot.repository.model.Product> screening() {
+    public List<Product> screening(ProviderInfo providerInfo) {
         LOG.info("Screening has started for " + this.TITLE);
 
         String queryPath = "/search/?menu_id=100008&text=%s&available=1";
 
         LocalDateTime fetchTime = LocalDateTime.now();
 
-        List<ru.proshik.applepricebot.repository.model.Product> newProducts = new ArrayList<>();
         List<Product> products = new ArrayList<>();
 
         for (ProductTypePointer productTypePointer : productTypeClassHolder()) {
@@ -64,19 +60,23 @@ public class CitilinkSpbProvider implements Provider {
                     continue;
                 }
                 try {
-                    CitilinkProductObject object = objectMapper.readValue(info, CitilinkProductObject.class);
+                    CitilinkProduct object = objectMapper.readValue(info, CitilinkProduct.class);
                     ArrayList<String> productData = groupExtractor(object.getShortName(), productTypePointer.liTitleRegexp);
-                    if (productData.size() == 4 || !object.getPrice().equals(null)) {
-                        String title = String.format("%s %s", productData.get(3), productData.get(2));
-                        String description = productData.get(0);
-                        String paramsData = productData.get(2);
-                        Map<String, String> params = extractGBSolid(paramsData);
-                        products.add(new Product(title, description, Boolean.TRUE, new BigDecimal(object.getPrice()), productTypePointer.assortmentType, productTypePointer.productType, params));
-//                        newProducts.add(new ru.proshik.applepricebot.repository.model.Product(ZonedDateTime.now(), fetchTime, ShopType.CITI_LINK,
-//                                title, description, null, new BigDecimal(object.getPrice()), productTypePointer.productType, ProviderUtils.paramsToString(params)));
-                    } else {
-                        LOG.error("wrong extract data for " + object.getShortName());
-                    }
+
+                    String title = String.format("%s %s", productData.get(3), productData.get(2));
+                    String description = productData.get(0);
+                    String paramsData = productData.get(2);
+                    Map<String, String> params = extractGBSolid(paramsData);
+
+                    Product product = Product.builder()
+                            .title(title)
+                            .description(description)
+                            .price(new BigDecimal(object.getPrice()))
+                            .productType(productTypePointer.productType)
+                            .parameters(ProviderUtils.paramsToString(params))
+                            .build();
+
+                    products.add(product);
                 } catch (IOException e) {
                     LOG.error(String.format(this.URL + queryPath, productTypePointer.queryText));
                     e.printStackTrace();
@@ -86,8 +86,7 @@ public class CitilinkSpbProvider implements Provider {
         }
         LOG.info("Screening has ended for " + TITLE);
 
-        return newProducts;
-//       return new Fetch(LocalDateTime.now(), assortment);
+        return products;
     }
 
     private HtmlPage openPageByQueryText(String queryPath, String queryText) {
@@ -113,19 +112,17 @@ public class CitilinkSpbProvider implements Provider {
 //                new ProductTypePointer(AssortmentType.IPHONE, ProductTypes.IPHONE_7, "iphone7red", "iPhone 7.*"),
 //                new ProductTypePointer(AssortmentType.IPHONE, ProductTypes.IPHONE_6S, "iphone6s", "iPhone 6s.*"),
 //                new ProductTypePointer(AssortmentType.IPHONE, ProductTypes.IPHONE_6, "iphone6", "iPhone 6.*"),
-                new ProductTypePointer(AssortmentType.IPHONE, ProductType.IPHONE_SE, "iphone%20SE", "(iPhone SE).(\\d+Gb),(.*),(.*)")
+                new ProductTypePointer(ProductType.IPHONE_SE, "iphone%20SE", "(iPhone SE).(\\d+Gb),(.*),(.*)")
         );
     }
 
     private class ProductTypePointer {
-        AssortmentType assortmentType;
+
         ProductType productType;
         String queryText;
         String liTitleRegexp;
 
-        ProductTypePointer(AssortmentType assortmentType, ProductType productType, String queryText,
-                           String liTitleRegexp) {
-            this.assortmentType = assortmentType;
+        ProductTypePointer(ProductType productType, String queryText, String liTitleRegexp) {
             this.productType = productType;
             this.queryText = queryText;
             this.liTitleRegexp = liTitleRegexp;
@@ -135,9 +132,9 @@ public class CitilinkSpbProvider implements Provider {
     /**
      * Fun
      */
-    public static void main(String[] args) throws ProviderParseException {
-        CitilinkSpbProvider citilinkSpbProvider = new CitilinkSpbProvider();
-        citilinkSpbProvider.screening();
-    }
+//    public static void main(String[] args) {
+//        CitilinkSpbProvider citilinkSpbProvider = new CitilinkSpbProvider();
+//        citilinkSpbProvider.screening();
+//    }
 
 }

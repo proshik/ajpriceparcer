@@ -8,17 +8,14 @@ import org.apache.log4j.Logger;
 import org.w3c.css.sac.CSSException;
 import org.w3c.css.sac.CSSParseException;
 import org.w3c.css.sac.ErrorHandler;
+import ru.proshik.applepricebot.model.ProviderInfo;
 import ru.proshik.applepricebot.provider.Provider;
-import ru.proshik.applepricebot.repository.model.ShopType;
-import ru.proshik.applepricebot.storage.model.AssortmentType;
-import ru.proshik.applepricebot.storage.model.Product;
-import ru.proshik.applepricebot.storage.model.ProductType;
+import ru.proshik.applepricebot.repository.model.Product;
+import ru.proshik.applepricebot.repository.model.ProductType;
 import ru.proshik.applepricebot.utils.ProviderUtils;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,8 +27,8 @@ public class IStoreSpbProvider implements Provider {
 
     private static final Logger LOG = Logger.getLogger(ru.proshik.applepricebot.provider.gsmstore.GsmStoreProvider.class);
 
-    public static final String TITLE = "ISTORESPB";
-    public static final String URL = "http://istorespb.ru";
+    private static final String TITLE = "ISTORESPB";
+    private static final String URL = "http://istorespb.ru";
 
     private static List<Pattern> TITLE_PATTERNS = Arrays.asList(Pattern.compile(".*GB"), Pattern.compile(".*Gb"));
 
@@ -44,13 +41,11 @@ public class IStoreSpbProvider implements Provider {
     }
 
     @Override
-    public List<ru.proshik.applepricebot.repository.model.Product> screening() {
+    public List<Product> screening(ProviderInfo providerInfo) {
         LOG.info("Screening has started for " + TITLE);
 
-        LocalDateTime fetchTime = LocalDateTime.now();
-
-        List<ru.proshik.applepricebot.repository.model.Product> newProducts = new ArrayList<>();
         List<Product> products = new ArrayList<>();
+
         for (ProductTypePointer ptp : productTypeClassHolder()) {
             HtmlPage page;
             try {
@@ -106,18 +101,22 @@ public class IStoreSpbProvider implements Provider {
                 if (title != null) {
                     params = ProviderUtils.extractParameters(title);
                 }
-//                newProducts.add(new ru.proshik.applepricebot.repository.model.Product(ZonedDateTime.now(), fetchTime, ShopType.ISTORE_SBP,
-//                        title, description, null, price, ptp.productType, ProviderUtils.paramsToString(params)));
-                products.add(new Product(title, description, null, price, AssortmentType.IPHONE, ptp.productType, params));
+                Product product =
+                        Product.builder()
+                                .title(title)
+                                .description(description)
+                                .price(price)
+                                .productType(ptp.productType)
+                                .parameters(ProviderUtils.paramsToString(params))
+                                .build();
+
+                products.add(product);
             }
         }
 
-//        printAssortments(assortments);
+        LOG.info("Screening ended for " + TITLE);
 
-        LOG.info("Screening has ended for " + TITLE);
-
-        return newProducts;
-//        return new Fetch(LocalDateTime.now(), assortment);
+        return products;
     }
 
 
@@ -167,10 +166,9 @@ public class IStoreSpbProvider implements Provider {
     /**
      * Run
      */
-    public static void main(String[] args) {
-        IStoreSpbProvider gsmStoreProvider = new IStoreSpbProvider();
-        gsmStoreProvider.screening();
-    }
-
+//    public static void main(String[] args) {
+//        IStoreSpbProvider gsmStoreProvider = new IStoreSpbProvider();
+//        gsmStoreProvider.screening();
+//    }
 
 }

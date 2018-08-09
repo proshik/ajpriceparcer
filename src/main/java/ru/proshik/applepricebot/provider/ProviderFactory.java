@@ -2,38 +2,30 @@ package ru.proshik.applepricebot.provider;
 
 
 import org.springframework.stereotype.Component;
+import ru.proshik.applepricebot.model.ProviderInfo;
 import ru.proshik.applepricebot.provider.aj.AjProvider;
 import ru.proshik.applepricebot.provider.citilink.CitilinkSpbProvider;
 import ru.proshik.applepricebot.provider.gsmstore.GsmStoreProvider;
 import ru.proshik.applepricebot.provider.istorespb.IStoreSpbProvider;
 import ru.proshik.applepricebot.repository.model.ShopType;
-import ru.proshik.applepricebot.storage.model.Shop;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 @Component
 public class ProviderFactory {
 
-    private Map<ShopType, Provider> PROVIDERS = new HashMap<>();
+    private Map<ProviderInfo, Provider> PROVIDERS = new HashMap<>();
 
     public ProviderFactory() {
-        PROVIDERS.put(ShopType.AJ, new AjProvider());
-        PROVIDERS.put(ShopType.GSM_STORE, new GsmStoreProvider());
-        PROVIDERS.put(ShopType.ISTORE_SBP, new IStoreSpbProvider());
-        PROVIDERS.put(ShopType.CITI_LINK, new CitilinkSpbProvider());
+        PROVIDERS.put(new ProviderInfo(ShopType.AJ.getTitle(), ShopType.AJ.getUrl(), ShopType.AJ.isEnabled()), new AjProvider());
+        PROVIDERS.put(new ProviderInfo(ShopType.GSM_STORE.getTitle(), ShopType.GSM_STORE.getUrl(),ShopType.GSM_STORE.isEnabled()), new GsmStoreProvider());
+        PROVIDERS.put(new ProviderInfo(ShopType.ISTORE_SBP.getTitle(), ShopType.ISTORE_SBP.getUrl(), ShopType.ISTORE_SBP.isEnabled()), new IStoreSpbProvider());
+        PROVIDERS.put(new ProviderInfo(ShopType.CITI_LINK.getTitle(), ShopType.CITI_LINK.getUrl(), ShopType.CITI_LINK.isEnabled()), new CitilinkSpbProvider());
     }
 
-    public Map<ShopType, Provider> providers() {
+    public Map<ProviderInfo, Provider> providers() {
         return PROVIDERS;
-    }
-
-    public Set<Shop> getShops() {
-        // TODO: 26.06.2018  
-        return Collections.emptySet();
-//        return new HashSet<>(PROVIDERS.keySet());
     }
 
 }

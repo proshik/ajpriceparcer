@@ -1,10 +1,11 @@
-package ru.proshik.applepricebot.service.v2;
+package ru.proshik.applepricebot.service;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.proshik.applepricebot.exception.ProviderParseException;
+import ru.proshik.applepricebot.model.ProviderInfo;
 import ru.proshik.applepricebot.provider.Provider;
 import ru.proshik.applepricebot.provider.ProviderFactory;
 import ru.proshik.applepricebot.repository.AssortmentRepository;
@@ -37,13 +38,13 @@ public class ScreeningService {
 
     @Transactional
     public List<Assortment> provideProducts(boolean store) {
-        Map<ShopType, Provider> providers = providerFactory.providers();
+        Map<ProviderInfo, Provider> providers = providerFactory.providers();
 
-        Map<ShopType, List<Product>> productByShopType = new HashMap<>();
-        for (Map.Entry<ShopType, Provider> entry : providers.entrySet()) {
+        Map<ProviderInfo, List<Product>> productByShopType = new HashMap<>();
+        for (Map.Entry<ProviderInfo, Provider> entry : providers.entrySet()) {
             try {
                 if (entry.getKey().isEnabled()) {
-                    List<Product> products = entry.getValue().screening();
+                    List<Product> products = entry.getValue().screening(entry.getKey());
                     productByShopType.put(entry.getKey(), products);
                 }
             } catch (ProviderParseException e) {
@@ -52,11 +53,11 @@ public class ScreeningService {
         }
 
         List<Assortment> result = new ArrayList<>();
-        for (Map.Entry<ShopType, List<Product>> entry : productByShopType.entrySet()) {
+        for (Map.Entry<ProviderInfo, List<Product>> entry : productByShopType.entrySet()) {
             Assortment assortment = Assortment.builder()
                     .createdDate(ZonedDateTime.now())
                     .fetchDate(LocalDateTime.now().atZone(ZoneId.of("Europe/Moscow")).toLocalDateTime())
-                    .shopType(entry.getKey())
+                    .shopType(ShopType.fromTitle(entry.getKey().getTitle()))
                     .products(entry.getValue())
                     .build();
 

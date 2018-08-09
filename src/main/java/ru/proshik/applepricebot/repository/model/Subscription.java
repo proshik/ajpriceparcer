@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
-import ru.proshik.applepricebot.storage.model.ProductType;
 
 import javax.persistence.*;
 

@@ -4,9 +4,7 @@ import org.apache.log4j.Logger;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import ru.proshik.applepricebot.service.DiffService;
-import ru.proshik.applepricebot.service.v2.NotificationService;
-import ru.proshik.applepricebot.service.v2.ScreeningService;
+import ru.proshik.applepricebot.service.ScreeningService;
 
 public class ScreeningJob implements Job {
 
@@ -14,12 +12,6 @@ public class ScreeningJob implements Job {
 
     @Autowired
     private ScreeningService screeningService;
-
-    @Autowired
-    private DiffService diffService;
-
-    @Autowired
-    private NotificationService notificationService;
 
     @Override
     public void execute(JobExecutionContext context) {
