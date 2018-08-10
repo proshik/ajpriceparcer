@@ -1,17 +1,17 @@
 package ru.proshik.applepricebot.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.proshik.applepricebot.repository.model.Assortment;
+import ru.proshik.applepricebot.repository.model.ProductType;
+import ru.proshik.applepricebot.repository.model.ProviderType;
 import ru.proshik.applepricebot.service.ScreeningService;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "api/v1")
+@RequestMapping(value = "api/v1/assortment")
 public class AssortmentController {
 
     private final ScreeningService screeningService;
@@ -21,9 +21,17 @@ public class AssortmentController {
         this.screeningService = screeningService;
     }
 
-    @PostMapping("assortment")
+    @PostMapping
     public List<Assortment> assortment(@RequestParam(required = false, defaultValue = "false") boolean store) {
         return screeningService.provideProducts(store);
+    }
+
+    // TODO: 10.08.2018
+    @GetMapping("filter")
+    public List<Assortment> filter(@RequestParam(required = false) ProviderType providerType,
+                                   @RequestParam(required = false) ProductType productType) {
+
+        return Collections.emptyList();
     }
 
 }
