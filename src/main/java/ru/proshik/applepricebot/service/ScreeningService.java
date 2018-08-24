@@ -8,6 +8,7 @@ import ru.proshik.applepricebot.exception.ProviderParseException;
 import ru.proshik.applepricebot.repository.AssortmentRepository;
 import ru.proshik.applepricebot.repository.ProviderRepository;
 import ru.proshik.applepricebot.repository.model.Assortment;
+import ru.proshik.applepricebot.repository.model.FetchType;
 import ru.proshik.applepricebot.repository.model.Product;
 import ru.proshik.applepricebot.repository.model.Provider;
 import ru.proshik.applepricebot.service.provider.ProviderResolver;
@@ -67,6 +68,7 @@ public class ScreeningService {
         for (Map.Entry<Long, List<Product>> entry : productByShopType.entrySet()) {
             Assortment assortment = Assortment.builder()
                     .createdDate(ZonedDateTime.now())
+                    .fetchType(FetchType.MAIN_DAY_SCHEDULE)
                     .fetchDate(LocalDateTime.now().atZone(ZoneId.of("Europe/Moscow")).toLocalDateTime())
                     .provider(byProviderId.get(entry.getKey()))
                     .products(entry.getValue())

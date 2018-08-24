@@ -37,10 +37,12 @@ public class Assortment {
     @Column(name = "fetch_date")
     private LocalDateTime fetchDate;
 
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = "fetch_type")
     private FetchType fetchType;
 
     @OneToOne
-    @JoinColumn(name="provider_id")
+    @JoinColumn(name = "provider_id")
     private Provider provider;
 
     @OneToMany(mappedBy = "assortment", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
