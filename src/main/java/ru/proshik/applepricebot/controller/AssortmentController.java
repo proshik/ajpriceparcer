@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.proshik.applepricebot.repository.model.Assortment;
 import ru.proshik.applepricebot.repository.model.FetchType;
 import ru.proshik.applepricebot.repository.model.ProductType;
-import ru.proshik.applepricebot.repository.model.ProviderType;
 import ru.proshik.applepricebot.service.AssortmentService;
 import ru.proshik.applepricebot.service.ScreeningService;
 
@@ -32,11 +31,10 @@ public class AssortmentController {
     }
 
     @GetMapping("filter")
-    public List<Assortment> filter(@RequestParam(required = false) String date,
-                                   @RequestParam(required = false) FetchType providerType,
-                                   @RequestParam(required = false) ProductType productType) {
-
-        Local
+    public List<Assortment> filter(@RequestParam(value = "date", required = false) String date,
+                                   @RequestParam(value = "fetch-type", required = false) FetchType fetchType,
+                                   @RequestParam(value = "provider", required = false) String provider,
+                                   @RequestParam(value = "product-type", required = false) ProductType productType) {
 
         return Collections.emptyList();
     }
