@@ -37,6 +37,8 @@ public class Assortment {
     @Column(name = "fetch_date")
     private LocalDateTime fetchDate;
 
+    private FetchType fetchType;
+
     @OneToOne
     @JoinColumn(name="provider_id")
     private Provider provider;

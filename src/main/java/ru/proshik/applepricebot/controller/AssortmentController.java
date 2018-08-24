@@ -21,7 +21,7 @@ public class AssortmentController {
         this.screeningService = screeningService;
     }
 
-    @PostMapping
+    @GetMapping
     public List<Assortment> assortment(@RequestParam(required = false, defaultValue = "false") boolean store) {
         return screeningService.provideProducts(store);
     }
