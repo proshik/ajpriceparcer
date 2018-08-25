@@ -10,8 +10,9 @@ public class GeneralExceptionHandler {
     private static final Logger LOG = Logger.getLogger(GeneralExceptionHandler.class);
 
     @ExceptionHandler(value = Exception.class)
-    protected void handleException(Exception ex) {
+    protected void handleException(Exception ex) throws Exception {
         LOG.error("Unexpected error", ex);
+        throw ex;
     }
 
 }
