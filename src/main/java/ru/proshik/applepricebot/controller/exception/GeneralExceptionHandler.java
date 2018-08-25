@@ -1,4 +1,4 @@
-package ru.proshik.applepricebot.controller;
+package ru.proshik.applepricebot.controller.exception;
 
 import org.apache.log4j.Logger;
 import org.springframework.web.bind.annotation.ControllerAdvice;

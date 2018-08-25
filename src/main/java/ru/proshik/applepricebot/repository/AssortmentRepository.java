@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public interface AssortmentRepository extends JpaRepository<Assortment, Long> {
 
-    @Query("select a from Assortment a join fetch a.provider " +
+    @Query("select a from Assortment a join fetch a.provider provider " +
             "where a.fetchDate >= :startFetchDate and a.fetchDate < :endFetchDate and a.fetchType=:fetchType")
     List<Assortment> findByFetchDateAndFetchType(@Param("startFetchDate") LocalDateTime startOfDay,
                                                  @Param("endFetchDate") LocalDateTime endOfDay,
