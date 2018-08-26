@@ -8,6 +8,7 @@ import ru.proshik.applepricebot.exception.ProviderParseException;
 import ru.proshik.applepricebot.repository.AssortmentRepository;
 import ru.proshik.applepricebot.repository.ProviderRepository;
 import ru.proshik.applepricebot.repository.model.Assortment;
+import ru.proshik.applepricebot.repository.model.FetchType;
 import ru.proshik.applepricebot.repository.model.Product;
 import ru.proshik.applepricebot.repository.model.Provider;
 import ru.proshik.applepricebot.service.provider.ProviderResolver;
@@ -16,10 +17,7 @@ import ru.proshik.applepricebot.service.provider.Screening;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,20 +27,21 @@ public class ScreeningService {
 
     private final ProviderResolver providerResolver;
 
-    private final AssortmentRepository assortmentRepository;
-
     private final ProviderRepository providerRepository;
 
+    private final AssortmentRepository assortmentRepository;
+
     @Autowired
-    public ScreeningService(ProviderResolver providerResolver, AssortmentRepository assortmentRepository, ProviderRepository providerRepository) {
+    public ScreeningService(ProviderResolver providerResolver,
+                            AssortmentRepository assortmentRepository,
+                            ProviderRepository providerRepository) {
         this.providerResolver = providerResolver;
         this.assortmentRepository = assortmentRepository;
         this.providerRepository = providerRepository;
     }
 
     @Transactional
-    public List<Assortment> provideProducts(boolean store) {
-
+    public List<Assortment> provideProducts(FetchType fetchType, boolean store) {
         List<Provider> providers = providerRepository.findAll();
 
         Map<Long, Provider> byProviderId = providers.stream()
@@ -67,6 +66,7 @@ public class ScreeningService {
         for (Map.Entry<Long, List<Product>> entry : productByShopType.entrySet()) {
             Assortment assortment = Assortment.builder()
                     .createdDate(ZonedDateTime.now())
+                    .fetchType(fetchType)
                     .fetchDate(LocalDateTime.now().atZone(ZoneId.of("Europe/Moscow")).toLocalDateTime())
                     .provider(byProviderId.get(entry.getKey()))
                     .products(entry.getValue())

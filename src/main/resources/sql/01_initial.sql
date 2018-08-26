@@ -21,7 +21,7 @@ create table if not exists provider
   created_date timestamp           default now(),
   title        text UNIQUE     NOT NULL,
   url          text UNIQUE     NOT NULL,
-  enabled       boolean UNIQUE  NOT NULL,
+  enabled      boolean         NOT NULL,
   type         text UNIQUE     NOT NULL
 );
 

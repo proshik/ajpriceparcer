@@ -10,7 +10,10 @@ import org.hibernate.id.enhanced.SequenceStyleGenerator;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 @Getter
 @Builder
@@ -37,11 +40,15 @@ public class Assortment {
     @Column(name = "fetch_date")
     private LocalDateTime fetchDate;
 
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = "fetch_type")
+    private FetchType fetchType;
+
     @OneToOne
-    @JoinColumn(name="provider_id")
+    @JoinColumn(name = "provider_id")
     private Provider provider;
 
-    @OneToMany(mappedBy = "assortment", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<Product> products;
+    @OneToMany(mappedBy = "assortment", cascade = {CascadeType.ALL})
+    private List<Product> products = new ArrayList<>();
 
 }

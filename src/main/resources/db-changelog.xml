@@ -10,5 +10,11 @@
     <changeSet id="2" author="proshik">
         <sqlFile path="sql/02_quartz.sql" relativeToChangelogFile="true" stripComments="true"/>
     </changeSet>
+    <changeSet id="3" author="proshik">
+        <sqlFile path="sql/03_provider_data.sql" relativeToChangelogFile="true" stripComments="true"/>
+    </changeSet>
+    <changeSet id="4" author="proshik">
+        <sqlFile path="sql/04_fetch_type.sql" relativeToChangelogFile="true" stripComments="true"/>
+    </changeSet>
 
 </databaseChangeLog>

@@ -37,12 +37,14 @@ spring:
     jdbc:
       initialize-schema: never
     properties:
-      org.quartz.threadPool.threadCount: 5
+      org.quartz.threadPool.threadCount: 2
       org.quartz.jobStore.isClustered: true
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
 server:
   port: ${PORT:8080}
-
+#  tomcat:
+#    max-connections: 50
+#    max-threads: 1
 
 info:
   app:

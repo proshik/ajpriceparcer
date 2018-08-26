@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import ru.proshik.applepricebot.repository.model.FetchType;
 import ru.proshik.applepricebot.service.ScreeningService;
 
 public class ScreeningJob implements Job {
@@ -16,7 +17,7 @@ public class ScreeningJob implements Job {
     @Override
     public void execute(JobExecutionContext context) {
         try {
-            screeningService.provideProducts(true);
+            screeningService.provideProducts(FetchType.MAIN_DAY_SCHEDULE, true);
         } catch (Exception e) {
             LOG.error("Unexpected error on screening job", e);
         }

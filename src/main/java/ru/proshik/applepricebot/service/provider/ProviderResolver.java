@@ -33,8 +33,4 @@ public class ProviderResolver {
         return screening;
     }
 
-    public Map<ProviderType, Screening> providers() {
-        return PROVIDERS;
-    }
-
 }
