@@ -37,6 +37,10 @@ $ docker run --rm \
 
 Print /start command after running bot service.
 
+### Swagger
+
+`http://localhost:8080/swagger-ui.html`
+
 ## TODO
 
 - internalization;

@@ -1,5 +1,6 @@
 package ru.proshik.applepricebot.repository.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vladmihalcea.hibernate.type.array.IntArrayType;
 import com.vladmihalcea.hibernate.type.array.StringArrayType;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
@@ -62,6 +63,7 @@ public class Product {
     @Column(columnDefinition = "json")
     private String parameters;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "assortment_id", nullable = false, updatable = false)
     private Assortment assortment;

@@ -4,8 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import ru.proshik.applepricebot.repository.model.ProductType;
+
+import javax.validation.constraints.NotNull;
 
 @Getter
 @Builder
