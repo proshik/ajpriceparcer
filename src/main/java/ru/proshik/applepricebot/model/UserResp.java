@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Builder
 @AllArgsConstructor
-public class UserRestOut {
+public class UserResp {
 
     private Long id;
 
@@ -18,7 +18,7 @@ public class UserRestOut {
 
     private String chatId;
 
-    private List<SubscriptionRestOut> subscriptions;
+    private List<Long> subscriptionIds;
 
 
 }

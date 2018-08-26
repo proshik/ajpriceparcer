@@ -27,20 +27,21 @@ public class ScreeningService {
 
     private final ProviderResolver providerResolver;
 
-    private final AssortmentRepository assortmentRepository;
-
     private final ProviderRepository providerRepository;
 
+    private final AssortmentRepository assortmentRepository;
+
     @Autowired
-    public ScreeningService(ProviderResolver providerResolver, AssortmentRepository assortmentRepository, ProviderRepository providerRepository) {
+    public ScreeningService(ProviderResolver providerResolver,
+                            AssortmentRepository assortmentRepository,
+                            ProviderRepository providerRepository) {
         this.providerResolver = providerResolver;
         this.assortmentRepository = assortmentRepository;
         this.providerRepository = providerRepository;
     }
 
     @Transactional
-    public List<Assortment> provideProducts(boolean store) {
-
+    public List<Assortment> provideProducts(FetchType fetchType, boolean store) {
         List<Provider> providers = providerRepository.findAll();
 
         Map<Long, Provider> byProviderId = providers.stream()
@@ -65,7 +66,7 @@ public class ScreeningService {
         for (Map.Entry<Long, List<Product>> entry : productByShopType.entrySet()) {
             Assortment assortment = Assortment.builder()
                     .createdDate(ZonedDateTime.now())
-                    .fetchType(FetchType.MAIN_DAY_SCHEDULE)
+                    .fetchType(fetchType)
                     .fetchDate(LocalDateTime.now().atZone(ZoneId.of("Europe/Moscow")).toLocalDateTime())
                     .provider(byProviderId.get(entry.getKey()))
                     .products(entry.getValue())

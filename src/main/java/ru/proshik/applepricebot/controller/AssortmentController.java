@@ -2,7 +2,7 @@ package ru.proshik.applepricebot.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.proshik.applepricebot.model.AssortmentOut;
+import ru.proshik.applepricebot.model.AssortmentResp;
 import ru.proshik.applepricebot.repository.model.Assortment;
 import ru.proshik.applepricebot.repository.model.FetchType;
 import ru.proshik.applepricebot.repository.model.ProductType;
@@ -30,16 +30,15 @@ public class AssortmentController {
     }
 
     @PostMapping
-    public List<Assortment> assortment(@RequestParam(required = false, defaultValue = "false") boolean store) {
-        return screeningService.provideProducts(store);
+    public List<Assortment> provideAssortment(@RequestParam(required = false, defaultValue = "false") boolean store) {
+        return screeningService.provideProducts(FetchType.BY_REQUEST, store);
     }
 
     @GetMapping("filter")
-    public List<AssortmentOut> filter(@RequestParam(value = "fetchDate", required = false) String fetchDateIn,
-                                      @RequestParam(value = "fetchType", required = false) FetchType fetchType,
-                                      @RequestParam(value = "provider", required = false) String provider,
-                                      @RequestParam(value = "productType", required = false) ProductType productType) {
-
+    public List<AssortmentResp> filter(@RequestParam(value = "fetchDate", required = false) String fetchDateIn,
+                                       @RequestParam(value = "fetchType", required = false) FetchType fetchType,
+                                       @RequestParam(value = "provider", required = false) String provider,
+                                       @RequestParam(value = "productType", required = false) ProductType productType) {
         LocalDate fetchDate = parseFetchDate(fetchDateIn);
 
         return assortmentService.filterByParameters(fetchDate, fetchType, provider, productType);
@@ -49,6 +48,7 @@ public class AssortmentController {
         if (fetchDateIn != null) {
             return LocalDate.parse(fetchDateIn, DATE_FORMATTER);
         }
+
         return null;
     }
 

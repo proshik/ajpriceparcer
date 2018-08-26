@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AssortmentOut {
+public class AssortmentResp {
 
     private String provider;
 
@@ -21,7 +21,7 @@ public class AssortmentOut {
 
     private LocalDateTime fetchDate;
 
-    private List<ProductOut> products;
+    private List<ProductResp> products;
 
 }
 

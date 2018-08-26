@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.proshik.applepricebot.exception.ProviderNotFoundException;
 import ru.proshik.applepricebot.exception.ProviderUpdateEnableException;
-import ru.proshik.applepricebot.model.ProviderRestOut;
+import ru.proshik.applepricebot.model.ProviderResp;
 import ru.proshik.applepricebot.repository.ProviderRepository;
 import ru.proshik.applepricebot.repository.model.Provider;
 
@@ -24,17 +24,17 @@ public class ProviderController {
     }
 
     @GetMapping
-    public List<ProviderRestOut> list() {
+    public List<ProviderResp> list() {
         List<Provider> providers = providerRepository.findAll();
 
         return providers.stream()
                 .map(this::transform)
-                .sorted(Comparator.comparing(ProviderRestOut::getId))
+                .sorted(Comparator.comparing(ProviderResp::getId))
                 .collect(Collectors.toList());
     }
 
     @GetMapping(value = "{providerId}")
-    public ProviderRestOut providerProvider(@PathVariable("providerId") Long providerId) {
+    public ProviderResp providerProvider(@PathVariable("providerId") Long providerId) {
         Provider provider = providerRepository.findById(providerId)
                 .orElseThrow(() -> new ProviderNotFoundException("Provider not found by id=" + providerId));
 
@@ -50,8 +50,8 @@ public class ProviderController {
         }
     }
 
-    private ProviderRestOut transform(Provider provider) {
-        return ProviderRestOut.builder()
+    private ProviderResp transform(Provider provider) {
+        return ProviderResp.builder()
                 .id(provider.getId())
                 .title(provider.getTitle())
                 .providerType(provider.getType())

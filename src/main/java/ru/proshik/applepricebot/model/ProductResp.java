@@ -7,12 +7,15 @@ import lombok.NoArgsConstructor;
 import ru.proshik.applepricebot.repository.model.ProductType;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 @Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductOut {
+public class ProductResp {
+
+    private Long id;
 
     private String title;
 
@@ -23,5 +26,7 @@ public class ProductOut {
     private BigDecimal price;
 
     private ProductType productType;
+
+    private Map<String, String> parameters;
 
 }

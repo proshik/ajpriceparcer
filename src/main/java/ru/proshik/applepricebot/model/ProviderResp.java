@@ -8,12 +8,16 @@ import ru.proshik.applepricebot.repository.model.ProviderType;
 @Getter
 @Builder
 @AllArgsConstructor
-public class ProviderRestOut {
+public class ProviderResp {
 
     private Long id;
+
     private String title;
+
     private String url;
+
     private ProviderType providerType;
+
     private boolean enabled;
 
 }

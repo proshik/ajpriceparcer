@@ -3,8 +3,8 @@ package ru.proshik.applepricebot.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.proshik.applepricebot.model.AssortmentOut;
-import ru.proshik.applepricebot.model.ProductOut;
+import ru.proshik.applepricebot.model.AssortmentResp;
+import ru.proshik.applepricebot.model.ProductResp;
 import ru.proshik.applepricebot.repository.AssortmentRepository;
 import ru.proshik.applepricebot.repository.model.Assortment;
 import ru.proshik.applepricebot.repository.model.FetchType;
@@ -28,10 +28,10 @@ public class AssortmentService {
     }
 
     @Transactional
-    public List<AssortmentOut> filterByParameters(LocalDate fetchDate,
-                                                  FetchType fetchType,
-                                                  String provider,
-                                                  ProductType productType) {
+    public List<AssortmentResp> filterByParameters(LocalDate fetchDate,
+                                                   FetchType fetchType,
+                                                   String provider,
+                                                   ProductType productType) {
         LocalDateTime startOfDay;
         LocalDateTime endOfDay;
         if (fetchDate != null) {
@@ -52,9 +52,9 @@ public class AssortmentService {
         return Collections.emptyList();
     }
 
-    private List<AssortmentOut> transformAssortment(List<Assortment> assortment) {
+    private List<AssortmentResp> transformAssortment(List<Assortment> assortment) {
         return assortment.stream()
-                .map(a -> AssortmentOut.builder()
+                .map(a -> AssortmentResp.builder()
                         .provider(a.getProvider().getTitle())
                         .fetchType(a.getFetchType())
                         .fetchDate(a.getFetchDate())
@@ -63,9 +63,9 @@ public class AssortmentService {
                 .collect(Collectors.toList());
     }
 
-    private List<ProductOut> transform(List<Product> products) {
+    private List<ProductResp> transform(List<Product> products) {
         return products.stream()
-                .map(p -> ProductOut.builder()
+                .map(p -> ProductResp.builder()
                         .title(p.getTitle())
                         .description(p.getDescription())
                         .available(p.getAvailable())
