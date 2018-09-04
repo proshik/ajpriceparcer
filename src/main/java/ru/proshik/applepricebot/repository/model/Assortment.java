@@ -1,9 +1,6 @@
 package ru.proshik.applepricebot.repository.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.id.enhanced.SequenceStyleGenerator;
 
@@ -19,6 +16,7 @@ import java.util.Set;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(of = {"id"})
 @Entity
 @Table(name = "assortment")
 public class Assortment {
@@ -48,7 +46,7 @@ public class Assortment {
     @JoinColumn(name = "provider_id")
     private Provider provider;
 
-    @OneToMany(mappedBy = "assortment", cascade = {CascadeType.ALL})
-    private List<Product> products = new ArrayList<>();
+    @OneToMany(mappedBy = "assortment", cascade = {CascadeType.ALL}, orphanRemoval = true)
+    private List<Product> products;
 
 }

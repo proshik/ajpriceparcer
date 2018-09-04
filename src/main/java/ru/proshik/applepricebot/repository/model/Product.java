@@ -1,17 +1,8 @@
 package ru.proshik.applepricebot.repository.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.vladmihalcea.hibernate.type.array.IntArrayType;
-import com.vladmihalcea.hibernate.type.array.StringArrayType;
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-import com.vladmihalcea.hibernate.type.json.JsonNodeBinaryType;
-import com.vladmihalcea.hibernate.type.json.JsonNodeStringType;
-import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
-import org.hibernate.annotations.TypeDefs;
 import org.hibernate.id.enhanced.SequenceStyleGenerator;
 
 import javax.persistence.*;
@@ -24,13 +15,13 @@ import java.math.BigDecimal;
 @EqualsAndHashCode(of = {"id"})
 @Entity
 @Table(name = "product")
-@TypeDefs({
-        @TypeDef(name = "string-array", typeClass = StringArrayType.class),
-        @TypeDef(name = "int-array", typeClass = IntArrayType.class),
-        @TypeDef(name = "json", typeClass = JsonStringType.class),
-        @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class),
-        @TypeDef(name = "jsonb-node", typeClass = JsonNodeBinaryType.class),
-        @TypeDef(name = "json-node", typeClass = JsonNodeStringType.class)})
+//@TypeDefs({
+//        @TypeDef(name = "string-array", typeClass = StringArrayType.class),
+//        @TypeDef(name = "int-array", typeClass = IntArrayType.class),
+//        @TypeDef(name = "json", typeClass = JsonStringType.class),
+//        @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class),
+//        @TypeDef(name = "jsonb-node", typeClass = JsonNodeBinaryType.class),
+//        @TypeDef(name = "json-node", typeClass = JsonNodeStringType.class)})
 public class Product {
 
     @Id
@@ -59,8 +50,9 @@ public class Product {
     @Column(name = "product_type")
     private ProductType productType;
 
-    @Type(type = "jsonb")
-    @Column(columnDefinition = "json")
+    //    @Type(type = "jsonb")
+    //    @Column(columnDefinition = "json")
+    @Column(name = "parameters")
     private String parameters;
 
     @JsonIgnore

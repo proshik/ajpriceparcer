@@ -6,14 +6,11 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.proshik.applepricebot.model.AssortmentResp;
 import ru.proshik.applepricebot.model.ProductResp;
 import ru.proshik.applepricebot.repository.AssortmentRepository;
-import ru.proshik.applepricebot.repository.model.Assortment;
-import ru.proshik.applepricebot.repository.model.FetchType;
-import ru.proshik.applepricebot.repository.model.Product;
-import ru.proshik.applepricebot.repository.model.ProductType;
+import ru.proshik.applepricebot.repository.model.*;
+import ru.proshik.applepricebot.repository.specification.AssortmentSpecification;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,7 +27,7 @@ public class AssortmentService {
     @Transactional
     public List<AssortmentResp> filterByParameters(LocalDate fetchDate,
                                                    FetchType fetchType,
-                                                   String provider,
+                                                   ProviderType providerType,
                                                    ProductType productType) {
         LocalDateTime startOfDay;
         LocalDateTime endOfDay;
@@ -42,14 +39,12 @@ public class AssortmentService {
             startOfDay = previousDay.atStartOfDay();
             endOfDay = startOfDay.plusDays(1);
         }
+//        List<Assortment> as = assortmentRepository.findByFetchDateAndFetchType(startOfDay, endOfDay, fetchType);
 
-        if (fetchType != null) {
-            List<Assortment> assortment = assortmentRepository.findByFetchDateAndFetchType(startOfDay, endOfDay, fetchType);
+        List<Assortment> assortments = assortmentRepository
+                .findAll(AssortmentSpecification.filter(startOfDay, endOfDay, fetchType, providerType, productType));
 
-            return transformAssortment(assortment);
-        }
-
-        return Collections.emptyList();
+        return transformAssortment(assortments);
     }
 
     private List<AssortmentResp> transformAssortment(List<Assortment> assortment) {

@@ -41,14 +41,14 @@ public class ProductController {
 
     private ProductResp transform(Product product) {
         Map<String, String> parameters = new HashMap<>();
-        if (product.getParameters() != null) {
-            try {
-                parameters = jsonMapper.readValue(product.getParameters(), new TypeReference<Map<String, String>>() {
-                });
-            } catch (IOException e) {
-                LOG.error("Unexpected error on parse json value of parameters for product with id=" + product.getId());
-            }
-        }
+//        if (product.getParameters() != null) {
+//            try {
+//                parameters = jsonMapper.readValue(product.getParameters(), new TypeReference<Map<String, String>>() {
+//                });
+//            } catch (IOException e) {
+//                LOG.error("Unexpected error on parse json value of parameters for product with id=" + product.getId());
+//            }
+//        }
 
         return ProductResp.builder()
                 .id(product.getId())

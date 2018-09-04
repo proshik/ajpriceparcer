@@ -6,6 +6,7 @@ import ru.proshik.applepricebot.model.AssortmentResp;
 import ru.proshik.applepricebot.repository.model.Assortment;
 import ru.proshik.applepricebot.repository.model.FetchType;
 import ru.proshik.applepricebot.repository.model.ProductType;
+import ru.proshik.applepricebot.repository.model.ProviderType;
 import ru.proshik.applepricebot.service.AssortmentService;
 import ru.proshik.applepricebot.service.ScreeningService;
 
@@ -37,11 +38,11 @@ public class AssortmentController {
     @GetMapping("filter")
     public List<AssortmentResp> filter(@RequestParam(value = "fetchDate", required = false) String fetchDateIn,
                                        @RequestParam(value = "fetchType", required = false) FetchType fetchType,
-                                       @RequestParam(value = "provider", required = false) String provider,
+                                       @RequestParam(value = "providerType", required = false) ProviderType providerType,
                                        @RequestParam(value = "productType", required = false) ProductType productType) {
         LocalDate fetchDate = parseFetchDate(fetchDateIn);
 
-        return assortmentService.filterByParameters(fetchDate, fetchType, provider, productType);
+        return assortmentService.filterByParameters(fetchDate, fetchType, providerType, productType);
     }
 
     private LocalDate parseFetchDate(String fetchDateIn) {
