@@ -11,15 +11,20 @@ import java.util.stream.Collectors;
 public class Transformer {
 
     public static UserResp transform(User user) {
+        // TODO: 05.09.2018 remove if everething is ok
         List<Long> subscriptionIds = user.getSubscriptions().stream()
                 .map(Subscription::getId)
+                .collect(Collectors.toList());
+
+        List<SubscriptionResp> subscriptions = user.getSubscriptions().stream()
+                .map(subscription -> transform(subscription))
                 .collect(Collectors.toList());
 
         return UserResp.builder()
                 .id(user.getId())
                 .createdDate(user.getCreatedDate())
                 .chatId(user.getChatId())
-                .subscriptionIds(subscriptionIds)
+                .subscriptions(subscriptions)
                 .build();
     }
 
@@ -28,6 +33,7 @@ public class Transformer {
                 .id(subscription.getId())
                 .productType(subscription.getProductType())
                 .providerId(subscription.getProvider().getId())
+                .providerType(subscription.getProvider().getType())
                 .build();
     }
 

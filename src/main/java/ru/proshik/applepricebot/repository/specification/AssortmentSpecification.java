@@ -1,13 +1,15 @@
 package ru.proshik.applepricebot.repository.specification;
 
-import org.hibernate.query.criteria.internal.path.PluralAttributePath;
 import org.springframework.data.jpa.domain.Specification;
 import ru.proshik.applepricebot.repository.model.Assortment;
 import ru.proshik.applepricebot.repository.model.FetchType;
 import ru.proshik.applepricebot.repository.model.ProductType;
 import ru.proshik.applepricebot.repository.model.ProviderType;
 
-import javax.persistence.criteria.*;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +22,6 @@ public class AssortmentSpecification {
                                                    ProviderType providerType,
                                                    ProductType productType) {
 
-
         return new Specification<Assortment>() {
             @Override
             public Predicate toPredicate(Root<Assortment> root,
@@ -28,73 +29,39 @@ public class AssortmentSpecification {
                                          CriteriaBuilder criteriaBuilder) {
                 List<Predicate> predicates = new ArrayList<>();
 
+                root.fetch("products");
                 root.fetch("provider");
-//                root.fetch("products");
-                Join<Object, Object> products = root.join("products");
-//                roo.fetch((PluralAttributePath) root.get("products"));
-
                 criteriaQuery.distinct(true);
-//                root.get(products)
-//                root.get("fetchType")
 
-                criteriaQuery.where(criteriaBuilder.equal(root.get("fetchType"), fetchType));
-                criteriaQuery.where(criteriaBuilder.equal(products.get("productType"), productType));
-
-                return criteriaQuery.getRestriction();
-
-//                System.out.println();
-//                criteriaBuilder.equal(root.g().)
-//
-//                root.get("adf").
-//                        criteriaQuery.distinct(true);
-//
-//                criteriaQuery.equals()
-//
-//                root.get("products");
-//                products.get("productType")
-//                products.on(criteriaBuilder.equal(products.get("productType"), productType));
-//                Root<Product> from = criteriaQuery.from(Product.class);
-
-//                Path<Product> products1 = root.get("products");
-//                products1.get("productType");
-//                if (startOfDay != null && endOfDay != null) {
-//                    predicates.add(criteriaBuilder.between(root.get("fetchDate"), startOfDay, endOfDay));
-//                }
-//                if (fetchType != null) {
-//                    predicates.add(criteriaBuilder.equal(root.get("fetchType"), fetchType));
-//                }
-//                if (providerType != null) {
-//                    predicates.add(criteriaBuilder.equal(root.get("provider").get("type"), providerType));
-//                }
+                if (startOfDay != null && endOfDay != null) {
+                    predicates.add(criteriaBuilder.between(root.get("fetchDate"), startOfDay, endOfDay));
+                }
+                if (fetchType != null) {
+                    predicates.add(criteriaBuilder.equal(root.get("fetchType"), fetchType));
+                }
+                if (providerType != null) {
+                    predicates.add(criteriaBuilder.equal(root.get("provider").get("type"), providerType));
+                }
+                // First attempt get products by productType
 //                if (productType != null) {
-//                    Path<Object> objectPath = root.join("products").get("productType");
-//                    Join<Assortment, Product> assortmentProductJoin = root.join("products");
-//                    assortmentProductJoin.fetch("")
-//                    Path<Object> productType1 = assortmentProductJoin.get("productType");
-//                    Join<Assortment, Product> on = assortmentProductJoin.on(criteriaBuilder.equal(assortmentProductJoin.get("productType"), productType));
-//                    predicates.add(criteriaBuilder.equal(from.get("productType"), productType));
-//                    root.fetch("products");
-
-//                    predicates.add(root.join("products").get("productType").in(productType));
+//                    predicates.add(criteriaBuilder.equal(products.get("productType"), productType));
 //                }
-//                return criteriaBuilder.conjunction();
-//                Join<Assortment, Product> company = root.join("products");
+
+                // Second attempt get products by productType
+//                Root<Product> producdts = criteriaQuery.from(Product.class);
 //
-//                criteriaQuery.where(criteriaBuilder.equal(company.get("productType"), productType));
-//                return criteriaQuery.getGroupRestriction();
-//                return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-//                return criteriaBuilder.equal(company.get("productType"), productType);
+//                Path<ProductType> productTypePath = producdts.get("productType");
+//
+//                Predicate customerIsAccountOwner = criteriaBuilder.equal(producdts.<Product>get("assortment"), root);
+//                Predicate accountExpiryDateBefore = criteriaBuilder.equal(productTypePath, productType);
+//
+//                predicates.add(customerIsAccountOwner);
+//                predicates.add(accountExpiryDateBefore);
+
+                Predicate[] predicatesArray = new Predicate[predicates.size()];
+                return criteriaBuilder.and(predicates.toArray(predicatesArray));
             }
         };
     }
 
-//    private static Specification<Product> productSpecification(ProductType productType) {
-//        return new Specification<Product>() {
-//            @Override
-//            public Predicate toPredicate(Root<Product> root,
-//                                         CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
-//                return null;
-//            }
-//        }
-//    }
 }

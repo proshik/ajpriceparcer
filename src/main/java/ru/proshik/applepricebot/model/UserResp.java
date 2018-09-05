@@ -3,6 +3,7 @@ package ru.proshik.applepricebot.model;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import ru.proshik.applepricebot.repository.model.Subscription;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -18,7 +19,7 @@ public class UserResp {
 
     private String chatId;
 
-    private List<Long> subscriptionIds;
+    private List<SubscriptionResp> subscriptions;
 
 
 }

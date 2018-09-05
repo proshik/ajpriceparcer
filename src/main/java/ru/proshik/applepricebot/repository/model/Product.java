@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(of = {"id"})
+//@EqualsAndHashCode(of = {"id"})
 @Entity
 @Table(name = "product")
 //@TypeDefs({

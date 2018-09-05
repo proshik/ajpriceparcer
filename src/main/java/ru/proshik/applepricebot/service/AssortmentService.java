@@ -39,27 +39,31 @@ public class AssortmentService {
             startOfDay = previousDay.atStartOfDay();
             endOfDay = startOfDay.plusDays(1);
         }
-//        List<Assortment> as = assortmentRepository.findByFetchDateAndFetchType(startOfDay, endOfDay, fetchType);
+//        List<Assortment> a =
+//                assortmentRepository.findByFetchDateAndFetchType(startOfDay, endOfDay, fetchType, providerType, productType);
+
+//        List<Assortment> allWithNameOnly = assortmentRepository.findAllWithNameOnly(startOfDay, endOfDay, fetchType, providerType, productType);
 
         List<Assortment> assortments = assortmentRepository
                 .findAll(AssortmentSpecification.filter(startOfDay, endOfDay, fetchType, providerType, productType));
 
-        return transformAssortment(assortments);
+        return transformAssortment(assortments, productType);
     }
 
-    private List<AssortmentResp> transformAssortment(List<Assortment> assortment) {
+    private List<AssortmentResp> transformAssortment(List<Assortment> assortment, ProductType productType) {
         return assortment.stream()
                 .map(a -> AssortmentResp.builder()
                         .provider(a.getProvider().getTitle())
                         .fetchType(a.getFetchType())
                         .fetchDate(a.getFetchDate())
-                        .products(transform(a.getProducts()))
+                        .products(transform(a.getProducts(), productType))
                         .build())
                 .collect(Collectors.toList());
     }
 
-    private List<ProductResp> transform(List<Product> products) {
+    private List<ProductResp> transform(List<Product> products, ProductType productType) {
         return products.stream()
+                .filter(p -> p.getProductType() == productType)
                 .map(p -> ProductResp.builder()
                         .title(p.getTitle())
                         .description(p.getDescription())

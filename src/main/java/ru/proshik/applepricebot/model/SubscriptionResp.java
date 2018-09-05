@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import ru.proshik.applepricebot.repository.model.ProductType;
+import ru.proshik.applepricebot.repository.model.ProviderType;
 
 @Getter
 @Builder
@@ -16,4 +17,5 @@ public class SubscriptionResp {
 
     private ProductType productType;
 
+    private ProviderType providerType;
 }

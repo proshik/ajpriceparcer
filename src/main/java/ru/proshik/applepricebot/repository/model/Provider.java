@@ -41,4 +41,5 @@ public class Provider {
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
     private ProviderType type;
+
 }
