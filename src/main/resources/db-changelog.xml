@@ -16,5 +16,8 @@
     <changeSet id="4" author="proshik">
         <sqlFile path="sql/04_fetch_type.sql" relativeToChangelogFile="true" stripComments="true"/>
     </changeSet>
+    <changeSet id="5" author="proshik">
+        <sqlFile path="sql/05_change_parameters_column_type.sql" relativeToChangelogFile="true" stripComments="true"/>
+    </changeSet>
 
 </databaseChangeLog>
