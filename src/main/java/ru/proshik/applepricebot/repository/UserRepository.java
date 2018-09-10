@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
 
-    @Query(value = "select distinct u from User u join fetch u.subscriptions s join fetch s.provider p join fetch s.")
+    @Query(value = "select distinct u from User u join fetch u.subscriptions s join fetch s.provider p")
     List<User> findUsers(Pageable pageable);
 
 //    @Query(value = "select u from User u inner join fetch u.subscriptions s")
