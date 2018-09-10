@@ -93,8 +93,7 @@ public class AjScreening implements Screening {
                         LOG.warn("The price doesn't found for productType=" + ptp.productType);
                     }
 
-                    Product product =
-                            Product.builder()
+                    Product product = Product.builder()
                                     .title(title)
                                     .description(description)
                                     .price(price)

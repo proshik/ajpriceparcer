@@ -103,8 +103,7 @@ public class GsmStoreScreening implements Screening {
                     params = ProviderUtils.extractParameters(title);
                 }
 
-                Product product =
-                        Product.builder()
+                Product product = Product.builder()
                                 .title(title)
                                 .description(description)
                                 .price(price)

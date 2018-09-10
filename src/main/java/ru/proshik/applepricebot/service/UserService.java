@@ -15,7 +15,7 @@ import ru.proshik.applepricebot.repository.model.User;
 
 import java.util.List;
 
-import static ru.proshik.applepricebot.service.utils.Transformer.transform;
+import static ru.proshik.applepricebot.utils.Transformer.transform;
 
 @Service
 public class UserService {

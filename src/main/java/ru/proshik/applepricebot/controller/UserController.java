@@ -8,10 +8,9 @@ import ru.proshik.applepricebot.model.SubscriptionReq;
 import ru.proshik.applepricebot.model.SubscriptionResp;
 import ru.proshik.applepricebot.model.UserResp;
 import ru.proshik.applepricebot.repository.UserRepository;
-import ru.proshik.applepricebot.repository.model.ProductType;
 import ru.proshik.applepricebot.repository.model.User;
 import ru.proshik.applepricebot.service.UserService;
-import ru.proshik.applepricebot.service.utils.Transformer;
+import ru.proshik.applepricebot.utils.Transformer;
 
 import javax.validation.Valid;
 import java.util.List;

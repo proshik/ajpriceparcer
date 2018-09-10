@@ -1,4 +1,4 @@
-package ru.proshik.applepricebot.service.utils;
+package ru.proshik.applepricebot.utils;
 
 import ru.proshik.applepricebot.model.SubscriptionResp;
 import ru.proshik.applepricebot.model.UserResp;
@@ -12,12 +12,12 @@ public class Transformer {
 
     public static UserResp transform(User user) {
         // TODO: 05.09.2018 remove if everething is ok
-        List<Long> subscriptionIds = user.getSubscriptions().stream()
-                .map(Subscription::getId)
-                .collect(Collectors.toList());
+//        List<Long> subscriptionIds = user.getSubscriptions().stream()
+//                .map(Subscription::getId)
+//                .collect(Collectors.toList());
 
         List<SubscriptionResp> subscriptions = user.getSubscriptions().stream()
-                .map(subscription -> transform(subscription))
+                .map(Transformer::transform)
                 .collect(Collectors.toList());
 
         return UserResp.builder()
