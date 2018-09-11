@@ -6,8 +6,6 @@ spring:
     show-sql: true
     properties:
       hibernate.jdbc.lob.non_contextual_creation: true
-  #    hibernate:
-  #      ddl-auto: update
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     platform: postgres
@@ -52,11 +50,10 @@ info:
     version: ${parent.version}
 
 # Telegram
-telegram.username: ${APPLEPRICESBOT_TELEGRAMUSERNAME}
-telegram.token: ${APPLEPRICESBOT_TELEGRAMTOKEN}
+telegram:
+  username: ${APPLEPRICESBOT_TELEGRAMUSERNAME}
+  token: ${APPLEPRICESBOT_TELEGRAMTOKEN}
 
-# DBPATH
-db.path: ${APPLEPRICESBOT_DBPATH:database.db}
 
 #logging:
 #  level:
