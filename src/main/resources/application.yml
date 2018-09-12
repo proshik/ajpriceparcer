@@ -18,13 +18,6 @@ spring:
       maximum-pool-size: 100
       connection-timeout: 30000
       connection-test-query: SELECT 1
-  profiles:
-    active: local
-  rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
   jackson:
     serialization.write-dates-as-timestamps: false
   liquibase:
@@ -51,6 +44,8 @@ info:
 
 # Telegram
 telegram:
+  webhook: ${APPLEPRICESBOT_WEBHOOK_IS_ENABLE:false}
+  webhook_url: ${APPLEPRICESBOT_WEBHOOK_URL:null}
   username: ${APPLEPRICESBOT_TELEGRAMUSERNAME}
   token: ${APPLEPRICESBOT_TELEGRAMTOKEN}
 
