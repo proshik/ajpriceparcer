@@ -1,18 +1,29 @@
 package ru.proshik.applepricebot.service.bot;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.bots.AbsSender;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.updateshandlers.SentCallback;
+
+import java.io.Serializable;
 
 @Component
 public class BotMessageHandler {
 
     private static final Logger LOG = Logger.getLogger(BotMessageHandler.class);
 
-    public BotApiMethod<Message> onWebhookUpdateReceived(Update update) {
+    @Lazy
+    @Autowired
+    private AbsSender bot;
+
+    public BotApiMethod<Message> onWebHookUpdateReceived(Update update) {
         // 1. build custom keyboard after any /start command and any messages. Buttons: Information, Statistics, Notifications.
         // Information shows the actual information by prices into shops. Statistic shows a change the prices between dates and dynamics by long period.
         // Notifications need for subscribe on several events like change prices for shops and products and avalable new products.
@@ -43,10 +54,23 @@ public class BotMessageHandler {
         }
 
         return message;
-//        return new SendMessage().setChatId(update.getMessage().getChatId())
-//                .setText("Hello " + update.getMessage().getText() + "!");
     }
 
+    public <T extends Serializable> void sendMessage(BotApiMethod<T> message) {
+        try {
+            bot.execute(message);
+        } catch (TelegramApiException e) {
+            LOG.error("send message", e);
+        }
+    }
+
+    public <T extends Serializable> void sendMessage(BotApiMethod<T> message, SentCallback<T> callback) {
+        try {
+            bot.executeAsync(message, callback);
+        } catch (TelegramApiException e) {
+            LOG.error("async send message");
+        }
+    }
 
     private SendMessage processCallbackOperation(Update update) {
 

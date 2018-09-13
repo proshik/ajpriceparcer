@@ -1,5 +1,6 @@
 package ru.proshik.applepricebot.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -7,6 +8,7 @@ import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 import org.telegram.telegrambots.util.WebhookUtils;
 import ru.proshik.applepricebot.service.bot.BotMessageHandler;
@@ -29,30 +31,36 @@ public class TelegramBotConfig {
     @Value("${telegram.webhook_url}")
     private String webHookUrl;
 
+    @Autowired
+    private BotMessageHandler botMessageHandler;
+
     @Bean
-    public DefaultAbsSender telegramBot(BotMessageHandler botMessageHandler) throws TelegramApiRequestException {
+    public AbsSender telegramBot() throws TelegramApiRequestException {
         ApiContextInitializer.init();
 
         DefaultBotOptions defaultBotOptions = new DefaultBotOptions();
 
+        AbsSender bot;
         if (isWebHook) {
-            DefaultAbsSender bot = new DefaultAbsSender(defaultBotOptions) {
+            DefaultAbsSender webHookBot = new DefaultAbsSender(defaultBotOptions) {
                 @Override
                 public String getBotToken() {
                     return token;
                 }
             };
-            WebhookUtils.setWebhook(bot, checkAndOrUpdateUrl(webHookUrl) + token, "");
+            WebhookUtils.setWebhook(webHookBot, checkAndOrUpdateUrl(webHookUrl) + token, "");
 
-            return bot;
+            bot = webHookBot;
         } else {
-            TgPollingBot bot = new TgPollingBot(botMessageHandler, defaultBotOptions, token, username);
+            TgPollingBot pollingBot = new TgPollingBot(defaultBotOptions, botMessageHandler, token, username);
 
             TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
-            telegramBotsApi.registerBot(bot);
+            telegramBotsApi.registerBot(pollingBot);
 
-            return bot;
+            bot = pollingBot;
         }
+
+        return bot;
     }
 
     private static String checkAndOrUpdateUrl(String url) {

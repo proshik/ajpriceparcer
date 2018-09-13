@@ -18,7 +18,7 @@ public class BotController {
     @PostMapping("/callback/${APPLEPRICESBOT_TELEGRAMTOKEN}")
     @ResponseBody
     public BotApiMethod<?> onUpdateReceived(@RequestBody Update update) {
-        return botMessageHandler.onWebhookUpdateReceived(update);
+        return botMessageHandler.onWebHookUpdateReceived(update);
     }
 
 }
