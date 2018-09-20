@@ -41,8 +41,7 @@ public class AjScreening implements Screening {
         try {
             page = client.getPage(provider.getUrl());
         } catch (IOException e) {
-            LOG.error("Error on parse aj.ru", e);
-            throw new ProviderParseException("Error on priceAssortment page from aj.ru", e);
+            throw new ProviderParseException("Error on get page from aj.ru", e);
         }
 
         List<Product> products = new ArrayList<>();

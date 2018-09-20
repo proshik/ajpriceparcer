@@ -45,7 +45,7 @@ public class GsmStoreScreening implements Screening {
             try {
                 page = client.getPage(provider.getUrl() + ptp.urlPath);
             } catch (IOException e) {
-                LOG.error("Error on get page from gsm-store.ru for url" + provider.getUrl() + ptp.urlPath);
+                LOG.error("Error on get page from gsm-store.ru for url" + provider.getUrl() + ptp.urlPath, e);
                 continue;
             }
 
