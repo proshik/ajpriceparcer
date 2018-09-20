@@ -1,1 +1,1 @@
-web: java -jar target/applepricesbot-1.0-SNAPSHOT.jar -Dspring.server.port=$PORT -Xmx=512
+web: java -jar target/applepricesbot-1.0-SNAPSHOT.jar -Dspring.server.port=$PORT
