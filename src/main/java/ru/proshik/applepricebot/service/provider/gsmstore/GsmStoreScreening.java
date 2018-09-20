@@ -11,7 +11,6 @@ import ru.proshik.applepricebot.utils.ProviderUtils;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,8 +37,6 @@ public class GsmStoreScreening implements Screening {
     @Override
     public List<Product> screening(Provider provider) {
         LOG.info("Screening has started for " + provider.getTitle());
-
-        LocalDateTime fetchTime = LocalDateTime.now();
 
         List<Product> products = new ArrayList<>();
 
@@ -104,13 +101,13 @@ public class GsmStoreScreening implements Screening {
                 }
 
                 Product product = Product.builder()
-                                .title(title)
-                                .description(description)
-                                .price(price)
-                                .available(available)
-                                .productType(ptp.productType)
-                                .parameters(ProviderUtils.paramsToString(params))
-                                .build();
+                        .title(title)
+                        .description(description)
+                        .price(price)
+                        .available(available)
+                        .productType(ptp.productType)
+                        .parameters(ProviderUtils.paramsToString(params))
+                        .build();
 
                 products.add(product);
             }
@@ -132,11 +129,12 @@ public class GsmStoreScreening implements Screening {
                 new ProductTypePointer(ProductType.IPHONE_6S, "/telefony/telefony-apple-iphone/iphone-6s/"),
                 new ProductTypePointer(ProductType.IPHONE_6S_PLUS, "/telefony/telefony-apple-iphone/iphone-6s-plus-/"),
                 new ProductTypePointer(ProductType.IPHONE_6, "/telefony/telefony-apple-iphone/iphone-6/"),
-                new ProductTypePointer(ProductType.IPHONE_SE, "/telefony/telefony-apple-iphone/iphone-se/"));
+                new ProductTypePointer(ProductType.IPHONE_SE, "/telefony/telefony-apple-iphone/iphone-se/"),
+                new ProductTypePointer(ProductType.IPHONE_XS, "/telefony/telefony-apple-iphone/iphone-xs/"),
+                new ProductTypePointer(ProductType.IPHONE_XS_MAX, "/telefony/telefony-apple-iphone/iphone-xs-max/"));
     }
 
     private class ProductTypePointer {
-
         ProductType productType;
         String urlPath;
 
@@ -144,7 +142,6 @@ public class GsmStoreScreening implements Screening {
             this.productType = productType;
             this.urlPath = urlPath;
         }
-
     }
 
     /**
@@ -152,7 +149,9 @@ public class GsmStoreScreening implements Screening {
      */
 //    public static void main(String[] args) {
 //        GsmStoreScreening gsmStoreProvider = new GsmStoreScreening();
-//        gsmStoreProvider.screening();
+//        List<Product> screening = gsmStoreProvider.screening(new Provider(null, null, "gsm-store", "https://gsm-store.ru", true, GSM_STORE));
+////        screening.stream().filter(product -> product.getProductType() == ProductType.IPHONE_XS).collect(Collectors.toList());
+//        System.out.println(screening);
 //    }
 
 }

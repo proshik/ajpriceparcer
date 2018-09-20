@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static ru.proshik.applepricebot.repository.model.ProviderType.AJ;
 import static ru.proshik.applepricebot.utils.ProviderUtils.extractParameters;
 
 public class AjScreening implements Screening {
@@ -34,11 +35,13 @@ public class AjScreening implements Screening {
         WebClient client = new WebClient();
         client.getOptions().setCssEnabled(false);
         client.getOptions().setJavaScriptEnabled(false);
+        client.getOptions().setUseInsecureSSL(true);
 
         HtmlPage page;
         try {
             page = client.getPage(provider.getUrl());
         } catch (IOException e) {
+            LOG.error("Error on parse aj.ru", e);
             throw new ProviderParseException("Error on priceAssortment page from aj.ru", e);
         }
 
@@ -94,12 +97,12 @@ public class AjScreening implements Screening {
                     }
 
                     Product product = Product.builder()
-                                    .title(title)
-                                    .description(description)
-                                    .price(price)
-                                    .productType(ptp.productType)
-                                    .parameters(ProviderUtils.paramsToString(params))
-                                    .build();
+                            .title(title)
+                            .description(description)
+                            .price(price)
+                            .productType(ptp.productType)
+                            .parameters(ProviderUtils.paramsToString(params))
+                            .build();
 
                     products.add(product);
                 }
@@ -123,6 +126,11 @@ public class AjScreening implements Screening {
                 new ProductTypePointer(ProductType.IPHONE_6S, "iphone6s", "iPhone 6s.*"),
                 new ProductTypePointer(ProductType.IPHONE_6, "iphone6", "iPhone 6.*"),
                 new ProductTypePointer(ProductType.IPHONE_SE, "iphone5se", "iPhone SE.*")
+// TODO: 20.09.2018 fix for this
+//                new ProductTypePointer(ProductType.IPHONE_XS, "iphoneXS", "iPhone XS(?!.*Max).*"),
+//                new ProductTypePointer(ProductType.IPHONE_XS_MAX, "iphoneXS", "iPhone XS Max.*"),
+//                new ProductTypePointer(ProductType.IPHONE_XR, "iphoneXR", "iPhone XR.*")
+
                 // MacBook Pro
 //                new ProductTypePointer(AssortmentType.MACBOOK_PRO, ProductTypes.MACBOOK_PRO_2017, "MacBookPro2017", "13\".*"),
 //                new ProductTypePointer(AssortmentType.MACBOOK_PRO, ProductTypes.MACBOOK_PRO_2017, "MacBookPro2017", "15\".*"),
@@ -153,7 +161,9 @@ public class AjScreening implements Screening {
      */
 //    public static void main(String[] args) throws ProviderParseException {
 //        AjScreening apP = new AjScreening();
-//        apP.screening();
+//        List<Product> screening = apP.screening(new Provider(null, null, "aj.ru", "https://aj.ru", true, AJ));
+//
+//        System.out.println(screening);
 //    }
 
 }
