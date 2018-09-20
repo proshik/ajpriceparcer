@@ -11,8 +11,14 @@
       "description": "Description for telegram.token."
     },
     {
-      "name": "db.path",
+      "name": "telegram.webhook.enabled",
       "type": "java.lang.String",
-      "description": "Description for db.path."
+      "description": "Description for telegram.webhook.enabled."
+    },
+    {
+      "name": "telegram.webhook.url",
+      "type": "java.lang.String",
+      "description": "Description for telegram.webhook.url."
     }
-  ] }
+  ]
+}

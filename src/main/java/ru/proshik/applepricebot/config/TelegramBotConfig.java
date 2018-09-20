@@ -25,10 +25,10 @@ public class TelegramBotConfig {
     @Value("${telegram.username}")
     private String username;
 
-    @Value("${telegram.webhook}")
-    private boolean isWebHook;
+    @Value("${telegram.webhook.enabled}")
+    private boolean webHookEnabled;
 
-    @Value("${telegram.webhook_url}")
+    @Value("${telegram.webhook.url}")
     private String webHookUrl;
 
     @Autowired
@@ -41,7 +41,7 @@ public class TelegramBotConfig {
         DefaultBotOptions defaultBotOptions = new DefaultBotOptions();
 
         AbsSender bot;
-        if (isWebHook) {
+        if (webHookEnabled) {
             DefaultAbsSender webHookBot = new DefaultAbsSender(defaultBotOptions) {
                 @Override
                 public String getBotToken() {

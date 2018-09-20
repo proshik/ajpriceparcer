@@ -44,8 +44,9 @@ info:
 
 # Telegram
 telegram:
-  webhook: ${APPLEPRICESBOT_WEBHOOK_IS_ENABLE:false}
-  webhook_url: ${APPLEPRICESBOT_WEBHOOK_URL:null}
+  webhook:
+    enabled: ${APPLEPRICESBOT_WEBHOOK_IS_ENABLE:false}
+    url: ${APPLEPRICESBOT_WEBHOOK_URL:null}
   username: ${APPLEPRICESBOT_TELEGRAMUSERNAME}
   token: ${APPLEPRICESBOT_TELEGRAMTOKEN}
 
