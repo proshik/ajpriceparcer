@@ -58,7 +58,7 @@ public class ScreeningService {
                     productByShopType.put(provider.getId(), screeningResult);
                 }
             } catch (ProviderParseException e) {
-                LOG.error("Screening the provider with id: " + provider.getId());
+                LOG.error("Screening the provider with id: " + provider.getId(), e);
             }
         }
 

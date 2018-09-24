@@ -17,16 +17,24 @@ public enum ProductType implements Serializable {
     IPHONE_8("iPhone 8"),
     IPHONE_8_PLUS("iPhone 8 Plus"),
     IPHONE_X("iPhone X"),
+    IPHONE_XS("iPhone XS"),
+    IPHONE_XS_MAX("iPhone XS Max"),
+    IPHONE_XR("iPhone XR"),
+
     /*
     iMac
      */
     IMAC_21_5("iMac 21.5"),
+
     IMAC_27("iMac 27"),
+
     IMAC_PRO_27("iMac Pro"),
+
     /*
     Macbook Pro
      */
     MACBOOK_PRO_2017("MacBook Pro 2017"),
+
     MACBOOK_PRO_2016("MacBook Pro 2016");
 
     private String value;
