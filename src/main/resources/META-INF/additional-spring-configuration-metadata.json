@@ -19,6 +19,16 @@
       "name": "telegram.webhook.url",
       "type": "java.lang.String",
       "description": "Description for telegram.webhook.url."
+    },
+    {
+      "name": "info.app.name",
+      "type": "java.lang.String",
+      "description": "Description for info.app.name."
+    },
+    {
+      "name": "info.app.version",
+      "type": "java.lang.String",
+      "description": "Description for info.app.version."
     }
   ]
 }

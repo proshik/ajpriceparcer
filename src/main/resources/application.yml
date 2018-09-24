@@ -15,7 +15,7 @@ spring:
     driver-class-name: org.postgresql.Driver
     hikari:
       minimum-idle: 5
-      maximum-pool-size: 100
+      maximum-pool-size: 20
       connection-timeout: 30000
       connection-test-query: SELECT 1
   jackson:
@@ -33,16 +33,12 @@ spring:
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
 server:
   port: ${PORT:8080}
-#  tomcat:
-#    max-connections: 50
-#    max-threads: 1
 
 info:
   app:
     name: ${spring.application.name}
     version: ${parent.version}
 
-# Telegram
 telegram:
   webhook:
     enabled: ${APPLEPRICESBOT_WEBHOOK_IS_ENABLE:false}
@@ -51,7 +47,4 @@ telegram:
   token: ${APPLEPRICESBOT_TELEGRAMTOKEN}
 
 
-#logging:
-#  level:
-#    org.springframework: debug
 
