@@ -1,18 +1,13 @@
 {
   "properties": [
     {
-      "name": "telegram.username",
+      "name": "info.app.name",
       "type": "java.lang.String",
-      "description": "Description for telegram.username."
+      "description": "Description for info.app.name."
     },
     {
-      "name": "telegram.token",
+      "name": "info.app.version",
       "type": "java.lang.String",
-      "description": "Description for telegram.token."
-    },
-    {
-      "name": "db.path",
-      "type": "java.lang.String",
-      "description": "Description for db.path."
+      "description": "Description for info.app.version."
     }
   ] }

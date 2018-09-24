@@ -48,7 +48,7 @@ public class Assortment {
     @JoinColumn(name = "provider_id")
     private Provider provider;
 
-    @OneToMany(mappedBy = "assortment")
+    @OneToMany(mappedBy = "assortment", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     private List<Product> products = new ArrayList<>();
 
 }

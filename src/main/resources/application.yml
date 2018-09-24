@@ -6,8 +6,6 @@ spring:
     show-sql: true
     properties:
       hibernate.jdbc.lob.non_contextual_creation: true
-  #    hibernate:
-  #      ddl-auto: update
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     platform: postgres
@@ -17,16 +15,9 @@ spring:
     driver-class-name: org.postgresql.Driver
     hikari:
       minimum-idle: 5
-      maximum-pool-size: 100
+      maximum-pool-size: 20
       connection-timeout: 30000
       connection-test-query: SELECT 1
-  profiles:
-    active: local
-  rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
   jackson:
     serialization.write-dates-as-timestamps: false
   liquibase:
@@ -42,23 +33,9 @@ spring:
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
 server:
   port: ${PORT:8080}
-#  tomcat:
-#    max-connections: 50
-#    max-threads: 1
 
 info:
   app:
     name: ${spring.application.name}
     version: ${parent.version}
-
-# Telegram
-telegram.username: ${APPLEPRICESBOT_TELEGRAMUSERNAME}
-telegram.token: ${APPLEPRICESBOT_TELEGRAMTOKEN}
-
-# DBPATH
-db.path: ${APPLEPRICESBOT_DBPATH:database.db}
-
-#logging:
-#  level:
-#    org.springframework: debug
 
