@@ -24,8 +24,9 @@ public class GsmStoreScreening implements Screening {
 
     private static final String IN_STOCK = "В наличии";
     private static final String OUT_STOCK = "Товар закончился";
+//    private static final String WAIT_STOCK = " Товар ожидается";
 
-    private static Pattern TITLE_PATTERN = Pattern.compile(".*Gb");
+    private static Pattern TITLE_PATTERN = Pattern.compile(".*(gb|Gb|GB)");
 
     private WebClient client = new WebClient();
 
@@ -149,8 +150,8 @@ public class GsmStoreScreening implements Screening {
      */
 //    public static void main(String[] args) {
 //        GsmStoreScreening gsmStoreProvider = new GsmStoreScreening();
-//        List<Product> screening = gsmStoreProvider.screening(new Provider(null, null, "gsm-store", "https://gsm-store.ru", true, GSM_STORE));
-////        screening.stream().filter(product -> product.getProductType() == ProductType.IPHONE_XS).collect(Collectors.toList());
+//        List<Product> screening = gsmStoreProvider.screening(new Provider(null, null, "gsm-store", "https://gsm-store.ru", true, ProviderType.GSM_STORE));
+//        screening.stream().filter(product -> product.getProductType() == ProductType.IPHONE_XS).collect(Collectors.toList());
 //        System.out.println(screening);
 //    }
 
