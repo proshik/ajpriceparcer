@@ -1,13 +1,11 @@
 package ru.proshik.applepricebot.service.provider;
 
+import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSpan;
 import org.apache.log4j.Logger;
-import org.w3c.css.sac.CSSException;
-import org.w3c.css.sac.CSSParseException;
-import org.w3c.css.sac.ErrorHandler;
 import ru.proshik.applepricebot.repository.model.Product;
 import ru.proshik.applepricebot.repository.model.ProductType;
 import ru.proshik.applepricebot.repository.model.Provider;
@@ -33,7 +31,7 @@ public class IStoreSpbScreeningProvider implements ScreeningProvider {
     public IStoreSpbScreeningProvider() {
         client.getOptions().setCssEnabled(false);
         client.getOptions().setJavaScriptEnabled(false);
-        client.setCssErrorHandler(new CustomErrorHandler());
+        client.setCssErrorHandler(new SilentCssErrorHandler());
     }
 
     @Override
@@ -98,12 +96,12 @@ public class IStoreSpbScreeningProvider implements ScreeningProvider {
                     params = ProviderUtils.extractParameters(title);
                 }
                 Product product = Product.builder()
-                                .title(title)
-                                .description(description)
-                                .price(price)
-                                .productType(ptp.productType)
-                                .parameters(ProviderUtils.paramsToString(params))
-                                .build();
+                        .title(title)
+                        .description(description)
+                        .price(price)
+                        .productType(ptp.productType)
+                        .parameters(ProviderUtils.paramsToString(params))
+                        .build();
 
                 products.add(product);
             }
@@ -138,24 +136,6 @@ public class IStoreSpbScreeningProvider implements ScreeningProvider {
             this.urlPath = urlPath;
         }
 
-    }
-
-    private class CustomErrorHandler implements ErrorHandler {
-
-        @Override
-        public void warning(CSSParseException e) throws CSSException {
-
-        }
-
-        @Override
-        public void error(CSSParseException e) throws CSSException {
-
-        }
-
-        @Override
-        public void fatalError(CSSParseException e) throws CSSException {
-
-        }
     }
 
     /**

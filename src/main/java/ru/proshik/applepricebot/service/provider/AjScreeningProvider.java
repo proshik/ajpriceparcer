@@ -1,5 +1,6 @@
 package ru.proshik.applepricebot.service.provider;
 
+import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
@@ -60,6 +61,7 @@ public class AjScreeningProvider implements ScreeningProvider {
         client.getOptions().setCssEnabled(false);
         client.getOptions().setJavaScriptEnabled(false);
         client.getOptions().setUseInsecureSSL(true);
+        client.setCssErrorHandler(new SilentCssErrorHandler());
 
         HtmlPage page;
         try {
@@ -121,7 +123,7 @@ public class AjScreeningProvider implements ScreeningProvider {
      */
 //    public static void main(String[] args) throws ProviderParseException {
 //        AjScreeningProvider apP = new AjScreeningProvider();
-//        List<Product> screening = apP.screening(new Provider(null, null, "aj.ru", "https://aj.ru", true, AJ));
+//        List<Product> screening = apP.screening(new Provider(null, null, "aj.ru", "https://aj.ru", true, ProviderType.AJ));
 //
 //        System.out.println(screening);
 //    }
