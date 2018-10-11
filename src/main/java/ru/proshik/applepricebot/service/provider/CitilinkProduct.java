@@ -1,4 +1,4 @@
-package ru.proshik.applepricebot.service.provider.citilink;
+package ru.proshik.applepricebot.service.provider;
 
 import com.fasterxml.jackson.annotation.*;
 

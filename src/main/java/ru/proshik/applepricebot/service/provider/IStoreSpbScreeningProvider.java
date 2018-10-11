@@ -1,4 +1,4 @@
-package ru.proshik.applepricebot.service.provider.istorespb;
+package ru.proshik.applepricebot.service.provider;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
@@ -11,8 +11,6 @@ import org.w3c.css.sac.ErrorHandler;
 import ru.proshik.applepricebot.repository.model.Product;
 import ru.proshik.applepricebot.repository.model.ProductType;
 import ru.proshik.applepricebot.repository.model.Provider;
-import ru.proshik.applepricebot.service.provider.Screening;
-import ru.proshik.applepricebot.service.provider.gsmstore.GsmStoreScreening;
 import ru.proshik.applepricebot.utils.ProviderUtils;
 
 import java.io.IOException;
@@ -24,15 +22,15 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class IStoreSpbScreening implements Screening {
+public class IStoreSpbScreeningProvider implements ScreeningProvider {
 
-    private static final Logger LOG = Logger.getLogger(GsmStoreScreening.class);
+    private static final Logger LOG = Logger.getLogger(GsmStoreScreeningProvider.class);
 
     private static List<Pattern> TITLE_PATTERNS = Arrays.asList(Pattern.compile(".*GB"), Pattern.compile(".*Gb"));
 
     private WebClient client = new WebClient();
 
-    public IStoreSpbScreening() {
+    public IStoreSpbScreeningProvider() {
         client.getOptions().setCssEnabled(false);
         client.getOptions().setJavaScriptEnabled(false);
         client.setCssErrorHandler(new CustomErrorHandler());
@@ -40,7 +38,7 @@ public class IStoreSpbScreening implements Screening {
 
     @Override
     public List<Product> screening(Provider provider) {
-        LOG.info("Screening has started for " + provider.getTitle());
+        LOG.info("ScreeningProvider has started for " + provider.getTitle());
 
         List<Product> products = new ArrayList<>();
 
@@ -111,7 +109,7 @@ public class IStoreSpbScreening implements Screening {
             }
         }
 
-        LOG.info("Screening ended for " + provider.getTitle());
+        LOG.info("ScreeningProvider ended for " + provider.getTitle());
 
         return products;
     }
@@ -164,7 +162,7 @@ public class IStoreSpbScreening implements Screening {
      * Run
      */
 //    public static void main(String[] args) {
-//        IStoreSpbScreening gsmStoreProvider = new IStoreSpbScreening();
+//        IStoreSpbScreeningProvider gsmStoreProvider = new IStoreSpbScreeningProvider();
 //        gsmStoreProvider.screening();
 //    }
 

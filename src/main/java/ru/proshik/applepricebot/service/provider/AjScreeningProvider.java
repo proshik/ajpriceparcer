@@ -1,4 +1,4 @@
-package ru.proshik.applepricebot.service.provider.aj;
+package ru.proshik.applepricebot.service.provider;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
@@ -10,7 +10,6 @@ import ru.proshik.applepricebot.exception.ProviderParseException;
 import ru.proshik.applepricebot.repository.model.Product;
 import ru.proshik.applepricebot.repository.model.ProductType;
 import ru.proshik.applepricebot.repository.model.Provider;
-import ru.proshik.applepricebot.service.provider.Screening;
 import ru.proshik.applepricebot.utils.ProviderUtils;
 
 import java.io.IOException;
@@ -22,9 +21,9 @@ import java.util.stream.Collectors;
 
 import static ru.proshik.applepricebot.utils.ProviderUtils.extractParameters;
 
-public class AjScreening implements Screening {
+public class AjScreeningProvider implements ScreeningProvider {
 
-    private static final Logger LOG = Logger.getLogger(AjScreening.class);
+    private static final Logger LOG = Logger.getLogger(AjScreeningProvider.class);
 
     private static class ProductTypeInfo {
         ProductType productType;
@@ -55,7 +54,7 @@ public class AjScreening implements Screening {
 
     @Override
     public List<Product> screening(Provider provider) throws ProviderParseException {
-        LOG.info("Screening has started for " + provider.getTitle());
+        LOG.info("ScreeningProvider has started for " + provider.getTitle());
 
         WebClient client = new WebClient();
         client.getOptions().setCssEnabled(false);
@@ -112,7 +111,7 @@ public class AjScreening implements Screening {
             }
         }
 
-        LOG.info("Screening has ended for " + provider.getTitle());
+        LOG.info("ScreeningProvider has ended for " + provider.getTitle());
 
         return products;
     }
@@ -121,7 +120,7 @@ public class AjScreening implements Screening {
      * Run
      */
 //    public static void main(String[] args) throws ProviderParseException {
-//        AjScreening apP = new AjScreening();
+//        AjScreeningProvider apP = new AjScreeningProvider();
 //        List<Product> screening = apP.screening(new Provider(null, null, "aj.ru", "https://aj.ru", true, AJ));
 //
 //        System.out.println(screening);
