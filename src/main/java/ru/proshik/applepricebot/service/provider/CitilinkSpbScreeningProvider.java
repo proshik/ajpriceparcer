@@ -1,4 +1,4 @@
-package ru.proshik.applepricebot.service.provider.citilink;
+package ru.proshik.applepricebot.service.provider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -8,7 +8,6 @@ import org.apache.log4j.Logger;
 import ru.proshik.applepricebot.repository.model.Product;
 import ru.proshik.applepricebot.repository.model.ProductType;
 import ru.proshik.applepricebot.repository.model.Provider;
-import ru.proshik.applepricebot.service.provider.Screening;
 import ru.proshik.applepricebot.utils.ProviderUtils;
 
 import java.io.IOException;
@@ -23,15 +22,15 @@ import static ru.proshik.applepricebot.utils.ProviderUtils.extractGBSolid;
 import static ru.proshik.applepricebot.utils.ProviderUtils.groupExtractor;
 
 
-public class CitilinkSpbScreening implements Screening {
+public class CitilinkSpbScreeningProvider implements ScreeningProvider {
 
-    private static final Logger LOG = Logger.getLogger(CitilinkSpbScreening.class);
+    private static final Logger LOG = Logger.getLogger(CitilinkSpbScreeningProvider.class);
 
     private WebClient client = new WebClient();
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    public CitilinkSpbScreening() {
+    public CitilinkSpbScreeningProvider() {
         client.getOptions().setCssEnabled(false);
         client.getOptions().setJavaScriptEnabled(false);
         client.addRequestHeader("_space", "spb_cl%3A");
@@ -39,7 +38,7 @@ public class CitilinkSpbScreening implements Screening {
 
     @Override
     public List<Product> screening(Provider provider) {
-        LOG.info("Screening has started for " + provider.getTitle());
+        LOG.info("ScreeningProvider has started for " + provider.getTitle());
 
         String queryPath = "/search/?menu_id=100008&text=%s&available=1";
 
@@ -81,7 +80,7 @@ public class CitilinkSpbScreening implements Screening {
 
             }
         }
-        LOG.info("Screening has ended for " + provider.getTitle());
+        LOG.info("ScreeningProvider has ended for " + provider.getTitle());
 
         return products;
     }
@@ -130,7 +129,7 @@ public class CitilinkSpbScreening implements Screening {
      * Fun
      */
 //    public static void main(String[] args) {
-//        CitilinkSpbScreening citilinkSpbProvider = new CitilinkSpbScreening();
+//        CitilinkSpbScreeningProvider citilinkSpbProvider = new CitilinkSpbScreeningProvider();
 //        citilinkSpbProvider.screening();
 //    }
 

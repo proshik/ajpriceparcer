@@ -6,7 +6,7 @@ import ru.proshik.applepricebot.repository.model.Provider;
 
 import java.util.List;
 
-public interface Screening {
+public interface ScreeningProvider {
 
     List<Product> screening(Provider provider) throws ProviderParseException;
 }

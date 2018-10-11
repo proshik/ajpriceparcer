@@ -12,7 +12,7 @@ import ru.proshik.applepricebot.repository.model.FetchType;
 import ru.proshik.applepricebot.repository.model.Product;
 import ru.proshik.applepricebot.repository.model.Provider;
 import ru.proshik.applepricebot.service.provider.ProviderResolver;
-import ru.proshik.applepricebot.service.provider.Screening;
+import ru.proshik.applepricebot.service.provider.ScreeningProvider;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -51,14 +51,14 @@ public class ScreeningService {
         for (Provider provider : providers) {
             try {
                 if (provider.isEnabled()) {
-                    Screening screening = providerResolver.resolve(provider);
+                    ScreeningProvider screeningProvider = providerResolver.resolve(provider);
 
-                    List<Product> screeningResult = screening.screening(provider);
+                    List<Product> screeningResult = screeningProvider.screening(provider);
 
                     productByShopType.put(provider.getId(), screeningResult);
                 }
             } catch (ProviderParseException e) {
-                LOG.error("Screening the provider with id: " + provider.getId(), e);
+                LOG.error("ScreeningProvider the provider with id: " + provider.getId(), e);
             }
         }
 

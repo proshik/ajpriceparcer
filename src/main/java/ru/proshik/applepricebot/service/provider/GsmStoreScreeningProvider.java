@@ -1,4 +1,4 @@
-package ru.proshik.applepricebot.service.provider.gsmstore;
+package ru.proshik.applepricebot.service.provider;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 import ru.proshik.applepricebot.repository.model.Product;
 import ru.proshik.applepricebot.repository.model.ProductType;
 import ru.proshik.applepricebot.repository.model.Provider;
-import ru.proshik.applepricebot.service.provider.Screening;
 import ru.proshik.applepricebot.utils.ProviderUtils;
 
 import java.io.IOException;
@@ -18,9 +17,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class GsmStoreScreening implements Screening {
+public class GsmStoreScreeningProvider implements ScreeningProvider {
 
-    private static final Logger LOG = Logger.getLogger(GsmStoreScreening.class);
+    private static final Logger LOG = Logger.getLogger(GsmStoreScreeningProvider.class);
 
     private static final String IN_STOCK = "В наличии";
     private static final String OUT_STOCK = "Товар закончился";
@@ -30,14 +29,14 @@ public class GsmStoreScreening implements Screening {
 
     private WebClient client = new WebClient();
 
-    public GsmStoreScreening() {
+    public GsmStoreScreeningProvider() {
         client.getOptions().setCssEnabled(false);
         client.getOptions().setJavaScriptEnabled(false);
     }
 
     @Override
     public List<Product> screening(Provider provider) {
-        LOG.info("Screening has started for " + provider.getTitle());
+        LOG.info("ScreeningProvider has started for " + provider.getTitle());
 
         List<Product> products = new ArrayList<>();
 
@@ -114,7 +113,7 @@ public class GsmStoreScreening implements Screening {
             }
         }
 
-        LOG.info("Screening has ended for " + provider.getTitle());
+        LOG.info("ScreeningProvider has ended for " + provider.getTitle());
 
         return products;
     }
@@ -149,7 +148,7 @@ public class GsmStoreScreening implements Screening {
      * Run
      */
 //    public static void main(String[] args) {
-//        GsmStoreScreening gsmStoreProvider = new GsmStoreScreening();
+//        GsmStoreScreeningProvider gsmStoreProvider = new GsmStoreScreeningProvider();
 //        List<Product> screening = gsmStoreProvider.screening(new Provider(null, null, "gsm-store", "https://gsm-store.ru", true, ProviderType.GSM_STORE));
 //        screening.stream().filter(product -> product.getProductType() == ProductType.IPHONE_XS).collect(Collectors.toList());
 //        System.out.println(screening);
