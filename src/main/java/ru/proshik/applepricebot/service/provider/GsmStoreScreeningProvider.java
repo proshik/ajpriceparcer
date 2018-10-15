@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import ru.proshik.applepricebot.repository.model.Product;
 import ru.proshik.applepricebot.repository.model.ProductType;
 import ru.proshik.applepricebot.repository.model.Provider;
+import ru.proshik.applepricebot.repository.model.ProviderType;
 import ru.proshik.applepricebot.utils.ProviderUtils;
 
 import java.io.IOException;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class GsmStoreScreeningProvider implements ScreeningProvider {
 
@@ -131,7 +133,8 @@ public class GsmStoreScreeningProvider implements ScreeningProvider {
                 new ProductTypePointer(ProductType.IPHONE_6, "/telefony/telefony-apple-iphone/iphone-6/"),
                 new ProductTypePointer(ProductType.IPHONE_SE, "/telefony/telefony-apple-iphone/iphone-se/"),
                 new ProductTypePointer(ProductType.IPHONE_XS, "/telefony/telefony-apple-iphone/iphone-xs/"),
-                new ProductTypePointer(ProductType.IPHONE_XS_MAX, "/telefony/telefony-apple-iphone/iphone-xs-max/"));
+                new ProductTypePointer(ProductType.IPHONE_XS_MAX, "/telefony/telefony-apple-iphone/iphone-xs-max/"),
+                new ProductTypePointer(ProductType.IPHONE_XS_MAX, "/telefony/telefony-apple-iphone/iphone-xs-max-dual-sim/"));
     }
 
     private class ProductTypePointer {
@@ -150,8 +153,10 @@ public class GsmStoreScreeningProvider implements ScreeningProvider {
 //    public static void main(String[] args) {
 //        GsmStoreScreeningProvider gsmStoreProvider = new GsmStoreScreeningProvider();
 //        List<Product> screening = gsmStoreProvider.screening(new Provider(null, null, "gsm-store", "https://gsm-store.ru", true, ProviderType.GSM_STORE));
-//        screening.stream().filter(product -> product.getProductType() == ProductType.IPHONE_XS).collect(Collectors.toList());
+//
+////        screening.stream().filter(product -> product.getProductType() == ProductType.IPHONE_XS).collect(Collectors.toList());
+//
 //        System.out.println(screening);
-//    }
+//   }
 
 }
