@@ -134,7 +134,8 @@ public class GsmStoreScreeningProvider implements ScreeningProvider {
                 new ProductTypePointer(ProductType.IPHONE_SE, "/telefony/telefony-apple-iphone/iphone-se/"),
                 new ProductTypePointer(ProductType.IPHONE_XS, "/telefony/telefony-apple-iphone/iphone-xs/"),
                 new ProductTypePointer(ProductType.IPHONE_XS_MAX, "/telefony/telefony-apple-iphone/iphone-xs-max/"),
-                new ProductTypePointer(ProductType.IPHONE_XS_MAX, "/telefony/telefony-apple-iphone/iphone-xs-max-dual-sim/"));
+                new ProductTypePointer(ProductType.IPHONE_XS_MAX, "/telefony/telefony-apple-iphone/iphone-xs-max-dual-sim/"),
+                new ProductTypePointer(ProductType.IPHONE_XR, "/telefony/telefony-apple-iphone/iphone-xr-/"));
     }
 
     private class ProductTypePointer {

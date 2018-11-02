@@ -11,6 +11,7 @@ import ru.proshik.applepricebot.exception.ProviderParseException;
 import ru.proshik.applepricebot.repository.model.Product;
 import ru.proshik.applepricebot.repository.model.ProductType;
 import ru.proshik.applepricebot.repository.model.Provider;
+import ru.proshik.applepricebot.repository.model.ProviderType;
 import ru.proshik.applepricebot.utils.ProviderUtils;
 
 import java.io.IOException;
@@ -128,4 +129,14 @@ public class AjScreeningProvider implements ScreeningProvider {
 //        System.out.println(screening);
 //    }
 
+
+    // XS
+    // for title: iPhone XS(?!.*Max).*.GB
+    // for description: (?<=GB ).*
+    // for parameters: (?<=XS ).*GB
+
+    // XS Max
+    // for title: iPhone XS Max.*.GB
+    // for description: (?<=GB ).*
+    // for parameters: (?<=Max ).*GB
 }
