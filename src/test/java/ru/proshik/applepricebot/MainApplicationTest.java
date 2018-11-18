@@ -1,13 +1,14 @@
 package ru.proshik.applepricebot;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 public class MainApplicationTest {
 
     @Test
     public void main() {
-        Assert.assertEquals(true, true);
+        assertTrue(true);
     }
 
 }

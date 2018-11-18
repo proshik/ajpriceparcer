@@ -119,6 +119,13 @@
             <artifactId>reactor-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Because of https://stackoverflow.com/questions/52533878/mockito-error-in-spring-boot-tests-after-migrating-to-jdk-11 -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>2.23.0</version>
+            <scope>test</scope>
+        </dependency>
         <!-- Following dependencies need only because spring boot <2.1 doesn't support the Java 11. Remove the dependencies after upgrading the version of the spring boot! -->
         <dependency>
             <groupId>org.javassist</groupId>

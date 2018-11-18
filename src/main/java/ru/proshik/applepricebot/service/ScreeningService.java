@@ -7,13 +7,10 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.proshik.applepricebot.exception.ProviderParseException;
 import ru.proshik.applepricebot.repository.AssortmentRepository;
 import ru.proshik.applepricebot.repository.ProviderRepository;
-import ru.proshik.applepricebot.repository.model.Assortment;
-import ru.proshik.applepricebot.repository.model.FetchType;
-import ru.proshik.applepricebot.repository.model.Product;
-import ru.proshik.applepricebot.repository.model.Provider;
-import ru.proshik.applepricebot.service.provider.ProviderResolver;
+import ru.proshik.applepricebot.repository.model.*;
 import ru.proshik.applepricebot.service.provider.ScreeningProvider;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -25,17 +22,21 @@ public class ScreeningService {
 
     private static final Logger LOG = Logger.getLogger(ScreeningService.class);
 
-    private final ProviderResolver providerResolver;
+//    private final ProviderResolver providerResolver;
 
     private final ProviderRepository providerRepository;
 
     private final AssortmentRepository assortmentRepository;
 
     @Autowired
-    public ScreeningService(ProviderResolver providerResolver,
+    private Map<ProviderType, ScreeningProvider> screeningProviders;
+
+    @Autowired
+    public ScreeningService(
+//            ProviderResolver providerResolver,
                             AssortmentRepository assortmentRepository,
                             ProviderRepository providerRepository) {
-        this.providerResolver = providerResolver;
+//        this.providerResolver = providerResolver;
         this.assortmentRepository = assortmentRepository;
         this.providerRepository = providerRepository;
     }
@@ -51,7 +52,7 @@ public class ScreeningService {
         for (Provider provider : providers) {
             try {
                 if (provider.isEnabled()) {
-                    ScreeningProvider screeningProvider = providerResolver.resolve(provider);
+                    ScreeningProvider screeningProvider = screeningProviders.get(provider.getType());
 
                     List<Product> screeningResult = screeningProvider.screening(provider);
 
