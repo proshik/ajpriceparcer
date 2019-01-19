@@ -3,7 +3,6 @@ sudo: required
 language: java
 jdk:
   - openjdk11
-  - openjdk-ea
 
 cache:
   directories:
