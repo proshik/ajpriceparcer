@@ -1,1 +1,1 @@
-web: java -jar target/applepricesbot-1.0-SNAPSHOT.jar -Dspring.server.port=$PORT
+web: java -jar target/*.jar -Dspring.server.port=$PORT
