@@ -6,6 +6,7 @@ import com.gargoylesoftware.htmlunit.html.HTMLParser;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -27,7 +28,7 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class GsmStoreScreeningProviderTest {
 
-    private static final String DEFAULT_URL = "https://gsm-store.ru";
+    private static final String DEFAULT_URL = "https://test.test";
 
     private static final Provider PROVIDER = Provider.builder()
             .title("gsm-store.ru")
@@ -45,6 +46,7 @@ public class GsmStoreScreeningProviderTest {
     public GsmStoreScreeningProviderTest() {
     }
 
+    @Ignore
     @Test
     public void provideByProductTypeIphoneXsSuccess() throws Exception {
         // init mock
