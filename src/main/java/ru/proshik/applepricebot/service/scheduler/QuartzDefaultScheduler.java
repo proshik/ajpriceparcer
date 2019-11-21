@@ -24,6 +24,7 @@ public class QuartzDefaultScheduler {
 
     @PostConstruct
     public void init() throws SchedulerException {
+
         TriggerKey triggerKey = TriggerKey.triggerKey("ScreeningTrigger", "default");
         if (scheduler.getTrigger(triggerKey) != null) {
             LOG.debug("Trigger with key " + triggerKey + " al");

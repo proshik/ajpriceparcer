@@ -9,7 +9,7 @@ spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     platform: postgres
-    url: ${JDBC_DATABASE_URL:jdbc:postgresql://localhost:5432/applepricesbot}
+    url: ${JDBC_DATABASE_URL:jdbc:postgresql://localhost:5432/apple_prices_db}
     username: ${JDBC_DATABASE_USERNAME:postgres}
     password: ${JDBC_DATABASE_PASSWORD:password}
     driver-class-name: org.postgresql.Driver
@@ -26,10 +26,10 @@ spring:
   quartz:
     job-store-type: jdbc
     jdbc:
-      initialize-schema: never
+      initialize-schema: always
     properties:
       org.quartz.threadPool.threadCount: 2
-      org.quartz.jobStore.isClustered: true
+      org.quartz.jobStore.isClustered: false
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
 server:
   port: ${PORT:8080}

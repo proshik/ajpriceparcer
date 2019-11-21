@@ -82,6 +82,8 @@ public class ScreeningService {
             result.add(assortment);
         }
 
+        LOG.info("Screening operation is finished");
+
         return result;
     }
 }

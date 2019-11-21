@@ -1,11 +1,5 @@
 package ru.proshik.applepricebot.service.provider;
 
-import com.gargoylesoftware.htmlunit.StringWebResponse;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HTMLParser;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import org.apache.commons.io.IOUtils;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -17,15 +11,14 @@ import ru.proshik.applepricebot.repository.model.Provider;
 import ru.proshik.applepricebot.repository.model.ProviderType;
 
 import java.math.BigDecimal;
-import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-public class AjScreeningProviderTest {
+public class AjScreeningProviderTest extends ScreeningProviderTest {
 
     private static final String DEFAULT_URL = "https://test.test";
 
@@ -36,46 +29,57 @@ public class AjScreeningProviderTest {
             .type(ProviderType.AJ)
             .build();
 
-    private HtmlPage default_html_page = getPreparedHtmlPage();
-
     @Mock
     private HtmlPageProvider htmlPageProvider;
 
     @InjectMocks
     private AjScreeningProvider screeningProvider;
 
-    public AjScreeningProviderTest() throws Exception {
-    }
-
-    @Before
-    public void init() {
-        // mock
-        when(htmlPageProvider.provide(DEFAULT_URL)).thenReturn(default_html_page);
-    }
-
     @Test
-    public void provideSuccess() {
-        // call the method
+    public void provideSuccessAllFor2018YearSuccess() throws Exception {
+        // given
+        when(htmlPageProvider.provide(anyString())).thenReturn(getPreparedHtmlPage("aj_ru_2018.html"));
+
+        // when
         List<Product> products = screeningProvider.screening(PROVIDER);
 
-        // check
+        // then
         assertEquals(28, products.size());
     }
 
     @Test
-    public void provideByProductTypesSuccess() {
-        // call the method
+    public void provideByIphoneXsAndIphoneXsMaxFor2018YearSuccess() throws Exception {
+        // given
+        when(htmlPageProvider.provide(anyString())).thenReturn(getPreparedHtmlPage("aj_ru_2018.html"));
+
+        // when
         List<Product> products = screeningProvider.screening(PROVIDER, List.of(ProductType.IPHONE_XS, ProductType.IPHONE_XS_MAX));
 
-        // check
+        // then
         assertEquals(9, products.size());
     }
 
     @Test
-    public void provideByProductTypeIphoneXs() {
-        // call the method
+    public void provideByIphoneXsAndIphoneXsMaxFor2019YearSuccess() throws Exception {
+        // given
+        when(htmlPageProvider.provide(anyString())).thenReturn(getPreparedHtmlPage("aj_ru_2019.html"));
+
+        // when
+        List<Product> products = screeningProvider.screening(PROVIDER, List.of(ProductType.IPHONE_XS, ProductType.IPHONE_XS_MAX));
+
+        // then
+        assertEquals(8, products.size());
+    }
+
+    @Test
+    public void provideByProductTypeIphoneXsFor2018Success() throws Exception {
+        // given
+        when(htmlPageProvider.provide(anyString())).thenReturn(getPreparedHtmlPage("aj_ru_2018.html"));
+
+        // when
         List<Product> products = screeningProvider.screening(PROVIDER, ProductType.IPHONE_XS);
 
+        // then
         assertEquals(3, products.size());
 
         Product on64Gb = products.get(0);
@@ -87,13 +91,17 @@ public class AjScreeningProviderTest {
     }
 
     @Test
-    public void provideByProductTypeIphoneXsMax() {
-        // call the method
+    public void provideByProductTypeIphoneXsMaxFor2018Success() throws Exception {
+        // given
+        when(htmlPageProvider.provide(anyString())).thenReturn(getPreparedHtmlPage("aj_ru_2018.html"));
+
+        // when
         List<Product> products = screeningProvider.screening(PROVIDER, ProductType.IPHONE_XS_MAX);
 
+        // then
         assertEquals(6, products.size());
 
-        // check iPhone XS Max 64GB (с 2 sim)
+        // then iPhone XS Max 64GB (с 2 sim)
         Product on64Gb = products.get(3);
 
         assertEquals(new BigDecimal(85000), on64Gb.getPrice());
@@ -103,13 +111,16 @@ public class AjScreeningProviderTest {
     }
 
     @Test
-    public void provideByProductTypeIphoneXr() {
-        // call the method
+    public void provideByProductTypeIphoneXrFor2019Success() throws Exception {
+        // given
+        when(htmlPageProvider.provide(anyString())).thenReturn(getPreparedHtmlPage("aj_ru_2018.html"));
+
+        // when
         List<Product> products = screeningProvider.screening(PROVIDER, ProductType.IPHONE_XR);
 
         assertEquals(6, products.size());
 
-        // check iPhone XR 256GB
+        // then iPhone XR 256GB
         Product on64Gb = products.get(2);
 
         assertEquals(new BigDecimal(71500), on64Gb.getPrice());
@@ -118,12 +129,40 @@ public class AjScreeningProviderTest {
         assertEquals("{\"GB\":\"256GB\"}", on64Gb.getParameters());
     }
 
-    private HtmlPage getPreparedHtmlPage() throws Exception {
-        // init data
-        String text = IOUtils.toString(
-                getClass().getClassLoader().getResourceAsStream("provider_data/aj_ru.html"),
-                Charset.defaultCharset());
-        StringWebResponse response = new StringWebResponse(text, new URL(DEFAULT_URL));
-        return HTMLParser.parseHtml(response, new WebClient().getCurrentWindow());
+    @Test
+    public void provideSuccessAllFor2019YearSuccess() throws Exception {
+        // given
+        when(htmlPageProvider.provide(anyString())).thenReturn(getPreparedHtmlPage("aj_ru_2019.html"));
+
+        // when
+        List<Product> products = screeningProvider.screening(PROVIDER);
+
+        // then
+        assertEquals(34, products.size());
     }
+
+    @Test
+    public void provideSuccessIphone11For2019Success() throws Exception {
+        // given
+        when(htmlPageProvider.provide(anyString())).thenReturn(getPreparedHtmlPage("aj_ru_2019.html"));
+
+        // when
+        List<Product> products = screeningProvider.screening(PROVIDER, List.of(ProductType.IPHONE_11));
+
+        // then
+        assertEquals(6, products.size());
+    }
+
+    @Test
+    public void provideSuccessIphoneProAndMaxFor2019Success() throws Exception {
+        // given
+        when(htmlPageProvider.provide(anyString())).thenReturn(getPreparedHtmlPage("aj_ru_2019.html"));
+
+        // when
+        List<Product> products = screeningProvider.screening(PROVIDER, List.of(ProductType.IPHONE_11_PRO, ProductType.IPHONE_11_PRO_MAX));
+
+        // then
+        assertEquals(12, products.size());
+    }
+
 }

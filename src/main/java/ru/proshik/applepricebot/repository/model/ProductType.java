@@ -20,6 +20,9 @@ public enum ProductType implements Serializable {
     IPHONE_XS("iPhone XS"),
     IPHONE_XS_MAX("iPhone XS Max"),
     IPHONE_XR("iPhone XR"),
+    IPHONE_11("iPhone 11"),
+    IPHONE_11_PRO("iPhone 11 Pro"),
+    IPHONE_11_PRO_MAX("iPhone 11 Pro Max"),
 
     /*
     iMac
@@ -49,7 +52,7 @@ public enum ProductType implements Serializable {
 
     public static ProductType fromValue(String value) {
         return Arrays.stream(values())
-                .filter(pro -> pro.getValue().toUpperCase().equals(value.toUpperCase()))
+                .filter(pro -> pro.getValue().equalsIgnoreCase(value))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Unexpected ProductTypes value=" + value));
     }

@@ -8,16 +8,13 @@
         <sqlFile path="sql/01_initial.sql" relativeToChangelogFile="true" stripComments="true"/>
     </changeSet>
     <changeSet id="2" author="proshik">
-        <sqlFile path="sql/02_quartz.sql" relativeToChangelogFile="true" stripComments="true"/>
+        <sqlFile path="sql/02_provider_data.sql" relativeToChangelogFile="true" stripComments="true"/>
     </changeSet>
     <changeSet id="3" author="proshik">
-        <sqlFile path="sql/03_provider_data.sql" relativeToChangelogFile="true" stripComments="true"/>
+        <sqlFile path="sql/03_fetch_type.sql" relativeToChangelogFile="true" stripComments="true"/>
     </changeSet>
     <changeSet id="4" author="proshik">
-        <sqlFile path="sql/04_fetch_type.sql" relativeToChangelogFile="true" stripComments="true"/>
-    </changeSet>
-    <changeSet id="5" author="proshik">
-        <sqlFile path="sql/05_change_parameters_column_type.sql" relativeToChangelogFile="true" stripComments="true"/>
+        <sqlFile path="sql/04_change_parameters_column_type.sql" relativeToChangelogFile="true" stripComments="true"/>
     </changeSet>
 
 </databaseChangeLog>

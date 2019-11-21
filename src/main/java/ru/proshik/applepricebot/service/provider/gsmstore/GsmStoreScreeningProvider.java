@@ -14,8 +14,17 @@ import ru.proshik.applepricebot.repository.model.Provider;
 import ru.proshik.applepricebot.service.provider.HtmlPageProvider;
 import ru.proshik.applepricebot.service.provider.ScreeningProvider;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.toList;
 
 @Component
 @Qualifier("gsmStoreScreeningProvider")
@@ -38,19 +47,20 @@ public class GsmStoreScreeningProvider implements ScreeningProvider {
     }
 
     @Override
-    public List<Product> screening(Provider provider, ProductType productType) throws ProviderParseException {
+    public List<Product> screening(Provider provider, ProductType productType) {
         return screening(provider, List.of(productType));
     }
 
     @Override
-    public List<Product> screening(Provider provider, List<ProductType> productTypes) throws ProviderParseException {
+    public List<Product> screening(Provider provider, List<ProductType> productTypes) {
         LOG.info("ScreeningProvider has started for " + provider.getTitle());
 
         Map<ProductType, List<ProductTypePointer>> groupByProductType = getProductTypePointers().stream()
-                .collect(Collectors.groupingBy(ProductTypePointer::getProductType));
+                .collect(Collectors.groupingBy(ProductTypePointer::getProductType, mapping(o -> o, toList())));
 
         List<ProductTypePointer> selectedProductPointers = productTypes.stream()
-                .flatMap(productType -> groupByProductType.get(productType).stream())
+                .flatMap(productType -> Optional.ofNullable(groupByProductType.get(productType)).stream()
+                        .flatMap(Collection::stream))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
@@ -70,8 +80,7 @@ public class GsmStoreScreeningProvider implements ScreeningProvider {
             products.addAll(productBuilder.build(element.getLeft(), element.getRight()));
         }
 
-
-        LOG.info("ScreeningProvider has ended for " + provider.getTitle());
+        LOG.debug("ScreeningProvider has ended for " + provider.getTitle());
 
         return products;
     }
@@ -91,7 +100,10 @@ public class GsmStoreScreeningProvider implements ScreeningProvider {
                 new ProductTypePointer(ProductType.IPHONE_XS, "/telefony/telefony-apple-iphone/iphone-xs/"),
                 new ProductTypePointer(ProductType.IPHONE_XS_MAX, "/telefony/telefony-apple-iphone/iphone-xs-max/"),
                 new ProductTypePointer(ProductType.IPHONE_XS_MAX, "/telefony/telefony-apple-iphone/iphone-xs-max-dual-sim/"),
-                new ProductTypePointer(ProductType.IPHONE_XR, "/telefony/telefony-apple-iphone/iphone-xr-/"));
+                new ProductTypePointer(ProductType.IPHONE_XR, "/telefony/telefony-apple-iphone/iphone-xr-/"),
+                new ProductTypePointer(ProductType.IPHONE_11, "/telefony/telefony-apple-iphone/iphone-11/"),
+                new ProductTypePointer(ProductType.IPHONE_11_PRO, "/telefony/telefony-apple-iphone/iphone-11-pro/"),
+                new ProductTypePointer(ProductType.IPHONE_11_PRO_MAX, "/telefony/telefony-apple-iphone/iphone-11-pro-max/"));
     }
 
 }
